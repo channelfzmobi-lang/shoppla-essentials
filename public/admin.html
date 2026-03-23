@@ -532,14 +532,27 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 </label>
                 <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-contain-label">
                   <input type="radio" name="fp-media-fit" id="fp-fit-contain" value="contain" style="margin-top:2px;accent-color:var(--accent);">
-                  <div><div style="font-weight:700;font-size:13.5px;">Fit (Contain)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Whole image is visible. Dark background fills edges. Best for product-on-white photos.</div></div>
+                  <div><div style="font-weight:700;font-size:13.5px;">Fit (Contain)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Whole image is visible. Neutral background fills edges. Best for product-on-white photos.</div></div>
                 </label>
                 <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-fill-label">
                   <input type="radio" name="fp-media-fit" id="fp-fit-fill" value="fill" style="margin-top:2px;accent-color:var(--accent);">
                   <div><div style="font-weight:700;font-size:13.5px;">Stretch (Fill)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Image stretches to fit exactly. May distort. Use only if image is exactly the right ratio.</div></div>
                 </label>
               </div>
-              <div style="font-size:12px;color:var(--muted);margin-top:10px;">💡 "Fill (Cover)" is best for most products. Use "Fit (Contain)" if your images have a white/transparent background.</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:10px;">💡 "Fill (Cover)" is best for most products. Use "Fit (Contain)" if your media should never be cropped.</div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+                <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;">
+                  <label class="form-lbl" style="display:block;margin-bottom:8px;">Desktop media height (px)</label>
+                  <input id="fp-media-height-desktop-range" type="range" min="380" max="900" value="640" oninput="syncMediaHeight('desktop', this.value)" style="width:100%;accent-color:var(--accent);"/>
+                  <input class="form-input" id="fp-media-height-desktop" type="number" min="380" max="900" value="640" oninput="syncMediaHeight('desktop', this.value)" style="margin-top:8px;"/>
+                </div>
+                <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;">
+                  <label class="form-lbl" style="display:block;margin-bottom:8px;">Mobile media height (px)</label>
+                  <input id="fp-media-height-mobile-range" type="range" min="220" max="560" value="320" oninput="syncMediaHeight('mobile', this.value)" style="width:100%;accent-color:var(--accent);"/>
+                  <input class="form-input" id="fp-media-height-mobile" type="number" min="220" max="560" value="320" oninput="syncMediaHeight('mobile', this.value)" style="margin-top:8px;"/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
