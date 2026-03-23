@@ -532,14 +532,27 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 </label>
                 <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-contain-label">
                   <input type="radio" name="fp-media-fit" id="fp-fit-contain" value="contain" style="margin-top:2px;accent-color:var(--accent);">
-                  <div><div style="font-weight:700;font-size:13.5px;">Fit (Contain)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Whole image is visible. Dark background fills edges. Best for product-on-white photos.</div></div>
+                  <div><div style="font-weight:700;font-size:13.5px;">Fit (Contain)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Whole image is visible. Neutral background fills edges. Best for product-on-white photos.</div></div>
                 </label>
                 <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-fill-label">
                   <input type="radio" name="fp-media-fit" id="fp-fit-fill" value="fill" style="margin-top:2px;accent-color:var(--accent);">
                   <div><div style="font-weight:700;font-size:13.5px;">Stretch (Fill)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Image stretches to fit exactly. May distort. Use only if image is exactly the right ratio.</div></div>
                 </label>
               </div>
-              <div style="font-size:12px;color:var(--muted);margin-top:10px;">💡 "Fill (Cover)" is best for most products. Use "Fit (Contain)" if your images have a white/transparent background.</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:10px;">💡 "Fill (Cover)" is best for most products. Use "Fit (Contain)" if your media should never be cropped.</div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+                <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;">
+                  <label class="form-lbl" style="display:block;margin-bottom:8px;">Desktop media height (px)</label>
+                  <input id="fp-media-height-desktop-range" type="range" min="380" max="900" value="640" oninput="syncMediaHeight('desktop', this.value)" style="width:100%;accent-color:var(--accent);"/>
+                  <input class="form-input" id="fp-media-height-desktop" type="number" min="380" max="900" value="640" oninput="syncMediaHeight('desktop', this.value)" style="margin-top:8px;"/>
+                </div>
+                <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;">
+                  <label class="form-lbl" style="display:block;margin-bottom:8px;">Mobile media height (px)</label>
+                  <input id="fp-media-height-mobile-range" type="range" min="220" max="560" value="320" oninput="syncMediaHeight('mobile', this.value)" style="width:100%;accent-color:var(--accent);"/>
+                  <input class="form-input" id="fp-media-height-mobile" type="number" min="220" max="560" value="320" oninput="syncMediaHeight('mobile', this.value)" style="margin-top:8px;"/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1103,6 +1116,10 @@ function editProduct(id){
   setVal('fp-return-days',p.returnDays);
   setVal('fp-warranty',   p.warranty);
   setVal('fp-return-policy', p.returnPolicy);
+  setVal('fp-media-height-desktop', p.mediaHeightDesktop||640);
+  setVal('fp-media-height-mobile',  p.mediaHeightMobile||320);
+  syncMediaHeight('desktop', p.mediaHeightDesktop||640);
+  syncMediaHeight('mobile', p.mediaHeightMobile||320);
   if(document.getElementById('fp-category')) document.getElementById('fp-category').value = p.category||'';
   setProductPageColor(p.pageColor||'#ffffff');
 
@@ -1200,6 +1217,8 @@ function saveProduct(draft=false){
   const returnDays    = document.getElementById('fp-return-days')?.value.trim()||'30 days';
   const warranty      = document.getElementById('fp-warranty')?.value.trim()||'';
   const returnPolicy  = document.getElementById('fp-return-policy')?.value.trim()||'';
+  const mediaHeightDesktop = Math.max(380, Math.min(900, parseInt(document.getElementById('fp-media-height-desktop')?.value)||640));
+  const mediaHeightMobile  = Math.max(220, Math.min(560, parseInt(document.getElementById('fp-media-height-mobile')?.value)||320));
   const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
 
@@ -1231,15 +1250,15 @@ function saveProduct(draft=false){
   };
 
   // Media payload
-  const videoData    = currentVideoData||null;
+  const effectiveUrl = normalizeVideoUrl(videoURL);
+  const videoData    = effectiveUrl ? null : (currentVideoData||null);
   const images       = [...(currentImages||[])];
-  const effectiveUrl = videoURL||'';
 
   const icons = {'Furniture':'🛋️','Electronics':'💻','Fashion':'👗','Kitchen':'🍳','Lighting':'💡','Outdoor':'🌿','Bedding':'🛏️','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
 
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
-    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, agentId,
+    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId,
     videoData, videoURL:effectiveUrl, images,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
@@ -1268,9 +1287,19 @@ function clearProductForm(){
   });
   document.getElementById('fp-stock').value = 10;
   setProductPageColor('#ffffff');
+  syncMediaHeight('desktop', 640);
+  syncMediaHeight('mobile', 320);
+
   // Reset media fit
   const fitCover = document.getElementById('fp-fit-cover');
   if(fitCover) fitCover.checked = true;
+
+  // Reset media state to avoid stale upload carrying into next product
+  removeVideo();
+  currentImages = [];
+  const grid = document.getElementById('media-grid');
+  if(grid) grid.querySelectorAll('.media-item:not(.add-media)').forEach(el=>el.remove());
+
   contentSections = [];
   renderContentSections();
   editingProductId = null;
@@ -1368,6 +1397,22 @@ function setProductPageColor(hex){
   document.getElementById('color-preview-badge').textContent = names[hex]||hex;
   document.querySelectorAll('.color-swatch-admin').forEach(s=>s.classList.toggle('active',s.dataset.hex===hex));
 }
+
+function syncMediaHeight(type, value){
+  const isDesktop = type === 'desktop';
+  const min = isDesktop ? 380 : 220;
+  const max = isDesktop ? 900 : 560;
+  const fallback = isDesktop ? 640 : 320;
+  const parsed = parseInt(value);
+  const v = Number.isFinite(parsed) ? Math.max(min, Math.min(max, parsed)) : fallback;
+  const num = document.getElementById(`fp-media-height-${type}`);
+  const range = document.getElementById(`fp-media-height-${type}-range`);
+  if(num && String(num.value) !== String(v)) num.value = v;
+  if(range && String(range.value) !== String(v)) range.value = v;
+}
+
+function normalizeVideoUrl(url=''){ return url.trim(); }
+
 // Build color swatches
 const cgEl = document.getElementById('admin-color-grid');
 PAGE_COLORS.forEach(c=>{
@@ -2109,7 +2154,8 @@ function openPreview(productId){
 
 // ─── OPEN STOREFRONT ───
 function openStorefront(){
-  saveToStorage();window.open('shoppla.html','_blank');
+  saveToStorage();
+  window.open('/','_blank');
   showToast('🏪 Saved & opening live store…');
 }
 

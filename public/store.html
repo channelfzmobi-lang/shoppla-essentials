@@ -230,14 +230,14 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .faq-item.open .faq-arr{transform:rotate(45deg);}
 
 /* ═══ SALES PAGE ═══ */
-#sales-page{--sp-bg:#ffffff;background:var(--cream);}
-.sp-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,1fr);align-items:start;}
-.sp-media{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;background:#111;overflow:hidden;z-index:5;}
+#sales-page{--sp-bg:#ffffff;background:#f5f4f0;}
+.sp-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,1fr);align-items:start;gap:24px;padding-bottom:18px;}
+.sp-media{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));min-height:420px;max-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;background:#111;overflow:hidden;z-index:2;}
 .sp-main{flex:1;position:relative;overflow:hidden;}
 .sp-main video,.sp-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-.sp-main.fit-contain video,.sp-main.fit-contain img{object-fit:contain !important;background:#0d0b09;}
+.sp-main.fit-contain video,.sp-main.fit-contain img{object-fit:contain !important;background:#f5f4f0;}
 .sp-main.fit-fill video,.sp-main.fit-fill img{object-fit:fill !important;}
-.sp-main.fit-contain video,.sp-main.fit-contain img{object-fit:contain;background:#0d0b09;}
+.sp-main.fit-contain video,.sp-main.fit-contain img{object-fit:contain;background:#f5f4f0;}
 .sp-main.fit-fill video,.sp-main.fit-fill img{object-fit:fill;}
 .sp-vid-bg{width:100%;height:100%;background:linear-gradient(145deg,#1a1210,#2e1e14);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;cursor:pointer;position:relative;}
 .sp-vid-bg-icon{font-size:88px;opacity:.14;position:absolute;}
@@ -255,24 +255,24 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .sp-thumb{width:60px;height:60px;border-radius:9px;border:2px solid transparent;overflow:hidden;cursor:pointer;flex-shrink:0;transition:border-color .2s;background:rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;font-size:22px;color:rgba(255,255,255,.55);}
 .sp-thumb.active{border-color:var(--accent);}
 .sp-thumb img{width:100%;height:100%;object-fit:cover;}
-.sp-info{padding:32px 40px 100px;overflow-y:visible;max-height:none;min-width:0;background:var(--sp-bg,#fff);}
+.sp-info{padding:32px 40px 90px;overflow:visible;max-height:none;min-width:0;background:var(--sp-bg,#fff);position:relative;z-index:2;}
 .sp-brand-row{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
 .sp-brand{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);}
 .sp-verified{background:var(--warm);border:1px solid var(--border);font-size:10.5px;color:var(--muted);padding:2px 9px;border-radius:16px;}
-.sp-title{font-family:'Fraunces',serif;font-size:clamp(22px,2.4vw,34px);font-weight:900;line-height:1.1;margin-bottom:12px;}
-.sp-rating-row{display:flex;align-items:center;gap:9px;margin-bottom:18px;}
+.sp-title{font-family:'Fraunces',serif;font-size:clamp(22px,2.4vw,34px);font-weight:900;line-height:1.15;margin-bottom:12px;overflow-wrap:anywhere;word-break:break-word;}
+.sp-rating-row{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap;}
 .sp-stars{color:#f7b84a;font-size:15px;}
 .sp-rating-n{font-size:13.5px;font-weight:700;}
 .sp-rev-cnt{font-size:12.5px;color:var(--muted);}
 .sp-rev-lnk{color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;}
-.sp-price-row{display:flex;align-items:center;gap:12px;margin-bottom:5px;}
+.sp-price-row{display:flex;align-items:center;gap:12px;margin-bottom:5px;flex-wrap:wrap;}
 .sp-price{font-family:'Fraunces',serif;font-size:38px;font-weight:900;}
 .sp-was{font-size:17px;color:var(--muted);text-decoration:line-through;}
 .sp-save{background:rgba(232,84,26,.1);color:var(--accent);font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:16px;}
-.sp-install{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+.sp-install{font-size:12.5px;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;}
 .sp-stock{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--green);margin-bottom:4px;}
 .sp-stock-dot{width:7px;height:7px;background:var(--green);border-radius:50%;}
-.sp-delivery{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+.sp-delivery{font-size:12.5px;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;}
 .guest-notice{background:linear-gradient(135deg,#fffbf5,#fff7e8);border:1.5px solid #ffc87a;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;gap:10px;}
 .g-icon{font-size:20px;flex-shrink:0;}
 .g-ttl{font-size:13.5px;font-weight:700;}
@@ -310,52 +310,53 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .or-divider{text-align:center;font-size:12.5px;color:var(--muted);letter-spacing:.05em;margin:2px 0;}
 .trust-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
 .trust-b{background:var(--warm);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;}
-.sp-breadcrumb{font-size:12.5px;color:var(--muted);padding:12px 32px;display:flex;align-items:center;gap:5px;}
+.sp-breadcrumb{font-size:12.5px;color:var(--muted);padding:12px 32px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .sp-breadcrumb a{color:var(--muted);cursor:pointer;transition:color .2s;}
 .sp-breadcrumb a:hover{color:var(--accent);}
 
 /* ═══ PRODUCT DETAIL TABS ═══ */
-.pd-tabs-area{background:var(--cream);border-top:3px solid var(--border);}
+.pd-tabs-area{background:#f5f4f0;border-top:1px solid var(--border);padding-top:12px;}
 .pd-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;background:#fff;}
 .pd-tabs::-webkit-scrollbar{display:none;}
 .pd-tab{flex:1;min-width:140px;background:var(--warm);border:none;border-bottom:3px solid transparent;padding:14px 18px;font-family:'Satoshi',sans-serif;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;}
 .pd-tab.active{color:var(--ink);border-bottom-color:var(--accent);background:#fff;}
-.pd-content{display:none;background:var(--cream);}.pd-content.active{display:block;}
+.pd-content{display:none;background:#f5f4f0;padding-top:12px;position:relative;z-index:2;}
+.pd-content.active{display:block;}
 .pd-section{
   display:grid;grid-template-columns:1fr 1fr;background:#fff;
-  margin:24px 28px;border-radius:18px;overflow:hidden;
+  margin:0 28px 24px;border-radius:18px;overflow:hidden;
   border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04);
 }
 .pd-section.flip .pd-text{order:2;}.pd-section.flip .pd-img{order:1;}
-.pd-text{padding:44px 40px;display:flex;flex-direction:column;justify-content:center;}
-.pd-img{min-height:320px;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;}
+.pd-text{padding:44px 40px;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.pd-img{min-height:320px;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;min-width:0;}
 .pd-section.light{background:var(--warm);}
 .pd-section.light .pd-text{background:transparent;}
 .pd-eyebrow{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--accent2);margin-bottom:12px;}
-.pd-h2{font-family:'Fraunces',serif;font-size:clamp(24px,2.6vw,34px);font-weight:900;line-height:1.1;margin-bottom:16px;}
+.pd-h2{font-family:'Fraunces',serif;font-size:clamp(24px,2.6vw,34px);font-weight:900;line-height:1.1;margin-bottom:16px;overflow-wrap:anywhere;word-break:break-word;}
 .pd-h2 em{color:var(--accent);font-style:italic;}
-.pd-body{font-size:14.5px;line-height:1.75;color:var(--muted);margin-bottom:18px;}
+.pd-body{font-size:14.5px;line-height:1.75;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;word-break:break-word;}
 .pd-body strong{color:var(--ink);}
 .pd-quote{display:flex;gap:12px;background:rgba(232,84,26,.07);border-left:4px solid var(--accent);border-radius:0 9px 9px 0;padding:14px 16px;margin-top:2px;}
-.pd-quote-txt{font-size:14px;font-style:italic;color:rgba(255,255,255,.85);line-height:1.55;}
-.pd-quote-attr{font-size:11.5px;color:rgba(255,255,255,.42);margin-top:5px;}
+.pd-quote-txt{font-size:14px;font-style:italic;color:var(--ink);line-height:1.55;}
+.pd-quote-attr{font-size:11.5px;color:var(--muted);margin-top:5px;}
 .pd-pills{display:flex;flex-wrap:wrap;gap:8px;padding:22px 28px;margin:0 28px 4px;background:#fff;border-radius:12px;border:1px solid var(--border);}
 .pd-pill{display:flex;align-items:center;gap:7px;background:var(--warm);border:1.5px solid var(--border);border-radius:50px;padding:9px 16px;font-size:13px;font-weight:600;}
 .pd-bullets{list-style:none;display:flex;flex-direction:column;gap:9px;}
 .pd-bullets li{font-size:14px;line-height:1.5;color:var(--muted);}
 .pd-bullets li strong{color:var(--ink);}
-.pd-callout{display:flex;gap:12px;border-radius:12px;padding:16px 20px;margin-top:18px;font-size:14px;line-height:1.6;}
+.pd-callout{display:flex;gap:12px;border-radius:12px;padding:16px 20px;margin-top:18px;font-size:14px;line-height:1.6;overflow-wrap:anywhere;}
 .pd-callout span{font-size:24px;flex-shrink:0;}
 .pd-callout.purple{background:rgba(122,58,223,.07);border:1px solid rgba(122,58,223,.18);}
 .pd-callout.green{background:rgba(26,138,74,.07);border:1px solid rgba(26,138,74,.18);}
 .pd-callout.orange{background:rgba(232,84,26,.07);border:1px solid rgba(232,84,26,.18);}
-.pd-stat-row{display:flex;gap:24px;margin:18px 0;}
+.pd-stat-row{display:flex;gap:24px;margin:18px 0;flex-wrap:wrap;}
 .pd-stat-n{font-family:'Fraunces',serif;font-size:34px;font-weight:900;color:var(--accent);}
 .pd-stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
 .pd-icon-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}
-.pd-ii-ico{width:40px;height:40px;background:rgba(255,255,255,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.pd-ii-ttl{font-size:14px;font-weight:700;color:#fff;}
-.pd-ii-sub{font-size:12.5px;color:rgba(255,255,255,.48);margin-top:2px;}
+.pd-ii-ico{width:40px;height:40px;background:var(--warm);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.pd-ii-ttl{font-size:14px;font-weight:700;color:var(--ink);}
+.pd-ii-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
 .pd-dims{background:var(--warm);padding:36px 28px;margin:0 28px 4px;border-radius:14px;border:1px solid var(--border);}
 .pd-dims-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:20px;}
 .pd-dims-grid{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;background:#fff;}
@@ -581,10 +582,10 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
   .footer-grid{grid-template-columns:1fr 1fr;gap:28px;}
   .f-bot{flex-direction:column;gap:8px;text-align:center;}
   /* Sales page */
-  .sp-layout{grid-template-columns:1fr!important;display:flex!important;flex-direction:column!important;}
-  .sp-media{position:relative;height:72vw;min-height:240px;max-height:380px;width:100%;}
-  .sp-info{max-height:none;padding:20px 16px 90px;overflow-y:visible;}
-  .sp-title{font-size:22px;}
+  .sp-layout{grid-template-columns:1fr!important;display:flex!important;flex-direction:column!important;gap:16px!important;padding-bottom:10px;}
+  .sp-media{position:relative;top:auto;height:320px;min-height:220px;max-height:560px;width:100%;z-index:1;}
+  .sp-info{max-height:none;padding:20px 16px 90px;overflow:visible;margin-top:0;}
+  .sp-title{font-size:22px;margin-top:2px;}
   .sp-price{font-size:28px;}
   .sp-breadcrumb{padding:10px 16px;font-size:11.5px;flex-wrap:wrap;}
   /* Mobile sticky buy bar — shown only on ≤860px */
@@ -692,10 +693,10 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
   .footer-grid{grid-template-columns:1fr;gap:22px;}
   .f-logo{font-size:20px;}
   /* Sales page */
-  .sp-media{height:78vw;min-height:220px;}
+  .sp-media{height:300px;min-height:220px;max-height:480px;}
   .sp-thumbs{padding:6px;}
   .sp-thumb{width:50px;height:50px;}
-  .sp-info{padding:16px 14px 90px;}
+  .sp-info{padding:16px 14px 90px;overflow:visible;}
   .sp-title{font-size:19px;}
   .sp-price{font-size:25px;}
   .sp-sizes{gap:5px;}
@@ -756,7 +757,8 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
 body,html{max-width:100%;overflow-x:hidden;}
 img,video,iframe{max-width:100%;}
 *{min-width:0;}
-.sp-layout,.sp-info,.sp-media,.prod-card,.ip-card,.rev-card{overflow:hidden;}
+.sp-layout,.sp-info{overflow:visible;}
+.sp-media,.prod-card,.ip-card,.rev-card{overflow:hidden;}
 .prod-name,.sp-title,.ip-hero-title{overflow-wrap:break-word;word-break:break-word;}
 </style>
 </head>
@@ -1080,12 +1082,12 @@ img,video,iframe{max-width:100%;}
 <!-- PRODUCT DETAIL CONTENT -->
 <div id="pd-detail" class="pd-content active">
 
-  <!-- Section 1: Dark — text left, image right -->
-  <div class="pd-section">
-    <div class="pd-text" style="background:var(--ink);">
-      <div class="pd-eyebrow">✨ Why Everyone's Obsessed</div>
+  <!-- Section 1: Light — text left, image right -->
+  <div class="pd-section light">
+    <div class="pd-text" style="background:#fff;">
+      <div class="pd-eyebrow" style="color:var(--accent);">✨ Why Everyone's Obsessed</div>
       <h2 class="pd-h2">Sink Into <em>Pure Comfort</em><br/>Every Single Day</h2>
-      <p class="pd-body" style="color:rgba(255,255,255,.65);">Imagine coming home after a long day and sinking into something that feels like a warm hug. This delivers professional-grade comfort that transforms your living room into a sanctuary you'll never want to leave.</p>
+      <p class="pd-body">Imagine coming home after a long day and sinking into something that feels like a warm hug. This delivers professional-grade comfort that transforms your living room into a sanctuary you'll never want to leave.</p>
       <div class="pd-quote">
         <div>
           <div class="pd-quote-txt">"I've never owned anything this comfortable. My whole family fights over it."</div>
@@ -1093,8 +1095,8 @@ img,video,iframe{max-width:100%;}
         </div>
       </div>
     </div>
-    <div class="pd-img" style="background:linear-gradient(145deg,#2a1f1a,#4a3020);font-size:90px;">🛋️
-      <div style="position:absolute;bottom:20px;left:20px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;"><div style="opacity:.6;margin-bottom:3px;">Upload lifestyle photo →</div></div>
+    <div class="pd-img" style="background:linear-gradient(145deg,#e9ddcf,#d8c2aa);font-size:90px;">🛋️
+      <div style="position:absolute;bottom:20px;left:20px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:12px;border:1px solid var(--border);"><div style="opacity:.75;margin-bottom:3px;">Upload lifestyle photo →</div></div>
     </div>
   </div>
 
@@ -1144,13 +1146,13 @@ img,video,iframe{max-width:100%;}
     <div class="pd-img" style="background:linear-gradient(145deg,#d4a0a0,#c08080);font-size:90px;">🧶</div>
   </div>
 
-  <!-- Section 4: Dark — image left, text right (FLIP) -->
-  <div class="pd-section flip" style="background:var(--ink);">
-    <div class="pd-img" style="background:linear-gradient(145deg,#1a1512,#3a2a18);font-size:90px;">🪵</div>
-    <div class="pd-text" style="background:transparent;">
-      <div class="pd-eyebrow">🪵 Built to Last</div>
+  <!-- Section 4: Light — image left, text right (FLIP) -->
+  <div class="pd-section light flip">
+    <div class="pd-img" style="background:linear-gradient(145deg,#e7ddd1,#ccb9a3);font-size:90px;">🪵</div>
+    <div class="pd-text">
+      <div class="pd-eyebrow" style="color:var(--accent);">🪵 Built to Last</div>
       <h2 class="pd-h2">A Frame So Strong, <em>Guaranteed 2 Years</em></h2>
-      <p class="pd-body" style="color:rgba(255,255,255,.65);">Built from <strong style="color:#fff;">kiln-dried solid hardwood</strong> — the gold standard. No MDF. No particle board.</p>
+      <p class="pd-body">Built from <strong>kiln-dried solid hardwood</strong> — the gold standard. No MDF. No particle board.</p>
       <div class="pd-icon-item"><div class="pd-ii-ico">🌲</div><div><div class="pd-ii-ttl">Kiln-Dried Hardwood</div><div class="pd-ii-sub">Prevents warping and cracking over time</div></div></div>
       <div class="pd-icon-item"><div class="pd-ii-ico">🔩</div><div><div class="pd-ii-ttl">8-Way Hand-Tied Springs</div><div class="pd-ii-sub">Distributes weight evenly, lasts decades</div></div></div>
       <div class="pd-icon-item"><div class="pd-ii-ico">⚖️</div><div><div class="pd-ii-ttl">450 lb Weight Capacity</div><div class="pd-ii-sub">Engineered for real family life</div></div></div>
@@ -1760,18 +1762,17 @@ function makeCardHTML(p, showActions) {
   const disc = p.wasPrice ? '-'+Math.round((1-p.price/p.wasPrice)*100)+'%' : '';
   const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
   let mediaHTML;
-  if (p.videoData && p.videoData.base64) {
-    // Uploaded base64 video — plays on hover
-    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
-      onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
-      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
-  } else if (p.videoURL) {
-    // URL video — show play button overlay, open sales page on click (iframe loads there)
+  if (p.videoURL) {
     mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${p.id})" style="cursor:pointer;">
       <div class="play-ring">▶</div>
       <div class="vid-emoji">${p.icon||'📦'}</div>
       <div class="vid-lbl">▶ Watch video</div>
     </div>`;
+  } else if (p.videoData && p.videoData.base64) {
+    // Uploaded base64 video — plays on hover
+    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
+      onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
   } else if (p.images && p.images.length) {
     mediaHTML = `<img src="${p.images[0].base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
   } else {
@@ -1849,6 +1850,19 @@ function doSearch(q) {
 }
 
 // ═══ SALES PAGE ═══
+function getMediaFitMode(p){ return p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'; }
+
+function applySalesMediaSizing(p){
+  const media = document.querySelector('.sp-media');
+  if(!media) return;
+  const desktop = Math.max(380, Math.min(900, parseInt(p.mediaHeightDesktop)||640));
+  const mobile  = Math.max(220, Math.min(560, parseInt(p.mediaHeightMobile)||320));
+  const isMobile = window.matchMedia('(max-width: 860px)').matches;
+  media.style.height = `${isMobile ? mobile : desktop}px`;
+  media.style.maxHeight = isMobile ? '560px' : 'calc(100vh - var(--nav-h))';
+  media.style.minHeight = isMobile ? '220px' : '380px';
+}
+
 function openSalesPage(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
@@ -1870,24 +1884,20 @@ function openSalesPage(id) {
   if (instEl) instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
   document.getElementById('qty-val').value = 1;
 
-  // Checkout summary
   document.getElementById('ck-prod-name').textContent = p.name;
   document.getElementById('ck-prod-price').textContent = priceStr;
   const tax = Math.round(p.price * 0.08);
   document.getElementById('ck-tax').textContent  = '$'+tax;
   document.getElementById('ck-total').textContent = '$'+(p.price+tax).toLocaleString();
 
-  // Background
   const spInfo = document.getElementById('sp-info');
   if (spInfo) spInfo.style.background = p.pageColor||'#fff';
+  const salesPage = document.getElementById('sales-page');
+  if (salesPage) salesPage.style.background = '#f5f4f0';
 
-  // Build media panel
+  applySalesMediaSizing(p);
   buildMediaPanel(p);
-
-  // Build colour / size selectors
   buildVariants(p);
-
-  // Build CTAs
   buildCTAs(p);
 
   gotoPage('sales-page');
@@ -1895,65 +1905,47 @@ function openSalesPage(id) {
 }
 
 // ── Media panel ──
-
-// ── Convert any video link to an embeddable URL ──
-function toEmbedUrl(url) {
-  if (!url) return null;
-  url = url.trim();
-  // Already embed URL — add params
-  if (url.includes('/embed/')) {
-    const sep = url.includes('?') ? '&' : '?';
-    if (url.includes('youtube') || url.includes('youtu')) return url + sep + 'autoplay=1&mute=1&rel=0&modestbranding=1';
-    if (url.includes('vimeo')) return url + sep + 'autoplay=1&muted=1';
-    return url;
-  }
-  // YouTube watch?v=ID
-  let m = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // youtu.be/ID
-  m = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // youtube.com/shorts/ID
-  m = url.match(/\/shorts\/([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // Vimeo
-  m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (m) return 'https://player.vimeo.com/video/' + m[1] + '?autoplay=1&muted=1';
-  // Direct video file — return null so <video> tag is used instead
+function toEmbedUrl(rawUrl) {
+  if (!rawUrl) return null;
+  const url = rawUrl.trim();
   if (/\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(url)) return null;
-  // Generic iframe embed
+
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace('www.','');
+
+    if (host.includes('youtube.com') || host.includes('youtu.be')) {
+      let id = '';
+      if (host === 'youtu.be') id = u.pathname.split('/').filter(Boolean)[0] || '';
+      if (!id && u.searchParams.get('v')) id = u.searchParams.get('v');
+      if (!id && u.pathname.includes('/shorts/')) id = u.pathname.split('/shorts/')[1]?.split('/')[0] || '';
+      if (!id && u.pathname.includes('/live/')) id = u.pathname.split('/live/')[1]?.split('/')[0] || '';
+      if (!id && u.pathname.includes('/embed/')) id = u.pathname.split('/embed/')[1]?.split('/')[0] || '';
+      if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1`;
+    }
+
+    if (host.includes('vimeo.com')) {
+      const id = u.pathname.split('/').filter(Boolean).pop();
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&playsinline=1`;
+    }
+
+    if (url.includes('/embed/')) return `${url}${url.includes('?') ? '&' : '?'}autoplay=1`;
+  } catch(_) {}
+
   return url;
 }
 
 function buildMediaPanel(p) {
   const main = document.getElementById('sp-main');
   const vidBg = document.getElementById('sp-vid-bg');
-  // Remove any previously injected real media
+  const fitMode = getMediaFitMode(p);
+
   main.querySelectorAll('.sp-real').forEach(el => el.remove());
-  // Apply admin-set media fit
   main.classList.remove('fit-contain','fit-fill');
   if (p.mediaFit==='contain') main.classList.add('fit-contain');
   else if (p.mediaFit==='fill') main.classList.add('fit-fill');
-  // Apply admin media fit setting
-  main.classList.remove('fit-contain','fit-fill');
-  if(p.mediaFit==='contain') main.classList.add('fit-contain');
-  else if(p.mediaFit==='fill') main.classList.add('fit-fill');
 
-  if (p.videoData && p.videoData.base64) {
-    const vid = document.createElement('video');
-    vid.className = 'sp-real';
-    vid.src = p.videoData.base64;
-    vid.autoplay = true;
-    vid.muted = true;
-    vid.loop = true;
-    vid.playsInline = true;
-    vid.controls = true;
-    const fitMode = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-    vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
-    main.appendChild(vid);
-    vidBg.style.display = 'none';
-    vid.play().catch(() => {});
-  } else if (p.videoURL) {
+  if (p.videoURL) {
     const embedSrc = toEmbedUrl(p.videoURL);
     if (embedSrc) {
       const iframe = document.createElement('iframe');
@@ -1965,29 +1957,33 @@ function buildMediaPanel(p) {
       main.appendChild(iframe);
       vidBg.style.display = 'none';
     } else {
-      // Direct video file URL
       const vid = document.createElement('video');
-      vid.className = 'sp-real'; vid.src = p.videoURL;
+      vid.className = 'sp-real';
+      vid.src = p.videoURL;
       vid.autoplay = true; vid.muted = true; vid.loop = true; vid.controls = true; vid.playsInline = true;
-      const fm = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-      vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fm};z-index:2;`;
+      vid.preload = 'metadata';
+      vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
       main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(()=>{});
     }
+  } else if (p.videoData && p.videoData.base64) {
+    const vid = document.createElement('video');
+    vid.className = 'sp-real';
+    vid.src = p.videoData.base64;
+    vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.controls = true;
+    vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
+    main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
   } else if (p.images && p.images.length) {
     const img = document.createElement('img');
     img.className = 'sp-real';
     img.src = p.images[0].base64;
     img.alt = p.name;
-    const imgFit = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${imgFit};z-index:2;background:${imgFit==='contain'?'#f5f2ec':'transparent'};`;
-    main.appendChild(img);
-    vidBg.style.display = 'none';
+    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
+    main.appendChild(img); vidBg.style.display = 'none';
   } else {
     vidBg.style.display = 'flex';
     document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
   }
 
-  // Thumbnail strip
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
   const addThumb = (content, isImg, onClick) => {
@@ -2002,17 +1998,17 @@ function buildMediaPanel(p) {
     thumbsWrap.appendChild(t);
     return t;
   };
-  const hasVideo = (p.videoData && p.videoData.base64) || p.videoURL;
+  const hasVideo = (p.videoURL) || (p.videoData && p.videoData.base64);
   const t0 = addThumb(hasVideo ? '▶' : (p.images&&p.images.length?'🖼':p.icon||'📦'), false, () => {
     main.querySelectorAll('.sp-real').forEach(el => el.remove()); buildMediaPanel(p);
   });
   t0.classList.add('active');
   if (p.images) {
-    p.images.forEach((img, i) => {
+    p.images.forEach((img) => {
       addThumb(img.base64, true, () => {
         main.querySelectorAll('.sp-real').forEach(el => el.remove());
         const el = document.createElement('img'); el.className='sp-real'; el.src=img.base64;
-        el.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;';
+        el.style.cssText=`position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
         main.appendChild(el); vidBg.style.display='none';
       });
     });
@@ -2404,6 +2400,24 @@ setInterval(() => {
 loadData();
 renderHome();
 refreshBadge();
+
+window.addEventListener('resize', () => {
+  if (!currentProductId) return;
+  const p = products.find(x => x.id === currentProductId);
+  if (p) applySalesMediaSizing(p);
+});
+
+window.addEventListener('storage', (event) => {
+  if (event.key !== STORAGE_KEY) return;
+  const salesOpen = document.getElementById('sales-page')?.classList.contains('active');
+  loadData();
+  renderHome();
+  refreshBadge();
+  if (salesOpen && currentProductId) {
+    const latest = products.find(x => x.id === currentProductId);
+    if (latest) openSalesPage(latest.id);
+  }
+});
 </script>
 </body>
 </html>
