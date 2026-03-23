@@ -1116,6 +1116,10 @@ function editProduct(id){
   setVal('fp-return-days',p.returnDays);
   setVal('fp-warranty',   p.warranty);
   setVal('fp-return-policy', p.returnPolicy);
+  setVal('fp-media-height-desktop', p.mediaHeightDesktop||640);
+  setVal('fp-media-height-mobile',  p.mediaHeightMobile||320);
+  syncMediaHeight('desktop', p.mediaHeightDesktop||640);
+  syncMediaHeight('mobile', p.mediaHeightMobile||320);
   if(document.getElementById('fp-category')) document.getElementById('fp-category').value = p.category||'';
   setProductPageColor(p.pageColor||'#ffffff');
 
@@ -1213,6 +1217,8 @@ function saveProduct(draft=false){
   const returnDays    = document.getElementById('fp-return-days')?.value.trim()||'30 days';
   const warranty      = document.getElementById('fp-warranty')?.value.trim()||'';
   const returnPolicy  = document.getElementById('fp-return-policy')?.value.trim()||'';
+  const mediaHeightDesktop = Math.max(380, Math.min(900, parseInt(document.getElementById('fp-media-height-desktop')?.value)||640));
+  const mediaHeightMobile  = Math.max(220, Math.min(560, parseInt(document.getElementById('fp-media-height-mobile')?.value)||320));
   const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
 
@@ -1244,15 +1250,15 @@ function saveProduct(draft=false){
   };
 
   // Media payload
-  const videoData    = currentVideoData||null;
+  const effectiveUrl = normalizeVideoUrl(videoURL);
+  const videoData    = effectiveUrl ? null : (currentVideoData||null);
   const images       = [...(currentImages||[])];
-  const effectiveUrl = videoURL||'';
 
   const icons = {'Furniture':'🛋️','Electronics':'💻','Fashion':'👗','Kitchen':'🍳','Lighting':'💡','Outdoor':'🌿','Bedding':'🛏️','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
 
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
-    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, agentId,
+    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId,
     videoData, videoURL:effectiveUrl, images,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
