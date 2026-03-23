@@ -1397,6 +1397,22 @@ function setProductPageColor(hex){
   document.getElementById('color-preview-badge').textContent = names[hex]||hex;
   document.querySelectorAll('.color-swatch-admin').forEach(s=>s.classList.toggle('active',s.dataset.hex===hex));
 }
+
+function syncMediaHeight(type, value){
+  const isDesktop = type === 'desktop';
+  const min = isDesktop ? 380 : 220;
+  const max = isDesktop ? 900 : 560;
+  const fallback = isDesktop ? 640 : 320;
+  const parsed = parseInt(value);
+  const v = Number.isFinite(parsed) ? Math.max(min, Math.min(max, parsed)) : fallback;
+  const num = document.getElementById(`fp-media-height-${type}`);
+  const range = document.getElementById(`fp-media-height-${type}-range`);
+  if(num && String(num.value) !== String(v)) num.value = v;
+  if(range && String(range.value) !== String(v)) range.value = v;
+}
+
+function normalizeVideoUrl(url=''){ return url.trim(); }
+
 // Build color swatches
 const cgEl = document.getElementById('admin-color-grid');
 PAGE_COLORS.forEach(c=>{
