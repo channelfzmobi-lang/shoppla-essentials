@@ -1850,6 +1850,19 @@ function doSearch(q) {
 }
 
 // ═══ SALES PAGE ═══
+function getMediaFitMode(p){ return p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'; }
+
+function applySalesMediaSizing(p){
+  const media = document.querySelector('.sp-media');
+  if(!media) return;
+  const desktop = Math.max(380, Math.min(900, parseInt(p.mediaHeightDesktop)||640));
+  const mobile  = Math.max(220, Math.min(560, parseInt(p.mediaHeightMobile)||320));
+  const isMobile = window.matchMedia('(max-width: 860px)').matches;
+  media.style.height = `${isMobile ? mobile : desktop}px`;
+  media.style.maxHeight = isMobile ? '560px' : 'calc(100vh - var(--nav-h))';
+  media.style.minHeight = isMobile ? '220px' : '380px';
+}
+
 function openSalesPage(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
@@ -1871,24 +1884,20 @@ function openSalesPage(id) {
   if (instEl) instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
   document.getElementById('qty-val').value = 1;
 
-  // Checkout summary
   document.getElementById('ck-prod-name').textContent = p.name;
   document.getElementById('ck-prod-price').textContent = priceStr;
   const tax = Math.round(p.price * 0.08);
   document.getElementById('ck-tax').textContent  = '$'+tax;
   document.getElementById('ck-total').textContent = '$'+(p.price+tax).toLocaleString();
 
-  // Background
   const spInfo = document.getElementById('sp-info');
   if (spInfo) spInfo.style.background = p.pageColor||'#fff';
+  const salesPage = document.getElementById('sales-page');
+  if (salesPage) salesPage.style.background = '#f5f4f0';
 
-  // Build media panel
+  applySalesMediaSizing(p);
   buildMediaPanel(p);
-
-  // Build colour / size selectors
   buildVariants(p);
-
-  // Build CTAs
   buildCTAs(p);
 
   gotoPage('sales-page');
@@ -1896,65 +1905,47 @@ function openSalesPage(id) {
 }
 
 // ── Media panel ──
-
-// ── Convert any video link to an embeddable URL ──
-function toEmbedUrl(url) {
-  if (!url) return null;
-  url = url.trim();
-  // Already embed URL — add params
-  if (url.includes('/embed/')) {
-    const sep = url.includes('?') ? '&' : '?';
-    if (url.includes('youtube') || url.includes('youtu')) return url + sep + 'autoplay=1&mute=1&rel=0&modestbranding=1';
-    if (url.includes('vimeo')) return url + sep + 'autoplay=1&muted=1';
-    return url;
-  }
-  // YouTube watch?v=ID
-  let m = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // youtu.be/ID
-  m = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // youtube.com/shorts/ID
-  m = url.match(/\/shorts\/([A-Za-z0-9_-]{11})/);
-  if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&mute=1&rel=0&modestbranding=1';
-  // Vimeo
-  m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (m) return 'https://player.vimeo.com/video/' + m[1] + '?autoplay=1&muted=1';
-  // Direct video file — return null so <video> tag is used instead
+function toEmbedUrl(rawUrl) {
+  if (!rawUrl) return null;
+  const url = rawUrl.trim();
   if (/\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(url)) return null;
-  // Generic iframe embed
+
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace('www.','');
+
+    if (host.includes('youtube.com') || host.includes('youtu.be')) {
+      let id = '';
+      if (host === 'youtu.be') id = u.pathname.split('/').filter(Boolean)[0] || '';
+      if (!id && u.searchParams.get('v')) id = u.searchParams.get('v');
+      if (!id && u.pathname.includes('/shorts/')) id = u.pathname.split('/shorts/')[1]?.split('/')[0] || '';
+      if (!id && u.pathname.includes('/live/')) id = u.pathname.split('/live/')[1]?.split('/')[0] || '';
+      if (!id && u.pathname.includes('/embed/')) id = u.pathname.split('/embed/')[1]?.split('/')[0] || '';
+      if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1`;
+    }
+
+    if (host.includes('vimeo.com')) {
+      const id = u.pathname.split('/').filter(Boolean).pop();
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&playsinline=1`;
+    }
+
+    if (url.includes('/embed/')) return `${url}${url.includes('?') ? '&' : '?'}autoplay=1`;
+  } catch(_) {}
+
   return url;
 }
 
 function buildMediaPanel(p) {
   const main = document.getElementById('sp-main');
   const vidBg = document.getElementById('sp-vid-bg');
-  // Remove any previously injected real media
+  const fitMode = getMediaFitMode(p);
+
   main.querySelectorAll('.sp-real').forEach(el => el.remove());
-  // Apply admin-set media fit
   main.classList.remove('fit-contain','fit-fill');
   if (p.mediaFit==='contain') main.classList.add('fit-contain');
   else if (p.mediaFit==='fill') main.classList.add('fit-fill');
-  // Apply admin media fit setting
-  main.classList.remove('fit-contain','fit-fill');
-  if(p.mediaFit==='contain') main.classList.add('fit-contain');
-  else if(p.mediaFit==='fill') main.classList.add('fit-fill');
 
-  if (p.videoData && p.videoData.base64) {
-    const vid = document.createElement('video');
-    vid.className = 'sp-real';
-    vid.src = p.videoData.base64;
-    vid.autoplay = true;
-    vid.muted = true;
-    vid.loop = true;
-    vid.playsInline = true;
-    vid.controls = true;
-    const fitMode = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-    vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
-    main.appendChild(vid);
-    vidBg.style.display = 'none';
-    vid.play().catch(() => {});
-  } else if (p.videoURL) {
+  if (p.videoURL) {
     const embedSrc = toEmbedUrl(p.videoURL);
     if (embedSrc) {
       const iframe = document.createElement('iframe');
@@ -1966,29 +1957,33 @@ function buildMediaPanel(p) {
       main.appendChild(iframe);
       vidBg.style.display = 'none';
     } else {
-      // Direct video file URL
       const vid = document.createElement('video');
-      vid.className = 'sp-real'; vid.src = p.videoURL;
+      vid.className = 'sp-real';
+      vid.src = p.videoURL;
       vid.autoplay = true; vid.muted = true; vid.loop = true; vid.controls = true; vid.playsInline = true;
-      const fm = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-      vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fm};z-index:2;`;
+      vid.preload = 'metadata';
+      vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
       main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(()=>{});
     }
+  } else if (p.videoData && p.videoData.base64) {
+    const vid = document.createElement('video');
+    vid.className = 'sp-real';
+    vid.src = p.videoData.base64;
+    vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.controls = true;
+    vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
+    main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
   } else if (p.images && p.images.length) {
     const img = document.createElement('img');
     img.className = 'sp-real';
     img.src = p.images[0].base64;
     img.alt = p.name;
-    const imgFit = p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
-    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${imgFit};z-index:2;background:${imgFit==='contain'?'#f5f2ec':'transparent'};`;
-    main.appendChild(img);
-    vidBg.style.display = 'none';
+    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
+    main.appendChild(img); vidBg.style.display = 'none';
   } else {
     vidBg.style.display = 'flex';
     document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
   }
 
-  // Thumbnail strip
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
   const addThumb = (content, isImg, onClick) => {
@@ -2003,17 +1998,17 @@ function buildMediaPanel(p) {
     thumbsWrap.appendChild(t);
     return t;
   };
-  const hasVideo = (p.videoData && p.videoData.base64) || p.videoURL;
+  const hasVideo = (p.videoURL) || (p.videoData && p.videoData.base64);
   const t0 = addThumb(hasVideo ? '▶' : (p.images&&p.images.length?'🖼':p.icon||'📦'), false, () => {
     main.querySelectorAll('.sp-real').forEach(el => el.remove()); buildMediaPanel(p);
   });
   t0.classList.add('active');
   if (p.images) {
-    p.images.forEach((img, i) => {
+    p.images.forEach((img) => {
       addThumb(img.base64, true, () => {
         main.querySelectorAll('.sp-real').forEach(el => el.remove());
         const el = document.createElement('img'); el.className='sp-real'; el.src=img.base64;
-        el.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;';
+        el.style.cssText=`position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
         main.appendChild(el); vidBg.style.display='none';
       });
     });
