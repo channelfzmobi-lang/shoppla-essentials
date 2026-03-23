@@ -2400,6 +2400,24 @@ setInterval(() => {
 loadData();
 renderHome();
 refreshBadge();
+
+window.addEventListener('resize', () => {
+  if (!currentProductId) return;
+  const p = products.find(x => x.id === currentProductId);
+  if (p) applySalesMediaSizing(p);
+});
+
+window.addEventListener('storage', (event) => {
+  if (event.key !== STORAGE_KEY) return;
+  const salesOpen = document.getElementById('sales-page')?.classList.contains('active');
+  loadData();
+  renderHome();
+  refreshBadge();
+  if (salesOpen && currentProductId) {
+    const latest = products.find(x => x.id === currentProductId);
+    if (latest) openSalesPage(latest.id);
+  }
+});
 </script>
 </body>
 </html>
