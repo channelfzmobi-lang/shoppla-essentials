@@ -1287,9 +1287,19 @@ function clearProductForm(){
   });
   document.getElementById('fp-stock').value = 10;
   setProductPageColor('#ffffff');
+  syncMediaHeight('desktop', 640);
+  syncMediaHeight('mobile', 320);
+
   // Reset media fit
   const fitCover = document.getElementById('fp-fit-cover');
   if(fitCover) fitCover.checked = true;
+
+  // Reset media state to avoid stale upload carrying into next product
+  removeVideo();
+  currentImages = [];
+  const grid = document.getElementById('media-grid');
+  if(grid) grid.querySelectorAll('.media-item:not(.add-media)').forEach(el=>el.remove());
+
   contentSections = [];
   renderContentSections();
   editingProductId = null;
