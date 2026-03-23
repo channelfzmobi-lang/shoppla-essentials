@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Shoppla Admin — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0f0d0a;--sidebar:#100e0b;--cream:#faf8f4;--warm:#f3ede3;
+  --accent:#e8541a;--accent2:#f7b84a;--green:#1a8a4a;--red:#dc2626;
+  --blue:#2563eb;--purple:#7c3aed;
+  --muted:#8a8480;--border:#e5e0d6;--card:#fff;
+  --sb-w:260px;--header-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color:var(--ink);display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sb-w);background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{padding:24px 22px 20px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-logo-txt{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:#fff;cursor:pointer;}
+.sb-logo-txt span{color:var(--accent);}
+.sb-logo-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;letter-spacing:.08em;text-transform:uppercase;}
+.sb-section{padding:16px 14px 8px;}
+.sb-section-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.25);padding:0 8px;margin-bottom:6px;}
+.sb-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.55);font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px;}
+.sb-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sb-item.active{background:rgba(232,84,26,.18);color:#fff;}
+.sb-item.active .sb-icon{color:var(--accent);}
+.sb-icon{font-size:17px;width:20px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.sb-bottom{margin-top:auto;padding:16px 14px;border-top:1px solid rgba(255,255,255,.07);}
+.sb-user{display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.sb-user-name{font-size:13.5px;font-weight:700;color:#fff;}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,.35);}
+.view-store-btn{display:flex;align-items:center;gap:7px;background:rgba(232,84,26,.15);border:1px solid rgba(232,84,26,.3);color:var(--accent);font-size:12.5px;font-weight:700;padding:9px 14px;border-radius:9px;cursor:pointer;margin-top:12px;transition:background .2s;font-family:'Satoshi',sans-serif;width:100%;justify-content:center;}
+.view-store-btn:hover{background:rgba(232,84,26,.25);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── HEADER ── */
+.header{height:var(--header-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;gap:16px;flex-shrink:0;}
+.header-title{font-family:'Fraunces',serif;font-size:22px;font-weight:900;}
+.header-sub{font-size:13px;color:var(--muted);margin-top:1px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.hdr-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-family:'Satoshi',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .2s;border:none;}
+.hdr-btn-primary{background:var(--accent);color:#fff;}
+.hdr-btn-primary:hover{background:#c9420e;}
+.hdr-btn-outline{background:#fff;color:var(--ink);border:1.5px solid var(--border);}
+.hdr-btn-outline:hover{border-color:var(--ink);}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:28px 32px;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:#fff;border-radius:16px;padding:22px;border:1px solid var(--border);position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07;}
+.stat-card.orange::after{background:var(--accent);}
+.stat-card.yellow::after{background:var(--accent2);}
+.stat-card.green::after{background:var(--green);}
+.stat-card.blue::after{background:var(--blue);}
+.stat-icon{font-size:28px;margin-bottom:12px;}
+.stat-val{font-family:'Fraunces',serif;font-size:30px;font-weight:900;line-height:1;}
+.stat-lbl{font-size:13px;color:var(--muted);margin-top:4px;}
+.stat-change{font-size:12px;font-weight:700;margin-top:8px;display:flex;align-items:center;gap:4px;}
+.stat-change.up{color:var(--green);}
+.stat-change.dn{color:var(--red);}
+
+/* ── SECTION CARD ── */
+.section-card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:22px;}
+.sc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+.sc-title{font-size:15px;font-weight:800;}
+.sc-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.sc-actions{display:flex;gap:8px;}
+.sc-body{padding:22px;}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 14px;text-align:left;background:#f9f8f6;border-bottom:1px solid var(--border);}
+.data-table td{padding:14px 14px;font-size:14px;border-bottom:1px solid #f0ede8;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#faf9f7;}
+.prod-thumb{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#f0ebe0,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.prod-thumb-img{width:44px;height:44px;border-radius:10px;object-fit:cover;}
+.prod-cell{display:flex;align-items:center;gap:12px;}
+.prod-name-cell{font-weight:700;font-size:14px;}
+.prod-cat{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;}
+.badge-green{background:rgba(26,138,74,.1);color:var(--green);}
+.badge-orange{background:rgba(232,84,26,.1);color:var(--accent);}
+.badge-gray{background:#f0ede8;color:var(--muted);}
+.badge-red{background:rgba(220,38,38,.1);color:var(--red);}
+.table-actions{display:flex;gap:6px;}
+.tbl-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Satoshi',sans-serif;color:var(--ink);}
+.tbl-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tbl-btn.danger:hover{border-color:var(--red);color:var(--red);}
+
+/* ── PRODUCT FORM ── */
+.form-panel{max-width:860px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.form-group{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.form-group.full{grid-column:span 2;}
+.form-lbl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);}
+.form-lbl span{color:var(--red);}
+.form-input,.form-select,.form-textarea{border:1.5px solid var(--border);border-radius:10px;padding:12px 15px;font-family:'Satoshi',sans-serif;font-size:14.5px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff;width:100%;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,84,26,.1);}
+.form-textarea{resize:vertical;min-height:120px;line-height:1.6;}
+.form-hint{font-size:12px;color:var(--muted);}
+
+/* Upload zones */
+.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#faf9f7;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(232,84,26,.03);}
+.upload-icon{font-size:36px;margin-bottom:10px;}
+.upload-title{font-size:15px;font-weight:700;margin-bottom:5px;}
+.upload-sub{font-size:13px;color:var(--muted);}
+.upload-btn-sm{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'Satoshi',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.media-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px;}
+.media-item{position:relative;aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#f0ebe0,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid var(--border);overflow:hidden;}
+.media-item img{width:100%;height:100%;object-fit:cover;}
+.media-item .del-media{position:absolute;top:4px;right:4px;background:rgba(220,38,38,.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.media-item:hover .del-media{display:flex;}
+.media-item.add-media{background:#faf9f7;border:2px dashed var(--border);cursor:pointer;flex-direction:column;gap:4px;font-size:24px;color:var(--muted);transition:border-color .2s;}
+.media-item.add-media:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Content sections editor */
+.content-section{background:#f9f8f6;border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;position:relative;}
+.cs-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cs-type-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.cs-del{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;transition:color .2s;}
+.cs-del:hover{color:var(--red);}
+.add-section-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.add-sec-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border:1.5px dashed var(--border);border-radius:9px;background:none;font-family:'Satoshi',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s;}
+.add-sec-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,84,26,.04);}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;}
+.tab{padding:12px 20px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;}
+.tab:hover{color:var(--ink);}
+.tab.active{color:var(--ink);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+
+/* Color customizer in admin */
+.color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:16px;}
+.color-swatch-admin{width:100%;aspect-ratio:1;border-radius:10px;cursor:pointer;border:2.5px solid transparent;transition:transform .2s,border-color .2s;position:relative;}
+.color-swatch-admin:hover{transform:scale(1.1);}
+.color-swatch-admin.active{border-color:var(--ink);}
+.color-swatch-admin.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+
+/* Page settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-lbl{font-size:14.5px;font-weight:700;}
+.setting-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:50px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:23px;}
+
+/* Orders */
+.order-row-detail{background:#f9f8f6;border-radius:10px;padding:14px 16px;margin-top:8px;font-size:13.5px;}
+
+/* Quick actions */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.qa-card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:20px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.qa-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.07);}
+.qa-icon{font-size:32px;margin-bottom:10px;}
+.qa-title{font-size:13.5px;font-weight:700;}
+.qa-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* Notification dot */
+.notif-dot{width:8px;height:8px;background:var(--red);border-radius:50%;display:inline-block;margin-left:4px;}
+
+/* Recent activity */
+.activity-list{display:flex;flex-direction:column;gap:0;}
+.activity-item{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid #f0ede8;}
+.activity-item:last-child{border-bottom:none;}
+.act-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.act-msg{font-size:13.5px;line-height:1.45;}
+.act-msg b{font-weight:700;}
+.act-time{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* Rich text toolbar */
+.rte-toolbar{display:flex;gap:4px;flex-wrap:wrap;padding:8px 10px;background:#f5f4f0;border:1.5px solid var(--border);border-radius:10px 10px 0 0;border-bottom:none;}
+.rte-btn{background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:13px;cursor:pointer;font-family:'Satoshi',sans-serif;transition:background .15s;color:var(--ink);}
+.rte-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.rte-area{border:1.5px solid var(--border);border-radius:0 0 10px 10px;padding:14px;font-family:'Satoshi',sans-serif;font-size:14.5px;min-height:160px;outline:none;color:var(--ink);line-height:1.7;}
+.rte-area:focus{border-color:var(--accent);}
+
+/* Highlight preview */
+.sp-preview-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,84,26,.1);border:1px solid rgba(232,84,26,.2);color:var(--accent);font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;}
+
+/* Responsive */
+/* ═══ ADMIN RESPONSIVE ═══ */
+@media(max-width:1100px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .quick-actions{grid-template-columns:1fr 1fr;}
+  .form-grid-2{grid-template-columns:1fr;}
+  .content{padding:22px 20px;}
+}
+@media(max-width:860px){
+  body{flex-direction:column;height:auto;overflow:auto;}
+  .sidebar{width:100%;height:auto;flex-direction:row;overflow-x:auto;flex-shrink:0;padding:0;}
+  .sb-logo{display:none;}
+  .sb-bottom{display:none;}
+  .sb-section{padding:8px 6px;display:flex;flex-direction:row;gap:0;min-width:max-content;}
+  .sb-section-lbl{display:none;}
+  .sb-item{padding:10px 10px;font-size:12px;gap:6px;border-radius:0;margin-bottom:0;white-space:nowrap;}
+  .sb-icon{font-size:15px;width:16px;}
+  .main{overflow:visible;flex:1;}
+  .content{flex:1;overflow-y:auto;padding:16px 14px;}
+  .header{padding:0 16px;height:54px;}
+  .header-title{font-size:18px;}
+  .header-sub{display:none;}
+  .header-right{gap:8px;}
+  .hdr-btn{padding:8px 12px;font-size:12.5px;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stat-card{padding:16px;}
+  .stat-val{font-size:24px;}
+  .quick-actions{grid-template-columns:1fr 1fr;gap:10px;}
+  .qa-card{padding:16px;}
+  .form-grid-2{grid-template-columns:1fr;}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tab{min-width:auto;padding:11px 12px;font-size:12px;white-space:nowrap;}
+  .data-table th,.data-table td{padding:10px 10px;font-size:12.5px;}
+  .table-actions{flex-wrap:wrap;gap:4px;}
+  .tbl-btn{padding:5px 8px;font-size:11.5px;}
+  .section-card{border-radius:12px;}
+  .sc-head{flex-wrap:wrap;gap:8px;padding:14px 16px;}
+  .sc-body{padding:16px;}
+  .sc-actions{flex-wrap:wrap;gap:6px;}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .quick-actions{grid-template-columns:repeat(2,1fr);}
+  .data-table{font-size:12px;}
+  .prod-cell{gap:8px;}
+  .prod-thumb{width:36px;height:36px;font-size:18px;}
+  .badge{font-size:10.5px;padding:2px 8px;}
+  .header-title{font-size:16px;}
+  .hdr-btn span{display:none;}
+}
+
+/* Empty state */
+.empty-state{text-align:center;padding:56px 32px;}
+.empty-icon{font-size:52px;margin-bottom:14px;}
+.empty-title{font-family:'Fraunces',serif;font-size:22px;font-weight:900;margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--muted);}
+
+/* Modal */
+.adm-modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,8,6,.6);backdrop-filter:blur(6px);z-index:800;align-items:center;justify-content:center;}
+.adm-modal-overlay.open{display:flex;}
+.adm-modal{background:#fff;border-radius:20px;padding:36px;max-width:520px;width:100%;animation:popIn .25s ease both;}
+@keyframes popIn{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+.adm-modal h3{font-family:'Fraunces',serif;font-size:22px;font-weight:900;margin-bottom:8px;}
+.adm-modal p{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;}
+.modal-btn-cancel{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:11px 22px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.modal-btn-confirm{background:var(--red);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.modal-btn-confirm.safe{background:var(--accent);}
+
+/* Scrollbar */
+.content::-webkit-scrollbar{width:6px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-txt">Shoppla<span>.</span></div>
+    <div class="sb-logo-sub">Admin Dashboard</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-lbl">Overview</div>
+    <div class="sb-item active" onclick="nav(this,'dash')"><span class="sb-icon">🏠</span>Dashboard</div>
+    <div class="sb-item" onclick="nav(this,'analytics')"><span class="sb-icon">📊</span>Analytics</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-lbl">Store</div>
+    <div class="sb-item" onclick="nav(this,'products')"><span class="sb-icon">📦</span>Products<span class="sb-badge" id="prod-count-badge">8</span></div>
+    <div class="sb-item" onclick="nav(this,'add-product')"><span class="sb-icon">➕</span>Add Product</div>
+    <div class="sb-item" onclick="nav(this,'categories')"><span class="sb-icon">🗂</span>Categories</div>
+    <div class="sb-item" onclick="nav(this,'orders')"><span class="sb-icon">🛒</span>Orders<span class="sb-badge">3</span></div>
+    <div class="sb-item" onclick="nav(this,'customers')"><span class="sb-icon">👥</span>Customers</div>
+    <div class="sb-item" onclick="nav(this,'agents')"><span class="sb-icon">🎧</span>Support Agents</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-lbl">Content</div>
+    <div class="sb-item" onclick="nav(this,'pages')"><span class="sb-icon">📄</span>Pages</div>
+    <div class="sb-item" onclick="nav(this,'media')"><span class="sb-icon">🖼</span>Media Library</div>
+    <div class="sb-item" onclick="nav(this,'banners')"><span class="sb-icon">🎨</span>Banners & Hero</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-lbl">Settings</div>
+    <div class="sb-item" onclick="nav(this,'appearance')"><span class="sb-icon">🎭</span>Appearance</div>
+    <div class="sb-item" onclick="nav(this,'settings')"><span class="sb-icon">⚙️</span>Store Settings</div>
+  </div>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">S</div>
+      <div>
+        <div class="sb-user-name">Store Owner</div>
+        <div class="sb-user-role">Administrator</div>
+      </div>
+    </div>
+    <button class="view-store-btn" onclick="openStorefront()">🏪 View Live Store →</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- HEADER -->
+  <div class="header" id="main-header">
+    <div>
+      <div class="header-title" id="header-title">Dashboard</div>
+      <div class="header-sub" id="header-sub">Welcome back! Here's what's happening in your store.</div>
+    </div>
+    <div class="header-right">
+      <button class="hdr-btn hdr-btn-outline" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ New Product</button>
+      <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Changes saved successfully!')">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="panel active" id="panel-dash">
+      <div class="stats-row">
+        <div class="stat-card orange">
+          <div class="stat-icon">💰</div>
+          <div class="stat-val">$12,480</div>
+          <div class="stat-lbl">Total Revenue</div>
+          <div class="stat-change up">↑ 18% this month</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-val">247</div>
+          <div class="stat-lbl">Total Orders</div>
+          <div class="stat-change up">↑ 12% this week</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">👥</div>
+          <div class="stat-val">1,842</div>
+          <div class="stat-lbl">Customers</div>
+          <div class="stat-change up">↑ 8% this month</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">📦</div>
+          <div class="stat-val" id="total-products-stat">8</div>
+          <div class="stat-lbl">Active Products</div>
+          <div class="stat-change up">↑ 2 added this week</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">
+          <div class="qa-icon">➕</div>
+          <div class="qa-title">Add Product</div>
+          <div class="qa-sub">List a new item</div>
+        </div>
+        <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=orders]'),'orders')">
+          <div class="qa-icon">📬</div>
+          <div class="qa-title">New Orders</div>
+          <div class="qa-sub">3 awaiting</div>
+        </div>
+        <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=appearance]'),'appearance')">
+          <div class="qa-icon">🎨</div>
+          <div class="qa-title">Customize</div>
+          <div class="qa-sub">Colors & branding</div>
+        </div>
+        <div class="qa-card" onclick="openStorefront()">
+          <div class="qa-icon">🏪</div>
+          <div class="qa-title">View Store</div>
+          <div class="qa-sub">See live site</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+        <div class="section-card">
+          <div class="sc-head">
+            <div><div class="sc-title">Recent Orders</div><div class="sc-sub">Latest 5 transactions</div></div>
+            <button class="tbl-btn" onclick="nav(document.querySelector('.sb-item[onclick*=orders]'),'orders')">View All</button>
+          </div>
+          <div class="sc-body" style="padding:0;">
+            <table class="data-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody id="recent-orders-table"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-head"><div><div class="sc-title">Recent Activity</div></div></div>
+          <div class="sc-body" style="padding:14px 18px;">
+            <div class="activity-list">
+              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">🛒</div><div><div class="act-msg"><b>New order #1047</b> from Sarah M.</div><div class="act-time">2 min ago</div></div></div>
+              <div class="activity-item"><div class="act-icon" style="background:#e8f8ee;">⭐</div><div><div class="act-msg"><b>5-star review</b> on Velvet Sofa</div><div class="act-time">14 min ago</div></div></div>
+              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">📦</div><div><div class="act-msg"><b>Low stock alert:</b> Espresso Machine (2 left)</div><div class="act-time">1 hr ago</div></div></div>
+              <div class="activity-item"><div class="act-icon" style="background:#eff6ff;">👤</div><div><div class="act-msg"><b>New customer</b> registered: James T.</div><div class="act-time">2 hr ago</div></div></div>
+              <div class="activity-item"><div class="act-icon" style="background:#f5f3ff;">✅</div><div><div class="act-msg"><b>Order #1044</b> shipped to Amina K.</div><div class="act-time">3 hr ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUCTS ═══ -->
+    <div class="panel" id="panel-products">
+      <div class="section-card">
+        <div class="sc-head">
+          <div><div class="sc-title">All Products</div><div class="sc-sub" id="prod-table-sub">8 products in your store</div></div>
+          <div class="sc-actions">
+            <input type="text" class="form-input" style="width:220px;padding:8px 14px;font-size:13.5px;" placeholder="🔍 Search products…" oninput="filterProducts(this.value)"/>
+            <button class="hdr-btn hdr-btn-primary" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ Add Product</button>
+          </div>
+        </div>
+        <div style="padding:0;overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="products-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ADD / EDIT PRODUCT ═══ -->
+    <div class="panel form-panel" id="panel-add-product">
+      <div class="tabs">
+        <div class="tab active" onclick="switchFormTab(this,'ft-basic')">📋 Basic Info</div>
+        <div class="tab" onclick="switchFormTab(this,'ft-media')">🖼 Media & Video</div>
+        <div class="tab" onclick="switchFormTab(this,'ft-content')">✍️ Page Content</div>
+        <div class="tab" onclick="switchFormTab(this,'ft-pricing')">💰 Pricing & Stock</div>
+        <div class="tab" onclick="switchFormTab(this,'ft-seo')">🔍 SEO</div>
+      </div>
+
+      <!-- BASIC INFO -->
+      <div class="tab-panel active" id="ft-basic">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">Basic Information</div></div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-lbl">Product Name <span>*</span></label>
+              <input class="form-input" id="fp-name" placeholder="e.g. Velvet 3-Seater Sofa in Dusty Rose" oninput="updateProductPreview()"/>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Brand / Seller <span>*</span></label>
+                <input class="form-input" id="fp-brand" placeholder="e.g. Cozy Co." oninput="updateProductPreview()"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Category <span>*</span></label>
+                <select class="form-select" id="fp-category">
+                  <option value="">Select category…</option>
+                  <option>Furniture</option><option>Electronics</option><option>Fashion</option>
+                  <option>Kitchen</option><option>Bedding</option><option>Lighting</option>
+                  <option>Outdoor</option><option>Beauty</option><option>Sports</option>
+                  <option>Toys</option><option>Gaming</option><option>Books</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Short Description</label>
+              <textarea class="form-textarea" id="fp-desc" placeholder="A brief, compelling description shown on product cards and search results…" style="min-height:80px;"></textarea>
+              <div class="form-hint">Keep it under 160 characters for best results on cards.</div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Colour Options</label>
+                <input class="form-input" id="fp-colors" placeholder="e.g. Dusty Rose, Charcoal, Camel"/>
+                <div class="form-hint">Comma-separated colour names</div>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Size Options</label>
+                <input class="form-input" id="fp-sizes" placeholder="e.g. S, M, L, XL  or  2-Seater, 3-Seater"/>
+                <div class="form-hint">Comma-separated size options</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Tags</label>
+              <input class="form-input" id="fp-tags" placeholder="sofa, living room, velvet, modern, comfort"/>
+              <div class="form-hint">Helps customers find your product in search</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDIA -->
+      <div class="tab-panel" id="ft-media">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">UGC Video</div><div class="sc-sub">This plays first on the product card and sales page</div></div>
+          <div class="sc-body">
+            <div class="upload-zone" id="video-drop" onclick="document.getElementById('video-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleVideoDrop(event)">
+              <div class="upload-icon">🎬</div>
+              <div class="upload-title">Upload UGC Video</div>
+              <div class="upload-sub">MP4, MOV, WebM up to 500MB · Ideal: 9:16 or 4:3 · Max 2 min</div>
+              <button class="upload-btn-sm" onclick="event.stopPropagation();document.getElementById('video-file-input').click()">📁 Choose File</button>
+              <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)"/>
+            </div>
+            <div id="video-preview-wrap" style="display:none;margin-top:14px;">
+              <div style="display:flex;align-items:center;gap:12px;background:#f5f4f0;border-radius:12px;padding:14px 16px;">
+                <span style="font-size:28px;">🎬</span>
+                <div>
+                  <div style="font-weight:700;" id="video-filename">video.mp4</div>
+                  <div style="font-size:12px;color:var(--muted);" id="video-filesize">0 MB</div>
+                </div>
+                <button class="tbl-btn danger" style="margin-left:auto;" onclick="removeVideo()">✕ Remove</button>
+              </div>
+            </div>
+            <div style="margin-top:16px;">
+              <label class="form-lbl" style="margin-bottom:8px;display:block;">Or paste a video URL (YouTube / Vimeo embed)</label>
+              <input class="form-input" id="fp-video-url" placeholder="https://www.youtube.com/embed/..."/>
+            </div>
+            <div style="margin-top:16px;padding:18px;background:var(--warm);border-radius:12px;border:1px solid var(--border);">
+              <label class="form-lbl" style="display:block;margin-bottom:12px;">🖼 Media Display Style — how video/images are shown on product cards & sales page</label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-cover-label">
+                  <input type="radio" name="fp-media-fit" id="fp-fit-cover" value="cover" checked style="margin-top:2px;accent-color:var(--accent);">
+                  <div><div style="font-weight:700;font-size:13.5px;">Fill (Cover)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Image fills the whole frame. Edges may be cropped. Best for lifestyle photos.</div></div>
+                </label>
+                <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-contain-label">
+                  <input type="radio" name="fp-media-fit" id="fp-fit-contain" value="contain" style="margin-top:2px;accent-color:var(--accent);">
+                  <div><div style="font-weight:700;font-size:13.5px;">Fit (Contain)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Whole image is visible. Dark background fills edges. Best for product-on-white photos.</div></div>
+                </label>
+                <label style="flex:1;min-width:140px;display:flex;align-items:flex-start;gap:9px;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;" id="fit-fill-label">
+                  <input type="radio" name="fp-media-fit" id="fp-fit-fill" value="fill" style="margin-top:2px;accent-color:var(--accent);">
+                  <div><div style="font-weight:700;font-size:13.5px;">Stretch (Fill)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Image stretches to fit exactly. May distort. Use only if image is exactly the right ratio.</div></div>
+                </label>
+              </div>
+              <div style="font-size:12px;color:var(--muted);margin-top:10px;">💡 "Fill (Cover)" is best for most products. Use "Fit (Contain)" if your images have a white/transparent background.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">Product Images</div><div class="sc-sub">Up to 8 images. First image is the thumbnail.</div></div>
+          <div class="sc-body">
+            <div class="media-grid" id="media-grid">
+              <div class="media-item add-media" onclick="document.getElementById('img-upload').click()">
+                <span>➕</span>
+                <span style="font-size:11px;">Add Image</span>
+                <input type="file" id="img-upload" accept="image/*" multiple style="display:none" onchange="handleImageUpload(this)"/>
+              </div>
+            </div>
+            <div class="form-hint" style="margin-top:10px;">Drag to reorder · Hover to delete · First image = card thumbnail</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="tab-panel" id="ft-content">
+        <div class="section-card">
+          <div class="sc-head">
+            <div><div class="sc-title">Sales Page Content</div><div class="sc-sub">Build rich sections with text, images & emojis — like the reference site</div></div>
+          </div>
+          <div class="sc-body">
+
+            <div id="content-sections-list">
+              <!-- Default sections rendered by JS -->
+            </div>
+
+            <div class="add-section-btns">
+              <div class="add-sec-btn" onclick="addSection('headline-text')">📝 + Headline + Text</div>
+              <div class="add-sec-btn" onclick="addSection('text-image-right')">🖼 + Text + Image Right</div>
+              <div class="add-sec-btn" onclick="addSection('image-text-right')">🖼 + Image + Text Right</div>
+              <div class="add-sec-btn" onclick="addSection('bullet-list')">✅ + Bullet List</div>
+              <div class="add-sec-btn" onclick="addSection('stats')">📊 + Stats Row</div>
+              <div class="add-sec-btn" onclick="addSection('callout')">💬 + Callout / Quote</div>
+              <div class="add-sec-btn" onclick="addSection('specs')">📐 + Specs Table</div>
+              <div class="add-sec-btn" onclick="addSection('faq')">❓ + FAQ</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping & Returns (always present) -->
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">🚚 Shipping Content</div><div class="sc-sub">Shown in the Shipping tab</div></div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-lbl">Delivery Times</label>
+              <input class="form-input" id="fp-delivery" placeholder="e.g. Standard (FREE, 3-5 days), Express ($19, 1-2 days)"/>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Shipping Notes</label>
+              <textarea class="form-textarea" id="fp-shipping-notes" placeholder="Any special shipping details, international notes, etc." style="min-height:80px;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">↩️ Returns & Warranty Content</div><div class="sc-sub">Shown in the Returns tab</div></div>
+          <div class="sc-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Return Window</label>
+                <input class="form-input" id="fp-return-days" placeholder="e.g. 30 days"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Warranty Period</label>
+                <input class="form-input" id="fp-warranty" placeholder="e.g. 2-year frame warranty"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Return Policy Details</label>
+              <textarea class="form-textarea" id="fp-return-policy" placeholder="Describe your return & warranty policy in detail…" style="min-height:80px;"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="tab-panel" id="ft-pricing">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">Pricing & Inventory</div></div>
+          <div class="sc-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Price <span>*</span></label>
+                <input class="form-input" id="fp-price" type="number" placeholder="0.00" oninput="updateProductPreview()"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Compare-at Price (was)</label>
+                <input class="form-input" id="fp-was-price" type="number" placeholder="0.00"/>
+                <div class="form-hint">Shows as crossed out "was" price</div>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Stock Quantity</label>
+                <input class="form-input" id="fp-stock" type="number" placeholder="0" value="10"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">SKU / Product ID</label>
+                <input class="form-input" id="fp-sku" placeholder="e.g. SOFA-VLV-ROSE-3S"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Installment Info (optional)</label>
+              <input class="form-input" id="fp-installment" placeholder="e.g. 4 × $162.25 with Shoppla Pay — 0% interest"/>
+            </div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="toggle on" id="toggle-active" onclick="this.classList.toggle('on')"></div>
+                <div><div class="form-lbl" style="text-transform:none;letter-spacing:0;">Product is active (visible on store)</div></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="toggle on" id="toggle-featured" onclick="this.classList.toggle('on')"></div>
+                <div><div class="form-lbl" style="text-transform:none;letter-spacing:0;">Show in Featured Products on homepage</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div class="tab-panel" id="ft-seo">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">SEO & Metadata</div></div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-lbl">Page Title</label>
+              <input class="form-input" id="fp-seo-title" placeholder="Velvet 3-Seater Sofa — Shoppla"/>
+              <div class="form-hint">Recommended: 50–60 characters</div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Meta Description</label>
+              <textarea class="form-textarea" id="fp-seo-desc" placeholder="Shop the Velvet 3-Seater Sofa in Dusty Rose. Premium velvet, solid hardwood, free delivery." style="min-height:80px;"></textarea>
+              <div class="form-hint">Recommended: 120–160 characters</div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">URL Slug</label>
+              <input class="form-input" id="fp-slug" placeholder="velvet-3-seater-sofa-dusty-rose"/>
+            </div>
+          </div>
+        </div>
+        <!-- Sales page background color -->
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">🎨 Sales Page Background Color</div><div class="sc-sub">Choose the background color for this product's sales page</div></div>
+          <div class="sc-body">
+            <div class="color-grid" id="admin-color-grid"></div>
+            <div style="display:flex;gap:12px;align-items:center;margin-top:4px;">
+              <input type="color" class="form-input" id="fp-page-color" value="#ffffff" style="width:60px;height:44px;padding:4px;cursor:pointer;" oninput="setProductPageColor(this.value)"/>
+              <input class="form-input" id="fp-page-color-hex" placeholder="#ffffff" style="flex:1;" oninput="setProductPageColor(this.value)"/>
+              <span class="sp-preview-badge" id="color-preview-badge">White — Default</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save row -->
+      <div style="display:flex;gap:12px;margin-top:8px;padding-top:20px;border-top:1px solid var(--border);">
+        <button class="hdr-btn hdr-btn-primary" onclick="saveProduct()" style="padding:13px 32px;font-size:15px;">💾 Save Product</button>
+        <button class="hdr-btn hdr-btn-outline" onclick="saveProduct(true)" style="padding:13px 24px;">Save as Draft</button>
+        <button class="hdr-btn hdr-btn-outline" style="padding:13px 24px;margin-left:auto;color:var(--red);border-color:var(--red);" onclick="clearProductForm()">✕ Clear Form</button>
+      </div>
+    </div>
+
+    <!-- ═══ ORDERS ═══ -->
+    <div class="panel" id="panel-orders">
+      <div class="section-card">
+        <div class="sc-head">
+          <div><div class="sc-title">Orders</div><div class="sc-sub">All customer orders</div></div>
+          <div class="sc-actions">
+            <select class="form-select" style="width:160px;padding:8px 12px;font-size:13.5px;">
+              <option>All Orders</option><option>Pending</option><option>Processing</option><option>Shipped</option><option>Delivered</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Products</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CUSTOMERS ═══ -->
+    <div class="panel" id="panel-customers">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Customers</div><div class="sc-sub">All registered & guest buyers</div></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total Spent</th><th>Type</th><th>Joined</th></tr></thead>
+            <tbody id="customers-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ AGENTS ═══ -->
+    <div class="panel" id="panel-agents">
+      <div class="section-card">
+        <div class="sc-head">
+          <div><div class="sc-title">Support Agents</div><div class="sc-sub">Assign agents to products — each gets their own live call button</div></div>
+          <button class="hdr-btn hdr-btn-primary" onclick="openAgentModal(null)">➕ Add Agent</button>
+        </div>
+        <div class="sc-body">
+          <div id="agents-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+          <div id="agents-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--muted);">
+            <div style="font-size:52px;margin-bottom:14px;">🎧</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:7px;">No agents yet</div>
+            <div style="font-size:13.5px;margin-bottom:20px;">Add your first support agent to start assigning them to products.</div>
+            <button class="hdr-btn hdr-btn-primary" onclick="openAgentModal(null)">➕ Add First Agent</button>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">💡 How It Works</div></div>
+        <div class="sc-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+            <div style="background:var(--warm);border-radius:12px;padding:18px;"><div style="font-size:28px;margin-bottom:9px;">🎧</div><div style="font-weight:800;font-size:14px;margin-bottom:5px;">1. Add Agents</div><div style="font-size:13px;color:var(--muted);line-height:1.55;">Create agent profiles with name, photo, phone, WhatsApp, Zoom and availability hours.</div></div>
+            <div style="background:var(--warm);border-radius:12px;padding:18px;"><div style="font-size:28px;margin-bottom:9px;">📦</div><div style="font-weight:800;font-size:14px;margin-bottom:5px;">2. Assign to Products</div><div style="font-size:13px;color:var(--muted);line-height:1.55;">On each product's Basic Info tab, pick which agent handles live calls for that product.</div></div>
+            <div style="background:var(--warm);border-radius:12px;padding:18px;"><div style="font-size:28px;margin-bottom:9px;">📞</div><div style="font-weight:800;font-size:14px;margin-bottom:5px;">3. Customers Connect</div><div style="font-size:13px;color:var(--muted);line-height:1.55;">The live call button on each product card shows that agent's name, photo, and contact links.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CATEGORIES ═══ -->
+    <div class="panel" id="panel-categories">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Categories</div><div class="sc-sub">Manage your store categories</div></div>
+        <div class="sc-body">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;" id="cat-admin-grid"></div>
+          <div style="margin-top:22px;border-top:1px solid var(--border);padding-top:22px;">
+            <div style="font-weight:800;font-size:15px;margin-bottom:14px;">Add New Category</div>
+            <div style="display:flex;gap:10px;">
+              <input class="form-input" id="new-cat-name" placeholder="Category name" style="flex:1;"/>
+              <input class="form-input" id="new-cat-icon" placeholder="Emoji icon" style="width:80px;text-align:center;font-size:20px;"/>
+              <button class="hdr-btn hdr-btn-primary" onclick="addCategory()">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ APPEARANCE ═══ -->
+    <div class="panel" id="panel-appearance">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">Brand Colors</div></div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-lbl">Primary Accent Color</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="color" class="form-input" value="#e8541a" style="width:56px;height:44px;padding:4px;cursor:pointer;" id="brand-color-picker" oninput="updateBrandColor(this.value)"/>
+                <input class="form-input" value="#e8541a" id="brand-color-hex" style="flex:1;" oninput="updateBrandColor(this.value)"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Secondary Color</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="color" class="form-input" value="#f7b84a" style="width:56px;height:44px;padding:4px;cursor:pointer;"/>
+                <input class="form-input" value="#f7b84a" style="flex:1;"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Store Font</label>
+              <select class="form-select">
+                <option selected>Fraunces + Satoshi (Current)</option>
+                <option>Playfair + DM Sans</option>
+                <option>Libre Baskerville + Open Sans</option>
+                <option>Cormorant + Lato</option>
+              </select>
+            </div>
+            <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Brand colors saved!')">Apply Changes</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-head"><div class="sc-title">Store Logo</div></div>
+          <div class="sc-body">
+            <div style="text-align:center;padding:28px;background:#f5f4f0;border-radius:12px;margin-bottom:16px;">
+              <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:900;" id="logo-preview">Shoppla<span style="color:var(--accent);">.</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Store Name</label>
+              <input class="form-input" value="Shoppla" oninput="document.getElementById('logo-preview').childNodes[0].textContent=this.value"/>
+            </div>
+            <div class="upload-zone" style="padding:20px;" onclick="showToast('📁 File picker would open here')">
+              <div class="upload-icon" style="font-size:24px;">🖼</div>
+              <div class="upload-sub">Upload custom logo image (PNG, SVG)</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-card" style="grid-column:span 2;">
+          <div class="sc-head"><div class="sc-title">Homepage Hero Settings</div></div>
+          <div class="sc-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Hero Headline</label>
+                <input class="form-input" value="Shop Everything You Love"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Hero Subtext</label>
+                <input class="form-input" value="UGC video reviews on every product. Live calls. Guest checkout."/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">CTA Button Text</label>
+                <input class="form-input" value="Shop Now →"/>
+              </div>
+              <div class="form-group">
+                <label class="form-lbl">Topbar Announcement</label>
+                <input class="form-input" value="🎉 Free shipping on orders over $49 · No account needed"/>
+              </div>
+            </div>
+            <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Hero settings saved!')">Save Hero</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="panel" id="panel-settings">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Store Settings</div></div>
+        <div class="sc-body">
+          <div class="setting-row">
+            <div><div class="setting-lbl">Guest Checkout</div><div class="setting-sub">Allow purchases without account registration</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">Live Call Button</div><div class="setting-sub">Show live call button on all product cards</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">UGC Video on Cards</div><div class="setting-sub">Auto-play UGC video preview on product cards</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">Flash Sale Banner</div><div class="setting-sub">Show countdown flash sale on homepage</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-lbl">Email Notifications</div><div class="setting-sub">Receive email for every new order</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Contact & Support Info</div></div>
+        <div class="sc-body">
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-lbl">Support Email</label><input class="form-input" value="support@shoppla.com"/></div>
+            <div class="form-group"><label class="form-lbl">Phone / WhatsApp</label><input class="form-input" value="+1 (800) SHOPPLA"/></div>
+            <div class="form-group"><label class="form-lbl">WhatsApp Business Link</label><input class="form-input" placeholder="https://wa.me/..."/></div>
+            <div class="form-group"><label class="form-lbl">Zoom Meeting Link</label><input class="form-input" placeholder="https://zoom.us/j/..."/></div>
+          </div>
+          <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Contact info saved!')">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MEDIA LIBRARY ═══ -->
+    <div class="panel" id="panel-media">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Media Library</div><div class="sc-sub">All uploaded images and videos</div></div>
+        <div class="sc-body">
+          <div class="upload-zone" style="padding:24px;" onclick="showToast('📁 Media upload would open here')">
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">Drop files here or click to upload</div>
+            <div class="upload-sub">Images (JPG, PNG, WebP) or Videos (MP4, MOV)</div>
+          </div>
+          <div class="media-grid" style="margin-top:20px;" id="media-library-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BANNERS ═══ -->
+    <div class="panel" id="panel-banners">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Banners & Hero Slides</div></div>
+        <div class="sc-body">
+          <div style="background:linear-gradient(135deg,#100e0b,#2d1e10);border-radius:16px;padding:36px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div>
+              <div style="font-size:12px;letter-spacing:.2em;color:var(--accent2);font-weight:700;margin-bottom:8px;">CURRENT HERO</div>
+              <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#fff;">Shop <em style="color:var(--accent);">Everything</em> You Love</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.5);margin-top:8px;">UGC video · Live calls · Guest checkout</div>
+            </div>
+            <button class="hdr-btn hdr-btn-primary" onclick="nav(document.querySelector('.sb-item[onclick*=appearance]'),'appearance')">Edit Hero →</button>
+          </div>
+          <div style="font-weight:800;margin-bottom:14px;">Promo Banners</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+            <div style="background:linear-gradient(140deg,#ffe4cc,#ffb87a);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
+              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;">NEW SEASON</div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;">Refresh Your Bedroom</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:6px;">✏️ Click to edit</div>
+            </div>
+            <div style="background:linear-gradient(140deg,#d0f0d8,#8dd4a0);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
+              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--green);margin-bottom:6px;">OUTDOOR LIVING</div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;">Garden Ready</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:6px;">✏️ Click to edit</div>
+            </div>
+            <div style="background:linear-gradient(140deg,#181310,#2e2118);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
+              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--accent2);margin-bottom:6px;">SMART HOME</div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;color:#fff;">Light Up Your Space</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;">✏️ Click to edit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGES ═══ -->
+    <div class="panel" id="panel-pages">
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Store Pages</div></div>
+        <div class="sc-body">
+          <table class="data-table">
+            <thead><tr><th>Page</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><b>Homepage</b></td><td><span class="badge badge-green">Published</span></td><td>Today</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('Homepage editor opening…')">Edit</button><button class="tbl-btn" onclick="openStorefront()">View</button></div></td></tr>
+              <tr><td><b>About Us</b></td><td><span class="badge badge-gray">Draft</span></td><td>2 days ago</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('About page editor…')">Edit</button></div></td></tr>
+              <tr><td><b>Contact</b></td><td><span class="badge badge-green">Published</span></td><td>1 week ago</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('Contact page editor…')">Edit</button></div></td></tr>
+              <tr><td><b>FAQ</b></td><td><span class="badge badge-green">Published</span></td><td>1 week ago</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('FAQ editor…')">Edit</button></div></td></tr>
+              <tr><td><b>Privacy Policy</b></td><td><span class="badge badge-green">Published</span></td><td>2 weeks ago</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('Privacy policy editor…')">Edit</button></div></td></tr>
+              <tr><td><b>Returns Policy</b></td><td><span class="badge badge-green">Published</span></td><td>2 weeks ago</td><td><div class="table-actions"><button class="tbl-btn" onclick="showToast('Returns policy editor…')">Edit</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ANALYTICS ═══ -->
+    <div class="panel" id="panel-analytics">
+      <div class="stats-row" style="margin-bottom:20px;">
+        <div class="stat-card orange"><div class="stat-icon">👁</div><div class="stat-val">14,820</div><div class="stat-lbl">Page Views (30d)</div><div class="stat-change up">↑ 23%</div></div>
+        <div class="stat-card yellow"><div class="stat-icon">🛒</div><div class="stat-val">3.8%</div><div class="stat-lbl">Conversion Rate</div><div class="stat-change up">↑ 0.4%</div></div>
+        <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-val">$50.52</div><div class="stat-lbl">Avg Order Value</div><div class="stat-change up">↑ $4</div></div>
+        <div class="stat-card blue"><div class="stat-icon">📞</div><div class="stat-val">142</div><div class="stat-lbl">Live Calls</div><div class="stat-change up">↑ 18%</div></div>
+      </div>
+      <div class="section-card">
+        <div class="sc-head"><div class="sc-title">Top Products by Revenue</div></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Product</th><th>Views</th><th>Orders</th><th>Revenue</th><th>Conversion</th></tr></thead>
+            <tbody id="analytics-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="adm-modal-overlay" id="confirm-modal">
+  <div class="adm-modal">
+    <h3>Delete Product?</h3>
+    <p id="confirm-msg">Are you sure you want to delete this product? This action cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn-confirm" id="confirm-btn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:13px 22px;border-radius:12px;font-size:14px;font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;z-index:9999;max-width:340px;"></div>
+
+<script>
+// ─── STATE ───
+let products = [
+  {id:1,name:'Velvet 3-Seater Sofa in Dusty Rose',brand:'Cozy Co.',category:'Furniture',price:649,wasPrice:929,stock:7,status:'active',featured:true,icon:'🛋️',pageColor:'#ffffff'},
+  {id:2,name:'UltraSlim Pro Laptop 15" 512GB',brand:'TechNova',category:'Electronics',price:1199,wasPrice:0,stock:14,status:'active',featured:true,icon:'💻',pageColor:'#ffffff'},
+  {id:3,name:'Air Cloud Running Sneakers White',brand:'Stride',category:'Fashion',price:89,wasPrice:110,stock:42,status:'active',featured:true,icon:'👟',pageColor:'#ffffff'},
+  {id:4,name:'Espresso Machine with Milk Frother',brand:'Brew Master',category:'Kitchen',price:299,wasPrice:349,stock:2,status:'active',featured:true,icon:'☕',pageColor:'#fff5f3'},
+  {id:5,name:'Smart LED Pendant Light Gold',brand:'LumiGlow',category:'Lighting',price:129,wasPrice:152,stock:18,status:'active',featured:false,icon:'💡',pageColor:'#ffffff'},
+  {id:6,name:'Noise-Cancelling Wireless Headphones',brand:'SoundWave',category:'Electronics',price:199,wasPrice:249,stock:31,status:'active',featured:true,icon:'🎧',pageColor:'#f3f8ff'},
+  {id:7,name:'Rattan Garden Chair Set (2 pcs)',brand:'GreenSpace',category:'Outdoor',price:224,wasPrice:299,stock:9,status:'draft',featured:false,icon:'🪑',pageColor:'#f4faf5'},
+  {id:8,name:'Structured Leather Tote Bag Camel',brand:'Luxe & Co.',category:'Fashion',price:159,wasPrice:0,stock:23,status:'active',featured:true,icon:'👜',pageColor:'#ffffff'},
+];
+let orders = [
+  {id:1047,customer:'Sarah M.',email:'sarah@email.com',products:'Velvet 3-Seater Sofa',total:701,date:'Today, 10:23am',status:'pending'},
+  {id:1046,customer:'James T.',email:'james@email.com',products:'Headphones + Laptop',total:1398,date:'Yesterday',status:'processing'},
+  {id:1045,customer:'Amina K.',email:'amina@email.com',products:'Espresso Machine',total:351,date:'Mar 19',status:'shipped'},
+  {id:1044,customer:'David L.',email:'david@email.com',products:'Sneakers (White, L)',total:89,date:'Mar 18',status:'delivered'},
+  {id:1043,customer:'Maria S.',email:'maria@email.com',products:'LED Pendant Light',total:129,date:'Mar 17',status:'delivered'},
+];
+let categories = [
+  {name:'Furniture',icon:'🛋️',count:1},{name:'Electronics',icon:'📱',count:2},{name:'Fashion',icon:'👗',count:2},
+  {name:'Kitchen',icon:'🍳',count:1},{name:'Lighting',icon:'💡',count:1},{name:'Outdoor',icon:'🌿',count:1},
+];
+let customers = [
+  {name:'Sarah M.',email:'sarah@email.com',orders:3,spent:1890,type:'registered',joined:'Jan 12, 2026'},
+  {name:'James T.',email:'james@email.com',orders:2,spent:1398,type:'registered',joined:'Feb 5, 2026'},
+  {name:'Amina K.',email:'amina@email.com',orders:5,spent:2340,type:'registered',joined:'Dec 2, 2025'},
+  {name:'David L.',email:'david@email.com',orders:1,spent:89,type:'guest',joined:'Mar 18, 2026'},
+  {name:'Maria S.',email:'maria@email.com',orders:4,spent:650,type:'registered',joined:'Nov 20, 2025'},
+];
+let contentSections = [];
+let editingProductId = null;
+let deleteTargetId = null;
+let productPageColor = '#ffffff';
+let currentVideoData = null;   // {base64, name, size, type}
+let currentVideoURL  = '';
+let currentImages    = [];     // [{base64, name}]
+let checkoutMethod   = 'standard'; // 'standard'|'form'|'both'
+let paymentRoute     = 'pod';      // 'pod'|'online'|'both'
+
+const PAGE_COLORS = [
+  {name:'White',bg:'#ffffff'},{name:'Warm Cream',bg:'#faf8f4'},{name:'Blush',bg:'#fff5f3'},
+  {name:'Sage',bg:'#f4faf5'},{name:'Sky',bg:'#f3f8ff'},{name:'Lavender',bg:'#f7f4ff'},
+  {name:'Mint',bg:'#f2fdf8'},{name:'Champagne',bg:'#fdf9f0'},
+];
+
+// ─── NAVIGATION ───
+
+
+// ─── PRODUCTS TABLE ───
+function renderProductsTable(filter=''){
+  const tbody = document.getElementById('products-table-body');
+  const filtered = products.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase())||p.category.toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('prod-table-sub').textContent = `${filtered.length} product${filtered.length!==1?'s':''} in your store`;
+  tbody.innerHTML = filtered.map(p=>`
+    <tr>
+      <td><div class="prod-cell"><div class="prod-thumb">${p.icon}</div><div><div class="prod-name-cell">${p.name}</div><div class="prod-cat">${p.brand}</div></div></div></td>
+      <td><span class="badge badge-gray">${p.category}</span></td>
+      <td><b>$${p.price}</b>${p.wasPrice?`<span style="color:var(--muted);font-size:12px;text-decoration:line-through;margin-left:6px;">$${p.wasPrice}</span>`:''}</td>
+      <td><span class="badge ${p.stock<=3?'badge-red':p.stock<=10?'badge-orange':'badge-green'}">${p.stock} left</span></td>
+      <td><span class="badge ${p.status==='active'?'badge-green':'badge-gray'}">${p.status==='active'?'Active':'Draft'}</span></td>
+      <td><div class="table-actions">
+        <button class="tbl-btn" onclick="editProduct(${p.id})">✏️ Edit</button>
+        <button class="tbl-btn danger" onclick="promptDelete(${p.id})">🗑</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+function filterProducts(v){ renderProductsTable(v); }
+
+// ─── EDIT PRODUCT ───
+function editProduct(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  editingProductId = id;
+
+  // Basic fields
+  const setVal = (elId, val) => { const el=document.getElementById(elId); if(el) el.value=val||''; };
+  setVal('fp-name',       p.name);
+  setVal('fp-brand',      p.brand);
+  setVal('fp-price',      p.price);
+  setVal('fp-was-price',  p.wasPrice||'');
+  setVal('fp-stock',      p.stock||10);
+  setVal('fp-desc',       p.desc);
+  setVal('fp-colors',     p.colors);
+  setVal('fp-sizes',      p.sizes);
+  setVal('fp-video-url',  p.videoURL);
+  setVal('fp-installment',p.installment);
+  setVal('fp-delivery',   p.deliveryInfo);
+  setVal('fp-shipping-notes', p.shippingNotes);
+  setVal('fp-return-days',p.returnDays);
+  setVal('fp-warranty',   p.warranty);
+  setVal('fp-return-policy', p.returnPolicy);
+  if(document.getElementById('fp-category')) document.getElementById('fp-category').value = p.category||'';
+  setProductPageColor(p.pageColor||'#ffffff');
+
+  // Media fit
+  const fitVal = p.mediaFit||'cover';
+  const fitRadio = document.getElementById('fp-fit-'+fitVal);
+  if(fitRadio) fitRadio.checked = true;
+
+  // Restore video upload
+  currentVideoData = null; currentImages = [];
+  removeVideo();
+  if(p.videoData && p.videoData.base64){
+    currentVideoData = p.videoData;
+    document.getElementById('video-filename').textContent = p.videoData.name||'video.mp4';
+    document.getElementById('video-filesize').textContent = (p.videoData.size||'?')+' MB';
+    document.getElementById('video-drop').style.display='none';
+    document.getElementById('video-preview-wrap').style.display='block';
+    let vEl = document.getElementById('admin-video-preview');
+    if(!vEl){ vEl=document.createElement('video'); vEl.id='admin-video-preview'; vEl.controls=true; vEl.style.cssText='width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;'; document.getElementById('video-preview-wrap').appendChild(vEl); }
+    vEl.src = p.videoData.base64;
+  }
+
+  // Restore images
+  if(p.images && p.images.length){
+    currentImages = [...p.images];
+    const grid = document.getElementById('media-grid');
+    if(grid){
+      grid.querySelectorAll('.media-item:not(.add-media)').forEach(el=>el.remove());
+      currentImages.forEach((imgData,idx)=>{
+        const div=document.createElement('div'); div.className='media-item'; div.dataset.idx=idx;
+        const img=document.createElement('img'); img.src=imgData.base64; img.style.cssText='width:100%;height:100%;object-fit:cover;';
+        const btn=document.createElement('button'); btn.className='del-media'; btn.textContent='✕';
+        btn.onclick=()=>{ currentImages.splice(parseInt(div.dataset.idx),1); div.remove(); };
+        div.append(img,btn); grid.insertBefore(div, grid.lastElementChild);
+      });
+    }
+  }
+
+  // Content sections
+  if(p.contentSections){ contentSections=[...p.contentSections]; renderContentSections(); }
+
+  // Checkout settings
+  checkoutMethod = p.checkoutMethod||'standard';
+  paymentRoute   = p.paymentRoute||'pod';
+  if(typeof toggleCheckoutMethod==='function') toggleCheckoutMethod(checkoutMethod);
+  if(typeof togglePayRoute==='function') togglePayRoute(paymentRoute);
+  if(p.formConfig){
+    const fc=p.formConfig;
+    const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+    setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField);
+    ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
+  }
+  if(p.tyConfig){
+    const tc=p.tyConfig;
+    const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+    setV('fp-ty-heading',tc.heading); setV('fp-ty-sub',tc.sub); setV('fp-ty-body',tc.body);
+  }
+  if(p.gatewayConfig){
+    const gc=p.gatewayConfig;
+    if(document.getElementById('fp-gateway')){document.getElementById('fp-gateway').value=gc.gateway||'';if(typeof updateGatewayFields==='function')updateGatewayFields();}
+    if(document.getElementById('fp-currency')) document.getElementById('fp-currency').value=gc.currency||'USD';
+    setTimeout(()=>{
+      if(document.getElementById('fp-gw-key')&&gc.publicKey)  document.getElementById('fp-gw-key').value=gc.publicKey;
+      if(document.getElementById('fp-gw-url')&&gc.customUrl)  document.getElementById('fp-gw-url').value=gc.customUrl;
+      if(document.getElementById('fp-success-url')&&gc.successUrl) document.getElementById('fp-success-url').value=gc.successUrl;
+    },100);
+  }
+
+  // Agent assignment
+  const agentSel = document.getElementById('fp-agent');
+  if(agentSel){
+    if(typeof refreshAgentDropdowns==='function') refreshAgentDropdowns();
+    if(p.agentId){ agentSel.value=p.agentId; if(typeof previewSelectedAgent==='function') previewSelectedAgent(p.agentId); }
+    else { agentSel.value=''; const pr=document.getElementById('fp-agent-preview'); if(pr) pr.style.display='none'; }
+  }
+
+  nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
+  showToast(`✏️ Editing: ${p.name}`);
+}
+
+function saveProduct(draft=false){
+  const name      = document.getElementById('fp-name')?.value.trim()||'';
+  const brand     = document.getElementById('fp-brand')?.value.trim()||'';
+  const cat       = document.getElementById('fp-category')?.value||'';
+  const price     = parseFloat(document.getElementById('fp-price')?.value)||0;
+  const wasPrice  = parseFloat(document.getElementById('fp-was-price')?.value)||0;
+  const stock     = parseInt(document.getElementById('fp-stock')?.value)||10;
+  const desc      = document.getElementById('fp-desc')?.value.trim()||'';
+  const colors    = document.getElementById('fp-colors')?.value.trim()||'';
+  const sizes     = document.getElementById('fp-sizes')?.value.trim()||'';
+  const videoURL  = document.getElementById('fp-video-url')?.value.trim()||'';
+  const installment   = document.getElementById('fp-installment')?.value.trim()||'';
+  const deliveryInfo  = document.getElementById('fp-delivery')?.value.trim()||'';
+  const shippingNotes = document.getElementById('fp-shipping-notes')?.value.trim()||'';
+  const returnDays    = document.getElementById('fp-return-days')?.value.trim()||'30 days';
+  const warranty      = document.getElementById('fp-warranty')?.value.trim()||'';
+  const returnPolicy  = document.getElementById('fp-return-policy')?.value.trim()||'';
+  const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
+  const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
+
+  if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
+
+  // Collect checkout / form / gateway settings
+  const cm = checkoutMethod||'standard';
+  const pr = paymentRoute||'pod';
+  const formConfig = {
+    btnLabel:    document.getElementById('fp-form-btn-label')?.value||'Place My Order →',
+    heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
+    subtext:     document.getElementById('fp-form-subtext')?.value||'',
+    customField: document.getElementById('fp-custom-field')?.value||'',
+    ...['name','email','phone','address','city','qty','color','size','notes']
+      .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
+  };
+  const tyConfig = {
+    heading: document.getElementById('fp-ty-heading')?.value||'Order Confirmed! 🎉',
+    sub:     document.getElementById('fp-ty-sub')?.value||'',
+    body:    document.getElementById('fp-ty-body')?.value||'',
+  };
+  const gw = document.getElementById('fp-gateway')?.value||'';
+  const gatewayConfig = {
+    gateway:   gw,
+    publicKey: document.getElementById('fp-gw-key')?.value||'',
+    customUrl: document.getElementById('fp-gw-url')?.value||'',
+    currency:  document.getElementById('fp-currency')?.value||'USD',
+    successUrl:document.getElementById('fp-success-url')?.value||'',
+  };
+
+  // Media payload
+  const videoData    = currentVideoData||null;
+  const images       = [...(currentImages||[])];
+  const effectiveUrl = videoURL||'';
+
+  const icons = {'Furniture':'🛋️','Electronics':'💻','Fashion':'👗','Kitchen':'🍳','Lighting':'💡','Outdoor':'🌿','Bedding':'🛏️','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
+
+  const payload = {
+    name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
+    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, agentId,
+    videoData, videoURL:effectiveUrl, images,
+    deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
+    contentSections:[...contentSections],
+    checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
+  };
+
+  if(editingProductId){
+    const p = products.find(x=>x.id===editingProductId);
+    if(p) Object.assign(p, payload);
+    showToast('✅ Product updated!');
+  } else {
+    products.push({id:Date.now(), featured:false, icon:icons[cat]||'📦', ...payload});
+    showToast(draft?'📝 Saved as draft!':'✅ Product published!');
+  }
+  updateCounts();
+  editingProductId = null;
+  clearProductForm();
+  saveToStorage();
+  nav(document.querySelector('.sb-item[onclick*=products]'),'products');
+}
+
+function clearProductForm(){
+  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('fp-stock').value = 10;
+  setProductPageColor('#ffffff');
+  // Reset media fit
+  const fitCover = document.getElementById('fp-fit-cover');
+  if(fitCover) fitCover.checked = true;
+  contentSections = [];
+  renderContentSections();
+  editingProductId = null;
+}
+
+function updateCounts(){
+  const active = products.filter(p=>p.status==='active').length;
+  document.getElementById('prod-count-badge').textContent = products.length;
+  document.getElementById('total-products-stat').textContent = active;
+}
+
+// ─── DELETE ───
+function promptDelete(id){
+  deleteTargetId = id;
+  const p = products.find(x=>x.id===id);
+  document.getElementById('confirm-msg').textContent = `Delete "${p?.name}"? This cannot be undone.`;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function confirmDelete(){
+  products = products.filter(p=>p.id!==deleteTargetId);
+  closeModal();
+  updateCounts();
+  renderProductsTable();
+  showToast('🗑 Product deleted');
+}
+function closeModal(){ document.getElementById('confirm-modal').classList.remove('open'); }
+
+
+function updateOrderStatus(id,status){
+  if(!status||status==='Update status') return;
+  const o = orders.find(x=>x.id===id);
+  if(o){ o.status=status; renderOrders(); showToast(`✅ Order #${id} → ${status}`); }
+}
+
+
+
+
+
+
+
+
+
+
+
+// ─── CONTENT SECTIONS ───
+function renderContentSections(){
+  const list = document.getElementById('content-sections-list');
+  list.innerHTML = contentSections.map((s,i)=>buildSectionHTML(s,i)).join('');
+}
+function buildSectionHTML(s,i){
+  const types = {'headline-text':'📝 Headline + Text','text-image-right':'🖼 Text + Image Right','image-text-right':'🖼 Image + Text Right','bullet-list':'✅ Bullet List','stats':'📊 Stats Row','callout':'💬 Callout / Quote','specs':'📐 Specs Table','faq':'❓ FAQ'};
+  let inner = '';
+  if(s.type==='headline-text') inner=`
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Sink Into Pure Comfort Every Day" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Eyebrow Text (small label above)</label><input class="form-input" value="${s.eyebrow||''}" placeholder="e.g. ✨ Why Everyone's Obsessed" oninput="contentSections[${i}].eyebrow=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Your main paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Background</label><select class="form-select" onchange="contentSections[${i}].bg=this.value"><option value="white" ${s.bg==='white'?'selected':''}>White</option><option value="dark" ${s.bg==='dark'?'selected':''}>Dark (ink)</option><option value="warm" ${s.bg==='warm'?'selected':''}>Warm</option></select></div>
+  `;
+  else if(s.type==='text-image-right'||s.type==='image-text-right') inner=`
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${s.emoji||''}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${s.caption||''}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
+  `;
+  else if(s.type==='bullet-list') inner=`
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Key Features" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Bullet Points (one per line, start with emoji)</label><textarea class="form-textarea" placeholder="✅ Feature one&#10;✅ Feature two&#10;✅ Feature three" oninput="contentSections[${i}].bullets=this.value">${s.bullets||''}</textarea></div>
+  `;
+  else if(s.type==='callout') inner=`
+    <div class="form-group"><label class="form-lbl">Emoji Icon</label><input class="form-input" value="${s.emoji||'💬'}" style="width:80px;" oninput="contentSections[${i}].emoji=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Quote / Callout Text</label><textarea class="form-textarea" placeholder="e.g. "I've never owned a sofa this comfortable in my life." — Sarah R." oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Color</label><select class="form-select" onchange="contentSections[${i}].color=this.value"><option value="orange">Orange</option><option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option></select></div>
+  `;
+  else if(s.type==='stats') inner=`
+    <div class="form-group"><label class="form-lbl">Stats (format: Number|Label, one per line)</label><textarea class="form-textarea" placeholder="380|GSM Fabric Weight&#10;5|Colour Options&#10;A+|Fire Safety Rating" oninput="contentSections[${i}].stats=this.value">${s.stats||''}</textarea></div>
+  `;
+  else if(s.type==='specs') inner=`
+    <div class="form-group"><label class="form-lbl">Specs (format: Label|Value, one per line)</label><textarea class="form-textarea" placeholder="🎨 Color|Dusty Rose, Charcoal&#10;🧵 Material|Premium Velvet&#10;📐 Width|220cm" oninput="contentSections[${i}].specs=this.value">${s.specs||''}</textarea></div>
+  `;
+  else if(s.type==='faq') inner=`
+    <div class="form-group"><label class="form-lbl">FAQs (format: Question|Answer, one per line)</label><textarea class="form-textarea" style="min-height:140px;" placeholder="Can I return it?|Yes, within 30 days no questions asked.&#10;How long is delivery?|3-5 business days standard." oninput="contentSections[${i}].faqs=this.value">${s.faqs||''}</textarea></div>
+  `;
+  return `<div class="content-section"><div class="cs-header"><span class="cs-type-badge">${types[s.type]||s.type}</span></div><button class="cs-del" onclick="removeSection(${i})">✕</button>${inner}</div>`;
+}
+function addSection(type){ contentSections.push({type}); renderContentSections(); showToast('✅ Section added'); }
+function removeSection(i){ contentSections.splice(i,1); renderContentSections(); }
+
+// ─── PAGE COLOR ───
+function setProductPageColor(hex){
+  if(!hex) return;
+  productPageColor = hex;
+  document.getElementById('fp-page-color').value = hex.length===7?hex:'#ffffff';
+  document.getElementById('fp-page-color-hex').value = hex;
+  const names = {'#ffffff':'White — Default','#faf8f4':'Warm Cream','#fff5f3':'Soft Blush','#f4faf5':'Sage Green','#f3f8ff':'Sky Blue','#f7f4ff':'Lavender','#f2fdf8':'Mint','#fdf9f0':'Champagne'};
+  document.getElementById('color-preview-badge').textContent = names[hex]||hex;
+  document.querySelectorAll('.color-swatch-admin').forEach(s=>s.classList.toggle('active',s.dataset.hex===hex));
+}
+// Build color swatches
+const cgEl = document.getElementById('admin-color-grid');
+PAGE_COLORS.forEach(c=>{
+  const el = document.createElement('div');
+  el.className = 'color-swatch-admin'+(c.bg==='#ffffff'?' active':'');
+  el.style.background = c.bg;
+  el.style.border = c.bg==='#ffffff'?'2.5px solid #e0e0e0':'2.5px solid transparent';
+  el.title = c.name; el.dataset.hex = c.bg;
+  el.onclick = ()=>setProductPageColor(c.bg);
+  cgEl.appendChild(el);
+});
+
+// ─── VIDEO UPLOAD ───
+function handleVideoUpload(input){
+  if(!input.files[0]) return;
+  const f = input.files[0];
+  const maxMB = 50;
+  if(f.size > maxMB*1024*1024){
+    showToast('⚠️ Video too large (max 50MB). Paste a YouTube/Vimeo URL instead.');
+    return;
+  }
+  showToast('⏳ Reading video… please wait');
+  const reader = new FileReader();
+  reader.onload = e => {
+    currentVideoData = { base64: e.target.result, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
+    document.getElementById('video-filename').textContent = f.name;
+    document.getElementById('video-filesize').textContent = currentVideoData.size + ' MB';
+    document.getElementById('video-drop').style.display = 'none';
+    document.getElementById('video-preview-wrap').style.display = 'block';
+    // Show preview player
+    let vEl = document.getElementById('admin-video-preview');
+    if(!vEl){
+      vEl = document.createElement('video');
+      vEl.id = 'admin-video-preview';
+      vEl.controls = true;
+      vEl.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;';
+      document.getElementById('video-preview-wrap').appendChild(vEl);
+    }
+    vEl.src = e.target.result;
+    showToast('✅ Video ready: ' + f.name);
+  };
+  reader.onerror = () => showToast('❌ Failed to read video file');
+  reader.readAsDataURL(f);
+}
+function handleVideoDrop(e){
+  e.preventDefault(); document.getElementById('video-drop').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('video/')){ document.getElementById('video-filename').textContent=f.name; document.getElementById('video-filesize').textContent=(f.size/1024/1024).toFixed(1)+' MB'; document.getElementById('video-drop').style.display='none'; document.getElementById('video-preview-wrap').style.display='block'; }
+}
+function removeVideo(){
+  currentVideoData = null;
+  const vEl = document.getElementById('admin-video-preview');
+  if(vEl) vEl.remove();
+  const drop = document.getElementById('video-drop');
+  const wrap = document.getElementById('video-preview-wrap');
+  if(drop) drop.style.display = 'block';
+  if(wrap) wrap.style.display = 'none';
+  const fi = document.getElementById('video-file-input');
+  if(fi) fi.value = '';
+}
+function handleImageUpload(input){
+  const grid = document.getElementById('media-grid');
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const data = { base64: e.target.result, name: f.name };
+      currentImages.push(data);                          // ← save to state
+      const div = document.createElement('div');
+      div.className = 'media-item';
+      div.dataset.idx = currentImages.length - 1;
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      const btn = document.createElement('button');
+      btn.className = 'del-media'; btn.textContent = '✕';
+      btn.onclick = () => {
+        const idx = parseInt(div.dataset.idx);
+        currentImages.splice(idx, 1);
+        div.remove();
+        // re-index remaining items
+        grid.querySelectorAll('.media-item[data-idx]').forEach((el,i) => el.dataset.idx = i);
+        showToast('🗑 Image removed');
+      };
+      div.append(img, btn);
+      grid.insertBefore(div, grid.lastElementChild);
+      loaded++;
+      if(loaded === files.length) showToast(`✅ ${loaded} image(s) loaded`);
+    };
+    reader.onerror = () => showToast('❌ Failed to read image');
+    reader.readAsDataURL(f);
+  });
+}
+
+// ─── FORM TABS ───
+function switchFormTab(btn,id){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── BRAND COLOR ───
+function updateBrandColor(v){
+  document.getElementById('brand-color-picker').value = v;
+  document.getElementById('brand-color-hex').value = v;
+}
+
+// ─── TOAST ───
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform='translateY(0)'; t.style.opacity='1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);
+}
+
+
+
+// ─── INIT ───
+renderOrders();
+renderMediaLibrary();
+// Default content sections for new product
+contentSections = [
+  {type:'headline-text',eyebrow:'✨ Why Everyone\'s Obsessed',headline:'Experience the Difference Instantly',body:'Write a compelling intro paragraph about your product here. Explain what makes it special and why customers will love it.',bg:'dark'},
+  {type:'text-image-right',headline:'Premium Quality You Can Feel',body:'Describe the materials, quality, and craftsmanship here. Be specific about what sets your product apart.',emoji:'🎁',caption:'Upload product photo here'},
+  {type:'bullet-list',headline:'Key Features',bullets:'✅ First amazing feature\n✅ Second key benefit\n✅ Third selling point\n✅ Fourth reason to buy'},
+  {type:'callout',emoji:'💬',body:'"Add a customer quote here." — Customer Name, ⭐⭐⭐⭐⭐',color:'orange'},
+  {type:'specs',specs:'📦 Includes|Product × 1, Accessories\n⚖️ Weight|0 kg\n📐 Dimensions|0 × 0 × 0 cm'},
+  {type:'faq',faqs:'Can I return it?|Yes, within 30 days no questions asked.\nHow long is delivery?|3–5 business days free standard.'},
+];
+renderContentSections();
+updateCounts();
+
+// ─── LOCALSTORAGE ───
+const STORAGE_KEY='shoppla_products_v1';
+const ORDERS_KEY='shoppla_orders_v1';
+const SETTINGS_KEY='shoppla_settings_v1';
+const AGENTS_KEY='shoppla_agents_v1';
+
+function saveToStorage(){
+  try{
+    const data=JSON.stringify(products);
+    localStorage.setItem(STORAGE_KEY,data);
+    localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
+  }catch(e){
+    if(e.name==='QuotaExceededError') showToast('❌ Storage full! Use video URLs instead of uploads.');
+  }
+}
+function loadFromStorage(){
+  try{
+    const p=localStorage.getItem(STORAGE_KEY);
+    const o=localStorage.getItem(ORDERS_KEY);
+    if(p) products=JSON.parse(p);
+    if(o) orders=JSON.parse(o);
+  }catch(e){}
+}
+
+// ─── AGENTS ───
+let agents=[
+  {id:1,name:'Sarah Johnson',role:'Furniture Specialist',phone:'+1 (555) 010-2233',whatsapp:'https://wa.me/15550102233',zoom:'https://zoom.us/j/111',email:'sarah@shoppla.com',avatar:'S',avatarColor:'#e8541a',avatarImg:'',availability:'Mon–Fri 9am–6pm',status:'online',bio:'Expert in sofas, beds and home decor.'},
+  {id:2,name:'James Okafor',role:'Electronics Expert',phone:'+1 (555) 020-4455',whatsapp:'https://wa.me/15550204455',zoom:'https://zoom.us/j/222',email:'james@shoppla.com',avatar:'J',avatarColor:'#2563eb',avatarImg:'',availability:'Mon–Sat 10am–7pm',status:'online',bio:'Tech product specialist.'},
+  {id:3,name:'Amina Khalid',role:'Fashion Consultant',phone:'+1 (555) 030-6677',whatsapp:'https://wa.me/15550306677',zoom:'',email:'amina@shoppla.com',avatar:'A',avatarColor:'#7c3aed',avatarImg:'',availability:'Mon–Fri 8am–5pm',status:'busy',bio:'Style advisor for fashion.'},
+  {id:4,name:'David Chen',role:'General Support',phone:'+1 (555) 040-8899',whatsapp:'https://wa.me/15550408899',zoom:'https://zoom.us/j/444',email:'david@shoppla.com',avatar:'D',avatarColor:'#1a8a4a',avatarImg:'',availability:'24/7 Support',status:'online',bio:'General support for orders and returns.'},
+];
+function loadAgents(){
+  try{const a=JSON.parse(localStorage.getItem(AGENTS_KEY)||'[]');if(Array.isArray(a)&&a.length)agents=a;}catch(e){}
+}
+function saveAgents(){ try{localStorage.setItem(AGENTS_KEY,JSON.stringify(agents));}catch(e){} }
+
+function renderAgents(){
+  const grid=document.getElementById('agents-grid');
+  const empty=document.getElementById('agents-empty');
+  if(!grid)return;
+  if(!agents.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+  grid.innerHTML=agents.map(a=>`
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;position:relative;transition:box-shadow .2s;" onmouseenter="this.style.boxShadow='0 8px 24px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:${a.avatarImg?'none':a.avatarColor};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">
+          ${a.avatarImg?`<img src="${a.avatarImg}" style="width:100%;height:100%;object-fit:cover;"/>`:a.avatar||a.name[0]}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:800;font-size:15px;">${a.name}</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:2px;">${a.role}</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:5px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:${a.status==='online'?'#1a8a4a':a.status==='busy'?'#f7b84a':'#aaa'};flex-shrink:0;"></div>
+            <span style="font-size:11.5px;color:${a.status==='online'?'#1a8a4a':a.status==='busy'?'#c8840a':'#8a8480'};font-weight:600;">${a.status==='online'?'Online':a.status==='busy'?'Busy':'Offline'}</span>
+            <span style="font-size:11px;color:var(--muted);">· ${a.availability}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button class="tbl-btn" onclick="openAgentModal(${a.id})" style="padding:5px 9px;font-size:12px;">✏️</button>
+          <button class="tbl-btn danger" onclick="deleteAgent(${a.id})" style="padding:5px 9px;font-size:12px;">🗑</button>
+        </div>
+      </div>
+      ${a.bio?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;font-style:italic;">"${a.bio}"</div>`:''}
+      <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border);padding-top:11px;">
+        ${a.phone?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>📞</span><span style="color:var(--muted);">${a.phone}</span></div>`:''}
+        ${a.whatsapp?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>💬</span><a href="${a.whatsapp}" target="_blank" style="color:var(--green);font-weight:600;">WhatsApp</a></div>`:''}
+        ${a.zoom?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>📹</span><a href="${a.zoom}" target="_blank" style="color:var(--blue);font-weight:600;">Zoom</a></div>`:''}
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);">📦 Assigned to: <b>${products.filter(p=>p.agentId===a.id).length} product(s)</b></div>
+    </div>`).join('');
+  refreshAgentDropdowns();
+}
+
+function refreshAgentDropdowns(){
+  const sel=document.getElementById('fp-agent');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Default (Store settings)</option>'+agents.map(a=>`<option value="${a.id}">${a.name} — ${a.role}</option>`).join('');
+  if(cur)sel.value=cur;
+}
+
+document.addEventListener('change',e=>{if(e.target?.id==='fp-agent')previewSelectedAgent(e.target.value);});
+
+function previewSelectedAgent(agentId){
+  const preview=document.getElementById('fp-agent-preview');
+  if(!preview)return;
+  if(!agentId){preview.style.display='none';return;}
+  const a=agents.find(x=>x.id===parseInt(agentId));
+  if(!a){preview.style.display='none';return;}
+  const av=document.getElementById('fp-agent-avatar');
+  const nm=document.getElementById('fp-agent-name');
+  const rl=document.getElementById('fp-agent-role');
+  const st=document.getElementById('fp-agent-status');
+  if(av){av.innerHTML=a.avatarImg?`<img src="${a.avatarImg}" style="width:100%;height:100%;object-fit:cover;"/>`:a.avatar||a.name[0];av.style.background=a.avatarImg?'none':a.avatarColor;}
+  if(nm)nm.textContent=a.name;
+  if(rl)rl.textContent=a.role;
+  if(st)st.innerHTML=`<span style="color:${a.status==='online'?'#1a8a4a':'#c8840a'};font-weight:600;">● ${a.status==='online'?'Online':'Busy'}</span> · ${a.availability}`;
+  preview.style.display='flex';
+}
+
+function openAgentModal(agentId){
+  const a=agentId?agents.find(x=>x.id===agentId):null;
+  document.getElementById('agent-modal')?.remove();
+  const el=document.createElement('div');
+  el.id='agent-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(7px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  el.innerHTML=`<div style="background:#fff;border-radius:20px;padding:0;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="padding:22px 26px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Fraunces',serif;font-size:19px;font-weight:900;">${a?'Edit Agent':'Add New Agent'}</div>
+      <button onclick="document.getElementById('agent-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">✕</button>
+    </div>
+    <div style="padding:22px 26px 28px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:14px;background:var(--warm);border-radius:12px;">
+        <div id="am-avatar-preview" style="width:56px;height:56px;border-radius:50%;background:${a?.avatarColor||'#e8541a'};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">
+          ${a?.avatarImg?`<img src="${a.avatarImg}" style="width:100%;height:100%;object-fit:cover;"/>`:a?.avatar||a?.name?.[0]||'?'}
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Agent Photo (optional)</div>
+          <input type="file" id="am-photo" accept="image/*" style="font-size:12.5px;" onchange="previewAgentPhoto(this)"/>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:6px;color:var(--muted);">Color</div>
+          <input type="color" id="am-color" value="${a?.avatarColor||'#e8541a'}" style="width:44px;height:36px;border:1.5px solid var(--border);border-radius:7px;padding:2px;cursor:pointer;" oninput="updateAgentAvatarColor(this.value)"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group" style="grid-column:span 2;"><label class="form-lbl">Full Name *</label><input class="form-input" id="am-name" value="${a?.name||''}" placeholder="e.g. Sarah Johnson"/></div>
+        <div class="form-group"><label class="form-lbl">Role / Speciality</label><input class="form-input" id="am-role" value="${a?.role||''}" placeholder="e.g. Furniture Specialist"/></div>
+        <div class="form-group"><label class="form-lbl">Availability</label><input class="form-input" id="am-avail" value="${a?.availability||''}" placeholder="e.g. Mon–Fri 9am–6pm"/></div>
+        <div class="form-group"><label class="form-lbl">Status</label>
+          <select class="form-select" id="am-status">
+            <option value="online" ${a?.status==='online'?'selected':''}>🟢 Online</option>
+            <option value="busy" ${a?.status==='busy'?'selected':''}>🟡 Busy</option>
+            <option value="offline" ${a?.status==='offline'?'selected':''}>⚫ Offline</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-lbl">Email</label><input class="form-input" id="am-email" type="email" value="${a?.email||''}" placeholder="agent@store.com"/></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+        <div style="font-weight:800;font-size:13.5px;margin-bottom:14px;">📞 Contact Channels</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group" style="grid-column:span 2;"><label class="form-lbl">Phone Number</label><input class="form-input" id="am-phone" value="${a?.phone||''}" placeholder="+1 (555) 000-0000"/></div>
+          <div class="form-group"><label class="form-lbl">WhatsApp Link</label><input class="form-input" id="am-whatsapp" value="${a?.whatsapp||''}" placeholder="https://wa.me/15551234567"/></div>
+          <div class="form-group"><label class="form-lbl">Zoom / Video Link</label><input class="form-input" id="am-zoom" value="${a?.zoom||''}" placeholder="https://zoom.us/j/..."/></div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:4px;"><label class="form-lbl">Short Bio</label><textarea class="form-textarea" id="am-bio" style="min-height:70px;" placeholder="A short sentence about this agent's expertise…">${a?.bio||''}</textarea></div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button onclick="saveAgent(${a?a.id:'null'})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">${a?'Save Changes':'Add Agent'}</button>
+        <button onclick="document.getElementById('agent-modal').remove()" style="flex:1;background:var(--warm);border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:14.5px;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  el.onclick=()=>el.remove();
+  el._photoBase64=a?.avatarImg||'';
+  document.body.appendChild(el);
+}
+
+function previewAgentPhoto(input){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const m=document.getElementById('agent-modal');
+    if(m)m._photoBase64=e.target.result;
+    const p=document.getElementById('am-avatar-preview');
+    if(p)p.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"/>`;
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+function updateAgentAvatarColor(color){
+  const m=document.getElementById('agent-modal');
+  const p=document.getElementById('am-avatar-preview');
+  if(p&&!m?._photoBase64){p.style.background=color;p.textContent=document.getElementById('am-name')?.value?.[0]||'?';}
+}
+
+function saveAgent(agentId){
+  const name=document.getElementById('am-name')?.value.trim();
+  if(!name){showToast('⚠️ Agent name is required');return;}
+  const modal=document.getElementById('agent-modal');
+  const data={
+    name,role:document.getElementById('am-role')?.value.trim()||'',
+    availability:document.getElementById('am-avail')?.value.trim()||'',
+    status:document.getElementById('am-status')?.value||'online',
+    email:document.getElementById('am-email')?.value.trim()||'',
+    phone:document.getElementById('am-phone')?.value.trim()||'',
+    whatsapp:document.getElementById('am-whatsapp')?.value.trim()||'',
+    zoom:document.getElementById('am-zoom')?.value.trim()||'',
+    bio:document.getElementById('am-bio')?.value.trim()||'',
+    avatar:name[0].toUpperCase(),
+    avatarImg:modal?._photoBase64||'',
+    avatarColor:document.getElementById('am-color')?.value||'#e8541a'
+  };
+  if(agentId&&agentId!=='null'){
+    const idx=agents.findIndex(a=>a.id===agentId);
+    if(idx>-1)agents[idx]={...agents[idx],...data};
+    showToast('✅ Agent updated!');
+  }else{
+    agents.push({...data,id:Date.now()});
+    showToast('✅ Agent added!');
+  }
+  saveAgents();saveToStorage();
+  document.getElementById('agent-modal')?.remove();
+  renderAgents();refreshAgentDropdowns();
+}
+
+function deleteAgent(id){
+  if(!confirm('Remove this agent?'))return;
+  agents=agents.filter(a=>a.id!==id);
+  products.forEach(p=>{if(p.agentId===id)delete p.agentId;});
+  saveAgents();saveToStorage();renderAgents();
+  showToast('🗑 Agent removed');
+}
+
+// ─── VIEW ORDER MODAL ───
+function viewOrder(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  document.getElementById('order-detail-modal')?.remove();
+  const el=document.createElement('div');
+  el.id='order-detail-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
+  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div style="font-family:'Fraunces',serif;font-size:19px;font-weight:900;">Order #${o.id}</div>
+      <button onclick="document.getElementById('order-detail-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">✕</button>
+    </div>
+    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Customer</div>
+      <div style="font-weight:700;font-size:15px;">${o.customer}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:3px;">${o.email||''}</div>
+      ${o.phone?`<div style="font-size:13px;color:var(--muted);">📞 ${o.phone}</div>`:''}
+      ${o.address?`<div style="font-size:13px;color:var(--muted);">📍 ${o.address}${o.city?', '+o.city:''}</div>`:''}
+    </div>
+    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Items</div>
+      <div style="font-weight:600;">${o.products}</div>
+      ${o.qty?`<div style="font-size:13px;color:var(--muted);">Qty: ${o.qty}</div>`:''}
+      ${o.color?`<div style="font-size:13px;color:var(--muted);">Colour: ${o.color}</div>`:''}
+      ${o.notes?`<div style="font-size:13px;color:var(--muted);">Notes: ${o.notes}</div>`:''}
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;background:#f5f4f0;border-radius:11px;padding:14px;margin-bottom:18px;">
+      <span style="color:var(--muted);">Total</span>
+      <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">$${typeof o.total==='number'?o.total.toLocaleString():o.total}</span>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Update Status</div>
+      <select onchange="updateOrderStatus(${o.id},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
+        <option value="">— Choose status —</option>
+        <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
+        <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+        <option value="shipped" ${o.status==='shipped'?'selected':''}>Shipped</option>
+        <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('order-detail-modal').remove()" style="flex:1;background:#f5f4f0;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;cursor:pointer;">Close</button>
+      <button onclick="showToast('📧 Email sent to ${o.email||'customer'}');document.getElementById('order-detail-modal').remove();" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📧 Email</button>
+    </div>
+  </div>`;
+  el.onclick=e=>{if(e.target===el)el.remove();};
+  document.body.appendChild(el);
+}
+
+// ─── ENHANCED RENDER ORDERS (with viewOrder wired) ───
+function renderOrders(){
+  const tbody=document.getElementById('orders-table-body');if(!tbody)return;
+  try{const so=JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]');so.forEach(o=>{if(!orders.find(x=>x.id===o.id))orders.push(o);});}catch(e){}
+  const sorted=[...orders].sort((a,b)=>b.id-a.id);
+  tbody.innerHTML=sorted.map(o=>`
+    <tr>
+      <td><b>#${o.id}</b></td>
+      <td>${o.customer}<div style="font-size:12px;color:var(--muted);">${o.email||''}</div></td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.products}</td>
+      <td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
+      <td>${o.date||'—'}</td>
+      <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td>
+      <td><div class="table-actions">
+        <button class="tbl-btn" onclick="viewOrder(${o.id})">👁 View</button>
+        <select class="tbl-btn" onchange="updateOrderStatus(${o.id},this.value);this.selectedIndex=0;" style="font-size:12px;max-width:130px;">
+          <option>Update status</option>
+          <option value="pending">Pending</option><option value="processing">Processing</option>
+          <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
+        </select>
+      </div></td>
+    </tr>`).join('');
+  const rt=document.getElementById('recent-orders-table');
+  if(rt)rt.innerHTML=sorted.slice(0,5).map(o=>`
+    <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
+    <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('');
+  const ostat=document.getElementById('total-orders-stat');if(ostat)ostat.textContent=orders.length;
+  const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
+  const rstat=document.getElementById('total-revenue-stat');if(rstat)rstat.textContent='$'+rev.toLocaleString();
+}
+
+// ─── CUSTOMERS ───
+function renderCustomers(){
+  const tbody=document.getElementById('customers-table-body');if(!tbody)return;
+  let customers_all=[...customers];
+  orders.forEach(o=>{if(o.email&&o.customer&&!customers_all.find(c=>c.email===o.email))customers_all.push({name:o.customer,email:o.email,orders:1,spent:typeof o.total==='number'?o.total:parseFloat(o.total)||0,type:'guest',joined:'Recent'});});
+  tbody.innerHTML=customers_all.map(c=>`
+    <tr>
+      <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${c.name[0]}</div><b>${c.name}</b></div></td>
+      <td>${c.email}</td><td>${c.orders}</td><td>$${(c.spent||0).toLocaleString()}</td>
+      <td><span class="badge ${c.type==='registered'?'badge-green':'badge-gray'}">${c.type}</span></td>
+      <td>${c.joined}</td>
+      <td><div class="table-actions"><button class="tbl-btn" onclick="showToast('📧 Email sent to ${c.email}')">Email</button></div></td>
+    </tr>`).join('');
+  const cstat=document.getElementById('total-customers-stat');if(cstat)cstat.textContent=customers_all.length;
+}
+
+// ─── CATEGORIES ───
+function renderCategories(){
+  document.getElementById('cat-admin-grid').innerHTML=categories.map((c,i)=>`
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:20px;text-align:center;position:relative;">
+      <div style="font-size:32px;margin-bottom:8px;">${c.icon}</div>
+      <div style="font-weight:800;font-size:14px;">${c.name}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px;">${c.count} products</div>
+      <button class="tbl-btn danger" style="position:absolute;top:8px;right:8px;padding:4px 8px;" onclick="removeCategory(${i})">✕</button>
+    </div>`).join('');
+}
+function addCategory(){
+  const name=document.getElementById('new-cat-name').value.trim();
+  const icon=document.getElementById('new-cat-icon').value.trim()||'📦';
+  if(!name){showToast('⚠️ Enter a category name');return;}
+  categories.push({name,icon,count:0});renderCategories();
+  document.getElementById('new-cat-name').value='';document.getElementById('new-cat-icon').value='';
+  showToast(`✅ Category "${name}" added!`);
+}
+function removeCategory(i){categories.splice(i,1);renderCategories();showToast('Category removed');}
+
+// ─── ANALYTICS ───
+function renderAnalytics(){
+  const data=[
+    {name:'Velvet Sofa',views:1240,orders:28,revenue:18172},
+    {name:'Wireless Headphones',views:980,orders:41,revenue:8159},
+    {name:'UltraSlim Laptop',views:820,orders:12,revenue:14388},
+    {name:'Running Sneakers',views:1100,orders:55,revenue:4895},
+    {name:'Espresso Machine',views:640,orders:18,revenue:5382},
+  ];
+  const tbody=document.getElementById('analytics-table');
+  if(tbody)tbody.innerHTML=data.map(d=>`<tr><td><b>${d.name}</b></td><td>${d.views.toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${((d.orders/d.views)*100).toFixed(1)}%</td></tr>`).join('');
+}
+function injectChart(){
+  const el=document.getElementById('panel-analytics');if(!el)return;
+  if(el.querySelector('#revenue-chart-wrap'))return;
+  const data=[8200,9400,7800,11200,12480,10900];
+  const labels=['Oct','Nov','Dec','Jan','Feb','Mar'];
+  const max=Math.max(...data);
+  const w=560,h=180,pad=40,bw=60,gap=20;
+  const bars=data.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="${i===data.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===data.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
+  const wrap=document.createElement('div');wrap.id='revenue-chart-wrap';wrap.className='section-card';wrap.style.marginBottom='20px';
+  wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
+  el.insertBefore(wrap,el.querySelector('.stats-row').nextSibling);
+}
+
+// ─── MEDIA LIBRARY ───
+function renderMediaLibrary(){
+  const grid=document.getElementById('media-library-grid');
+  const countEl=document.getElementById('media-lib-count');
+  if(!grid)return;
+  const allMedia=[];
+  products.forEach(p=>{
+    if(p.videoData?.base64)allMedia.push({type:'video',name:p.videoData.name||'video.mp4',src:p.videoData.base64,product:p.name,size:p.videoData.size||'?'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',name:`${p.name} — photo ${i+1}`,src:img.base64,product:p.name}));
+  });
+  if(countEl)countEl.textContent=`${allMedia.length} file(s)`;
+  if(!allMedia.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;"><div style="font-size:52px;margin-bottom:14px;">📁</div><div style="font-weight:700;">No media uploaded yet</div><div style="font-size:13.5px;color:var(--muted);margin-top:6px;">Upload images and videos on product pages.</div></div>';return;}
+  grid.innerHTML=allMedia.map(m=>`
+    <div class="media-item" title="${m.product}" style="cursor:pointer;" onclick="openMediaPreview('${m.name}')">
+      ${m.type==='video'?`<div style="width:100%;height:100%;background:#1a1210;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;gap:4px;border-radius:10px;"><div>🎬</div><div style="font-size:10px;color:rgba(255,255,255,.6);">${m.size}MB</div></div>`:`<img src="${m.src}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" loading="lazy"/>`}
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));border-radius:0 0 10px 10px;padding:16px 6px 5px;font-size:10px;color:#fff;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.product}</div>
+    </div>`).join('');
+}
+function openMediaPreview(name){
+  const allMedia=[];
+  products.forEach(p=>{
+    if(p.videoData?.base64)allMedia.push({type:'video',src:p.videoData.base64,name:p.videoData.name||'video.mp4'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',src:img.base64,name:`${p.name} — photo ${i+1}`}));
+  });
+  const item=allMedia.find(m=>m.name===name);if(!item)return;
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;';
+  el.innerHTML=item.type==='video'?`<video src="${item.src}" controls autoplay style="max-width:90vw;max-height:82vh;border-radius:12px;"></video>`:`<img src="${item.src}" style="max-width:90vw;max-height:82vh;border-radius:12px;object-fit:contain;"/>`;
+  el.innerHTML+=`<div style="color:rgba(255,255,255,.5);font-size:13px;margin-top:12px;">Tap outside to close</div>`;
+  el.onclick=()=>el.remove();
+  document.body.appendChild(el);
+}
+
+// ─── PAGES ───
+const sitePages=[
+  {title:'Home',slug:'/',status:'published',lastEdit:'Auto-generated'},
+  {title:'About Us',slug:'/about',status:'published',lastEdit:'Mar 20, 2026'},
+  {title:'Contact',slug:'/contact',status:'published',lastEdit:'Mar 18, 2026'},
+  {title:'FAQ',slug:'/faq',status:'published',lastEdit:'Mar 15, 2026'},
+  {title:'Privacy Policy',slug:'/privacy',status:'published',lastEdit:'Mar 1, 2026'},
+  {title:'Shipping Info',slug:'/shipping',status:'published',lastEdit:'Mar 1, 2026'},
+  {title:'Returns',slug:'/returns',status:'published',lastEdit:'Mar 1, 2026'},
+];
+function renderPages(){
+  const tbody=document.getElementById('pages-table-body');if(!tbody)return;
+  tbody.innerHTML=sitePages.map((p,i)=>`<tr>
+    <td><b>${p.title}</b></td><td style="color:var(--muted);font-size:13px;">${p.slug}</td>
+    <td><span class="badge badge-green">${p.status}</span></td>
+    <td style="color:var(--muted);font-size:13px;">${p.lastEdit}</td>
+    <td><div class="table-actions">
+      <button class="tbl-btn" onclick="showToast('✏️ Editing ${p.title}')">✏️ Edit</button>
+      <button class="tbl-btn" onclick="openStorefront()">👁 View</button>
+    </div></td></tr>`).join('');
+}
+
+// ─── BANNERS ───
+const bannerData=[
+  {id:'hero',label:'Homepage Hero',active:true,headline:'Shop Everything You Love',sub:'UGC video reviews · Live calls · Guest checkout.',cta:'Shop Now →',bg:'#100e0b'},
+  {id:'topbar',label:'Topbar Announcement',active:true,headline:'🎉 Free shipping on orders over $49 · No account needed',sub:'',cta:'',bg:'#100e0b'},
+  {id:'flash',label:'Flash Sale Banner',active:true,headline:'Up to 60% OFF Today Only',sub:'⚡ Flash Sale — Limited time',cta:'Browse Deals →',bg:'#e8541a'},
+];
+function renderBanners(){
+  const wrap=document.getElementById('banners-list');if(!wrap)return;
+  wrap.innerHTML=bannerData.map((b,i)=>`
+    <div class="section-card" style="margin-bottom:16px;">
+      <div class="sc-head">
+        <div><div class="sc-title">${b.label}</div><div class="sc-sub" style="color:${b.active?'var(--green)':'var(--muted)'};">${b.active?'✅ Active':'⭕ Inactive'}</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="toggle ${b.active?'on':''}" onclick="bannerData[${i}].active=!bannerData[${i}].active;this.classList.toggle('on');showToast('Banner updated');renderBanners();"></div>
+          <button class="hdr-btn hdr-btn-outline" onclick="editBanner(${i})">✏️ Edit</button>
+        </div>
+      </div>
+      <div class="sc-body"><div style="background:${b.bg};border-radius:10px;padding:16px 20px;color:#fff;">
+        <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:900;margin-bottom:4px;">${b.headline}</div>
+        ${b.sub?`<div style="font-size:13px;opacity:.7;margin-bottom:7px;">${b.sub}</div>`:''}
+        ${b.cta?`<div style="display:inline-block;background:rgba(255,255,255,.15);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;">${b.cta}</div>`:''}
+      </div></div>
+    </div>`).join('');
+}
+function editBanner(i){
+  const b=bannerData[i];
+  document.getElementById('banner-edit-modal')?.remove();
+  const el=document.createElement('div');
+  el.id='banner-edit-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
+  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;max-width:480px;width:100%;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;">Edit: ${b.label}</div>
+      <button onclick="document.getElementById('banner-edit-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">✕</button>
+    </div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" id="be-headline" value="${b.headline}"/></div>
+    ${b.sub!==undefined?`<div class="form-group"><label class="form-lbl">Subtext</label><input class="form-input" id="be-sub" value="${b.sub}"/></div>`:''}
+    ${b.cta!==undefined?`<div class="form-group"><label class="form-lbl">CTA Button</label><input class="form-input" id="be-cta" value="${b.cta}"/></div>`:''}
+    <div class="form-group"><label class="form-lbl">Background Color</label>
+      <div style="display:flex;gap:9px;align-items:center;">
+        <input type="color" id="be-bg" value="${b.bg}" style="width:50px;height:40px;border:1.5px solid var(--border);border-radius:8px;padding:3px;cursor:pointer;">
+        <input class="form-input" id="be-bg-hex" value="${b.bg}" style="flex:1;" oninput="document.getElementById('be-bg').value=this.value"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button onclick="saveBanner(${i})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Save</button>
+      <button onclick="document.getElementById('banner-edit-modal').remove()" style="flex:1;background:var(--warm);border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;cursor:pointer;">Cancel</button>
+    </div>
+  </div>`;
+  el.onclick=e=>{if(e.target===el)el.remove();};
+  document.body.appendChild(el);
+}
+function saveBanner(i){
+  bannerData[i].headline=document.getElementById('be-headline')?.value||bannerData[i].headline;
+  bannerData[i].sub=document.getElementById('be-sub')?.value??bannerData[i].sub;
+  bannerData[i].cta=document.getElementById('be-cta')?.value??bannerData[i].cta;
+  bannerData[i].bg=document.getElementById('be-bg-hex')?.value||bannerData[i].bg;
+  document.getElementById('banner-edit-modal')?.remove();
+  renderBanners();showToast('✅ Banner saved!');
+}
+
+// ─── SETTINGS ───
+function saveSettings(){
+  const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
+  const toggleStates=ids.map(id=>document.getElementById(id)?.classList.contains('on')??true);
+  const contact={
+    email:document.getElementById('s-support-email')?.value||'',
+    phone:document.getElementById('s-phone')?.value||'',
+    whatsapp:document.getElementById('s-whatsapp')?.value||'',
+    zoom:document.getElementById('s-zoom')?.value||'',
+  };
+  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({toggleStates,contact}));}catch(e){}
+  showToast('✅ Settings saved!');
+}
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');
+    const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
+    if(s.toggleStates)s.toggleStates.forEach((on,i)=>{const el=document.getElementById(ids[i]);if(el)el.classList.toggle('on',on);});
+    if(s.contact){
+      ['s-support-email','s-phone','s-whatsapp','s-zoom'].forEach(id=>{
+        const key=id.replace('s-','').replace('support-email','email');
+        const el=document.getElementById(id);
+        if(el&&s.contact[key])el.value=s.contact[key];
+      });
+    }
+  }catch(e){}
+}
+
+// ─── EXPORT ───
+function exportProducts(){
+  const header='ID,Name,Brand,Category,Price,Stock,Status\n';
+  const rows=products.map(p=>`${p.id},"${p.name}","${p.brand||''}","${p.category}",${p.price},${p.stock},${p.status}`).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shoppla-products.csv';a.click();
+  showToast('📥 Products exported');
+}
+function exportOrders(){
+  const header='Order ID,Customer,Products,Total,Date,Status\n';
+  const rows=orders.map(o=>`${o.id},"${o.customer}","${o.products}",${o.total},"${o.date||''}",${o.status}`).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shoppla-orders.csv';a.click();
+  showToast('📥 Orders exported');
+}
+function filterOrders(v){document.querySelectorAll('#orders-table-body tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(v.toLowerCase())?'':'none';});}
+function filterOrdersByStatus(status){document.querySelectorAll('#orders-table-body tr').forEach(r=>{r.style.display=(!status||r.textContent.toLowerCase().includes(status))?'':'none';});}
+function filterCustomers(v){document.querySelectorAll('#customers-table-body tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(v.toLowerCase())?'':'none';});}
+
+// ─── UNIFIED NAV ───
+function nav(el,panelId){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('panel-'+panelId);
+  if(panel)panel.classList.add('active');
+  const titles={'dash':'Dashboard','analytics':'Analytics','products':'Products','add-product':editingProductId?'Edit Product':'Add New Product','categories':'Categories','orders':'Orders','customers':'Customers','agents':'Support Agents','pages':'Pages','media':'Media Library','banners':'Banners & Hero','appearance':'Appearance','settings':'Store Settings'};
+  const subs={'dash':'Welcome back!','products':'Manage your product catalogue.','add-product':editingProductId?'Editing existing product':'Create a new product listing.','orders':'Track and fulfil customer orders.','customers':'View all your buyers.','analytics':'Store performance overview.','agents':'Manage your live call support team.','appearance':'Customize your store look.','settings':'Configure your store.','categories':'Organise products into categories.','pages':'Manage static pages.','media':'All uploaded files.','banners':'Manage hero & promo banners.'};
+  const titleEl=document.getElementById('header-title');const subEl=document.getElementById('header-sub');
+  if(titleEl)titleEl.textContent=titles[panelId]||panelId;
+  if(subEl)subEl.textContent=subs[panelId]||'';
+  if(panelId==='products')renderProductsTable();
+  if(panelId==='orders')renderOrders();
+  if(panelId==='customers')renderCustomers();
+  if(panelId==='categories')renderCategories();
+  if(panelId==='analytics'){renderAnalytics();setTimeout(injectChart,50);}
+  if(panelId==='media')renderMediaLibrary();
+  if(panelId==='pages')setTimeout(renderPages,50);
+  if(panelId==='banners')setTimeout(renderBanners,50);
+  if(panelId==='agents'){loadAgents();renderAgents();}
+}
+
+// ─── REFRESH STATS ───
+function refreshDashStats(){
+  const active=products.filter(p=>p.status==='active').length;
+  const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
+  const el=id=>document.getElementById(id);
+  if(el('total-products-stat'))el('total-products-stat').textContent=active;
+  if(el('total-orders-stat'))el('total-orders-stat').textContent=orders.length;
+  if(el('total-revenue-stat'))el('total-revenue-stat').textContent='$'+rev.toLocaleString();
+  if(el('total-customers-stat'))el('total-customers-stat').textContent=customers.length;
+}
+
+// ─── DUPLICATE PRODUCT ───
+function duplicateProduct(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const clone={...p,id:Date.now(),name:p.name+' (Copy)',status:'draft'};
+  products.push(clone);saveToStorage();updateCounts();renderProductsTable();
+  showToast('📋 Product duplicated as draft');
+}
+
+// ─── OPEN PREVIEW ───
+function openPreview(productId){
+  const p=products.find(x=>x.id===productId);if(!p)return;
+  const save=p.wasPrice?Math.round(p.wasPrice-p.price):0;
+  const fitMode=p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover';
+  const win=window.open('','_blank','width=480,height=820');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>${p.name} — Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Satoshi:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Satoshi',sans-serif;background:${p.pageColor||'#fff'};color:#100e0b;}
+  .banner{background:#e8541a;color:#fff;text-align:center;padding:8px;font-size:12px;font-weight:700;}
+  .vid{height:300px;background:#111;position:relative;overflow:hidden;}
+  .vid-fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:100%;}
+  .play{width:64px;height:64px;background:rgba(232,84,26,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .info{padding:20px 18px;}
+  .brand{font-size:11px;color:#e8541a;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;}
+  h1{font-family:'Fraunces',serif;font-size:22px;font-weight:900;line-height:1.15;margin-bottom:9px;}
+  .stars{color:#f7b84a;font-size:15px;margin-bottom:14px;}
+  .price-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .price{font-family:'Fraunces',serif;font-size:34px;font-weight:900;}
+  .was{font-size:16px;color:#8a8480;text-decoration:line-through;}
+  .save-t{background:rgba(232,84,26,.12);color:#e8541a;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .call{background:linear-gradient(135deg,#0d4f28,#1a8a4a);border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .call span{color:#fff;font-size:13px;font-weight:700;}.call button{background:#fff;color:#1a8a4a;border:none;border-radius:50px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;}
+  .cta-p{width:100%;background:#e8541a;color:#fff;border:none;border-radius:11px;padding:15px;font-size:15.5px;font-weight:800;cursor:pointer;margin-bottom:9px;}
+  .cta-s{width:100%;background:#fff;color:#100e0b;border:1.5px solid #e5e0d6;border-radius:11px;padding:14px;font-size:14.5px;font-weight:700;cursor:pointer;}
+  .trust{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;}
+  .trust span{background:#f3ede3;border:1px solid #e5e0d6;border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:600;}
+  </style></head><body>
+  <div class="banner">👁 ADMIN PREVIEW</div>
+  <div class="vid">${p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
+  <div class="info">
+    <div class="brand">${p.brand}</div><h1>${p.name}</h1>
+    <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>
+    <div class="price-row"><span class="price">$${p.price}</span>${p.wasPrice?`<span class="was">$${p.wasPrice}</span><span class="save-t">Save $${save}</span>`:''}</div>
+    <div class="call"><span>📞 Questions? Talk live</span><button>Call Now</button></div>
+    <button class="cta-p">⚡ Buy Now — Guest Checkout</button>
+    <button class="cta-s">🛒 Add to Cart</button>
+    <div class="trust"><span>🔒 Secure</span><span>↩️ 30-Day Returns</span><span>📦 Free Shipping</span></div>
+  </div></body></html>`);
+  win.document.close();
+}
+
+// ─── OPEN STOREFRONT ───
+function openStorefront(){
+  saveToStorage();window.open('shoppla.html','_blank');
+  showToast('🏪 Saved & opening live store…');
+}
+
+// ─── INIT ───
+loadFromStorage();loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
+</script>
+</body>
+</html>
