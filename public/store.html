@@ -1762,18 +1762,17 @@ function makeCardHTML(p, showActions) {
   const disc = p.wasPrice ? '-'+Math.round((1-p.price/p.wasPrice)*100)+'%' : '';
   const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
   let mediaHTML;
-  if (p.videoData && p.videoData.base64) {
-    // Uploaded base64 video — plays on hover
-    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
-      onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
-      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
-  } else if (p.videoURL) {
-    // URL video — show play button overlay, open sales page on click (iframe loads there)
+  if (p.videoURL) {
     mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${p.id})" style="cursor:pointer;">
       <div class="play-ring">▶</div>
       <div class="vid-emoji">${p.icon||'📦'}</div>
       <div class="vid-lbl">▶ Watch video</div>
     </div>`;
+  } else if (p.videoData && p.videoData.base64) {
+    // Uploaded base64 video — plays on hover
+    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
+      onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
   } else if (p.images && p.images.length) {
     mediaHTML = `<img src="${p.images[0].base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
   } else {
