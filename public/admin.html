@@ -520,8 +520,8 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               </div>
             </div>
             <div style="margin-top:16px;">
-              <label class="form-lbl" style="margin-bottom:8px;display:block;">Or paste a video URL (YouTube / Vimeo embed)</label>
-              <input class="form-input" id="fp-video-url" placeholder="https://www.youtube.com/embed/..."/>
+              <label class="form-lbl" style="margin-bottom:8px;display:block;">Or paste a video URL (YouTube / Vimeo / direct MP4)</label>
+              <input class="form-input" id="fp-video-url" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..." oninput="validateVideoUrl()"/>
             </div>
             <div style="margin-top:16px;padding:18px;background:var(--warm);border-radius:12px;border:1px solid var(--border);">
               <label class="form-lbl" style="display:block;margin-bottom:12px;">🖼 Media Display Style — how video/images are shown on product cards & sales page</label>
@@ -712,6 +712,20 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       </div>
 
       <!-- Save row -->
+      <!-- Live Salespage Preview -->
+      <div style="margin-top:20px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:between;padding:14px 18px;background:var(--warm);border-bottom:1px solid var(--border);">
+          <span style="font-weight:700;font-size:14px;">👁 Live Salespage Preview</span>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="hdr-btn hdr-btn-outline" style="padding:6px 14px;font-size:12px;" onclick="setPreviewMode('desktop')" id="preview-desktop-btn">🖥 Desktop</button>
+            <button class="hdr-btn hdr-btn-outline" style="padding:6px 14px;font-size:12px;" onclick="setPreviewMode('mobile')" id="preview-mobile-btn">📱 Mobile</button>
+          </div>
+        </div>
+        <div id="live-preview-container" style="background:#f5f4f0;display:flex;justify-content:center;padding:16px;">
+          <iframe id="live-preview-iframe" src="/store.html" style="width:100%;height:600px;border:none;border-radius:10px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.08);transition:width .3s;"></iframe>
+        </div>
+      </div>
+
       <div style="display:flex;gap:12px;margin-top:8px;padding-top:20px;border-top:1px solid var(--border);">
         <button class="hdr-btn hdr-btn-primary" onclick="saveProduct()" style="padding:13px 32px;font-size:15px;">💾 Save Product</button>
         <button class="hdr-btn hdr-btn-outline" onclick="saveProduct(true)" style="padding:13px 24px;">Save as Draft</button>
@@ -1277,6 +1291,7 @@ function saveProduct(draft=false){
   editingProductId = null;
   clearProductForm();
   saveToStorage();
+  refreshLivePreview();
   nav(document.querySelector('.sb-item[onclick*=products]'),'products');
 }
 
@@ -1411,7 +1426,64 @@ function syncMediaHeight(type, value){
   if(range && String(range.value) !== String(v)) range.value = v;
 }
 
-function normalizeVideoUrl(url=''){ return url.trim(); }
+function normalizeVideoUrl(url=''){
+  url = url.trim();
+  if(!url) return '';
+  // YouTube patterns
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if(ytMatch) return 'https://www.youtube.com/embed/' + ytMatch[1];
+  // Vimeo patterns
+  const vmMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
+  if(vmMatch) return 'https://player.vimeo.com/video/' + vmMatch[1];
+  // Direct video file
+  if(/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return url;
+  return '';
+}
+
+function validateVideoUrl(){
+  const input = document.getElementById('fp-video-url');
+  const url = input?.value.trim()||'';
+  let fb = document.getElementById('video-url-feedback');
+  if(!fb){
+    fb = document.createElement('div');
+    fb.id = 'video-url-feedback';
+    fb.style.cssText = 'margin-top:8px;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;display:none;';
+    input.parentElement.appendChild(fb);
+  }
+  // Live preview iframe
+  let lp = document.getElementById('video-url-live-preview');
+  if(!lp){
+    lp = document.createElement('div');
+    lp.id = 'video-url-live-preview';
+    lp.style.cssText = 'margin-top:12px;display:none;';
+    input.parentElement.appendChild(lp);
+  }
+  if(!url){ fb.style.display='none'; lp.style.display='none'; return; }
+  const normalized = normalizeVideoUrl(url);
+  if(normalized){
+    fb.style.display='block';
+    fb.style.background='rgba(34,197,94,.1)';
+    fb.style.color='#16a34a';
+    fb.style.border='1px solid rgba(34,197,94,.25)';
+    const isEmbed = normalized.includes('youtube.com/embed') || normalized.includes('player.vimeo.com');
+    const isDirect = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(normalized);
+    fb.textContent = isEmbed ? '✅ Valid video URL — preview below' : isDirect ? '✅ Valid direct video file' : '✅ Valid URL';
+    // Show preview
+    lp.style.display='block';
+    if(isEmbed){
+      lp.innerHTML = '<iframe src="'+normalized+'?autoplay=0" style="width:100%;height:200px;border-radius:10px;border:none;background:#000;" allowfullscreen></iframe>';
+    } else if(isDirect){
+      lp.innerHTML = '<video src="'+normalized+'" controls style="width:100%;max-height:200px;border-radius:10px;background:#000;"></video>';
+    } else { lp.style.display='none'; }
+  } else {
+    fb.style.display='block';
+    fb.style.background='rgba(239,68,68,.1)';
+    fb.style.color='#dc2626';
+    fb.style.border='1px solid rgba(239,68,68,.25)';
+    fb.textContent = '❌ Invalid URL — use a YouTube, Vimeo, or direct .mp4 link';
+    lp.style.display='none';
+  }
+}
 
 // Build color swatches
 const cgEl = document.getElementById('admin-color-grid');
@@ -2157,6 +2229,27 @@ function openStorefront(){
   saveToStorage();
   window.open('/','_blank');
   showToast('🏪 Saved & opening live store…');
+}
+
+// ─── LIVE PREVIEW ───
+function setPreviewMode(mode){
+  const iframe = document.getElementById('live-preview-iframe');
+  const dBtn = document.getElementById('preview-desktop-btn');
+  const mBtn = document.getElementById('preview-mobile-btn');
+  if(!iframe) return;
+  if(mode==='mobile'){
+    iframe.style.width='375px'; iframe.style.height='667px';
+    if(mBtn) mBtn.style.background='var(--accent)'; if(mBtn) mBtn.style.color='#fff';
+    if(dBtn) dBtn.style.background=''; if(dBtn) dBtn.style.color='';
+  } else {
+    iframe.style.width='100%'; iframe.style.height='600px';
+    if(dBtn) dBtn.style.background='var(--accent)'; if(dBtn) dBtn.style.color='#fff';
+    if(mBtn) mBtn.style.background=''; if(mBtn) mBtn.style.color='';
+  }
+}
+function refreshLivePreview(){
+  const iframe = document.getElementById('live-preview-iframe');
+  if(iframe) iframe.src = iframe.src;
 }
 
 // ─── INIT ───
