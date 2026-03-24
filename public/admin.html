@@ -2230,6 +2230,27 @@ function openStorefront(){
   showToast('🏪 Saved & opening live store…');
 }
 
+// ─── LIVE PREVIEW ───
+function setPreviewMode(mode){
+  const iframe = document.getElementById('live-preview-iframe');
+  const dBtn = document.getElementById('preview-desktop-btn');
+  const mBtn = document.getElementById('preview-mobile-btn');
+  if(!iframe) return;
+  if(mode==='mobile'){
+    iframe.style.width='375px'; iframe.style.height='667px';
+    if(mBtn) mBtn.style.background='var(--accent)'; if(mBtn) mBtn.style.color='#fff';
+    if(dBtn) dBtn.style.background=''; if(dBtn) dBtn.style.color='';
+  } else {
+    iframe.style.width='100%'; iframe.style.height='600px';
+    if(dBtn) dBtn.style.background='var(--accent)'; if(dBtn) dBtn.style.color='#fff';
+    if(mBtn) mBtn.style.background=''; if(mBtn) mBtn.style.color='';
+  }
+}
+function refreshLivePreview(){
+  const iframe = document.getElementById('live-preview-iframe');
+  if(iframe) iframe.src = iframe.src;
+}
+
 // ─── INIT ───
 loadFromStorage();loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
 </script>
