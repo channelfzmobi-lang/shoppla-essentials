@@ -1411,7 +1411,64 @@ function syncMediaHeight(type, value){
   if(range && String(range.value) !== String(v)) range.value = v;
 }
 
-function normalizeVideoUrl(url=''){ return url.trim(); }
+function normalizeVideoUrl(url=''){
+  url = url.trim();
+  if(!url) return '';
+  // YouTube patterns
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if(ytMatch) return 'https://www.youtube.com/embed/' + ytMatch[1];
+  // Vimeo patterns
+  const vmMatch = url.match(/(?:vimeo\.com\/)(\d+)/);
+  if(vmMatch) return 'https://player.vimeo.com/video/' + vmMatch[1];
+  // Direct video file
+  if(/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return url;
+  return '';
+}
+
+function validateVideoUrl(){
+  const input = document.getElementById('fp-video-url');
+  const url = input?.value.trim()||'';
+  let fb = document.getElementById('video-url-feedback');
+  if(!fb){
+    fb = document.createElement('div');
+    fb.id = 'video-url-feedback';
+    fb.style.cssText = 'margin-top:8px;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;display:none;';
+    input.parentElement.appendChild(fb);
+  }
+  // Live preview iframe
+  let lp = document.getElementById('video-url-live-preview');
+  if(!lp){
+    lp = document.createElement('div');
+    lp.id = 'video-url-live-preview';
+    lp.style.cssText = 'margin-top:12px;display:none;';
+    input.parentElement.appendChild(lp);
+  }
+  if(!url){ fb.style.display='none'; lp.style.display='none'; return; }
+  const normalized = normalizeVideoUrl(url);
+  if(normalized){
+    fb.style.display='block';
+    fb.style.background='rgba(34,197,94,.1)';
+    fb.style.color='#16a34a';
+    fb.style.border='1px solid rgba(34,197,94,.25)';
+    const isEmbed = normalized.includes('youtube.com/embed') || normalized.includes('player.vimeo.com');
+    const isDirect = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(normalized);
+    fb.textContent = isEmbed ? '✅ Valid video URL — preview below' : isDirect ? '✅ Valid direct video file' : '✅ Valid URL';
+    // Show preview
+    lp.style.display='block';
+    if(isEmbed){
+      lp.innerHTML = '<iframe src="'+normalized+'?autoplay=0" style="width:100%;height:200px;border-radius:10px;border:none;background:#000;" allowfullscreen></iframe>';
+    } else if(isDirect){
+      lp.innerHTML = '<video src="'+normalized+'" controls style="width:100%;max-height:200px;border-radius:10px;background:#000;"></video>';
+    } else { lp.style.display='none'; }
+  } else {
+    fb.style.display='block';
+    fb.style.background='rgba(239,68,68,.1)';
+    fb.style.color='#dc2626';
+    fb.style.border='1px solid rgba(239,68,68,.25)';
+    fb.textContent = '❌ Invalid URL — use a YouTube, Vimeo, or direct .mp4 link';
+    lp.style.display='none';
+  }
+}
 
 // Build color swatches
 const cgEl = document.getElementById('admin-color-grid');
