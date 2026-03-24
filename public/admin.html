@@ -1291,6 +1291,7 @@ function saveProduct(draft=false){
   editingProductId = null;
   clearProductForm();
   saveToStorage();
+  refreshLivePreview();
   nav(document.querySelector('.sb-item[onclick*=products]'),'products');
 }
 
