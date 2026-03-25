@@ -2429,9 +2429,11 @@ setInterval(() => {
 }, 60000);
 
 // ═══ INIT ═══
-loadData();
-renderHome();
-refreshBadge();
+(async function(){
+  await loadData();
+  renderHome();
+  refreshBadge();
+})();
 
 window.addEventListener('resize', () => {
   if (!currentProductId) return;
@@ -2439,10 +2441,10 @@ window.addEventListener('resize', () => {
   if (p) applySalesMediaSizing(p);
 });
 
-window.addEventListener('storage', (event) => {
+window.addEventListener('storage', async (event) => {
   if (event.key !== STORAGE_KEY) return;
   const salesOpen = document.getElementById('sales-page')?.classList.contains('active');
-  loadData();
+  await loadData();
   renderHome();
   refreshBadge();
   if (salesOpen && currentProductId) {
