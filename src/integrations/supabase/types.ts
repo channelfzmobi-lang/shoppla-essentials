@@ -14,7 +14,284 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agents: {
+        Row: {
+          availability: string | null
+          avatar: string | null
+          avatar_color: string | null
+          avatar_img: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          role: string | null
+          status: string | null
+          whatsapp: string | null
+          zoom: string | null
+        }
+        Insert: {
+          availability?: string | null
+          avatar?: string | null
+          avatar_color?: string | null
+          avatar_img?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          role?: string | null
+          status?: string | null
+          whatsapp?: string | null
+          zoom?: string | null
+        }
+        Update: {
+          availability?: string | null
+          avatar?: string | null
+          avatar_color?: string | null
+          avatar_img?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: string | null
+          status?: string | null
+          whatsapp?: string | null
+          zoom?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          address: string | null
+          city: string | null
+          color: string | null
+          created_at: string
+          customer: string
+          email: string | null
+          id: string
+          notes: string | null
+          order_number: number
+          payment_method: string | null
+          phone: string | null
+          product_id: string | null
+          products_text: string | null
+          qty: number | null
+          size: string | null
+          status: string | null
+          total: number | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          color?: string | null
+          created_at?: string
+          customer?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: number
+          payment_method?: string | null
+          phone?: string | null
+          product_id?: string | null
+          products_text?: string | null
+          qty?: number | null
+          size?: string | null
+          status?: string | null
+          total?: number | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          color?: string | null
+          created_at?: string
+          customer?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: number
+          payment_method?: string | null
+          phone?: string | null
+          product_id?: string | null
+          products_text?: string | null
+          qty?: number | null
+          size?: string | null
+          status?: string | null
+          total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          agent_id: number | null
+          brand: string | null
+          category: string | null
+          checkout_method: string | null
+          colors: string | null
+          content_sections: Json | null
+          created_at: string
+          delivery_info: string | null
+          description: string | null
+          featured: boolean | null
+          form_config: Json | null
+          gateway_config: Json | null
+          icon: string | null
+          id: string
+          images: Json | null
+          installment: string | null
+          media_fit: string | null
+          media_height_desktop: number | null
+          media_height_mobile: number | null
+          name: string
+          page_color: string | null
+          payment_route: string | null
+          price: number
+          return_days: string | null
+          return_policy: string | null
+          shipping_notes: string | null
+          sizes: string | null
+          status: string | null
+          stock: number | null
+          ty_config: Json | null
+          updated_at: string
+          video_data: Json | null
+          video_url: string | null
+          warranty: string | null
+          was_price: number | null
+        }
+        Insert: {
+          agent_id?: number | null
+          brand?: string | null
+          category?: string | null
+          checkout_method?: string | null
+          colors?: string | null
+          content_sections?: Json | null
+          created_at?: string
+          delivery_info?: string | null
+          description?: string | null
+          featured?: boolean | null
+          form_config?: Json | null
+          gateway_config?: Json | null
+          icon?: string | null
+          id?: string
+          images?: Json | null
+          installment?: string | null
+          media_fit?: string | null
+          media_height_desktop?: number | null
+          media_height_mobile?: number | null
+          name: string
+          page_color?: string | null
+          payment_route?: string | null
+          price?: number
+          return_days?: string | null
+          return_policy?: string | null
+          shipping_notes?: string | null
+          sizes?: string | null
+          status?: string | null
+          stock?: number | null
+          ty_config?: Json | null
+          updated_at?: string
+          video_data?: Json | null
+          video_url?: string | null
+          warranty?: string | null
+          was_price?: number | null
+        }
+        Update: {
+          agent_id?: number | null
+          brand?: string | null
+          category?: string | null
+          checkout_method?: string | null
+          colors?: string | null
+          content_sections?: Json | null
+          created_at?: string
+          delivery_info?: string | null
+          description?: string | null
+          featured?: boolean | null
+          form_config?: Json | null
+          gateway_config?: Json | null
+          icon?: string | null
+          id?: string
+          images?: Json | null
+          installment?: string | null
+          media_fit?: string | null
+          media_height_desktop?: number | null
+          media_height_mobile?: number | null
+          name?: string
+          page_color?: string | null
+          payment_route?: string | null
+          price?: number
+          return_days?: string | null
+          return_policy?: string | null
+          shipping_notes?: string | null
+          sizes?: string | null
+          status?: string | null
+          stock?: number | null
+          ty_config?: Json | null
+          updated_at?: string
+          video_data?: Json | null
+          video_url?: string | null
+          warranty?: string | null
+          was_price?: number | null
+        }
+        Relationships: []
+      }
+      store_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
