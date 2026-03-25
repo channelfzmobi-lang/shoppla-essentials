@@ -1731,7 +1731,24 @@ function getCart()  { try { return JSON.parse(localStorage.getItem(CART_KEY)||'[
 function saveCart(c){ try { localStorage.setItem(CART_KEY, JSON.stringify(c)); } catch(e) {} }
 function getWish()  { try { return JSON.parse(localStorage.getItem(WISH_KEY)||'[]'); } catch(e) { return []; } }
 function saveWish(w){ try { localStorage.setItem(WISH_KEY, JSON.stringify(w)); } catch(e) {} }
-function saveOrders(o){ try { localStorage.setItem(ORDERS_KEY, JSON.stringify(o)); } catch(e) {} }
+async function saveOrders(o){
+  try { localStorage.setItem(ORDERS_KEY, JSON.stringify(o)); } catch(e) {}
+  // Also save to cloud
+  if(!sb||!o||!o.length) return;
+  try{
+    const last=o[o.length-1];
+    if(last&&!last._cloud_saved){
+      await sb.from('orders').insert({
+        customer:last.customer||'', email:last.email||'', phone:last.phone||'',
+        address:last.address||'', city:last.city||'', products_text:last.products||'',
+        qty:last.qty||1, color:last.color||'', size:last.size||'',
+        notes:last.notes||'', total:last.total||0, status:last.status||'pending',
+        payment_method:last.paymentMethod||'',
+      });
+      last._cloud_saved=true;
+    }
+  }catch(e){console.warn('Cloud order save error:',e);}
+}
 function getOrders(){ try { return JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]'); } catch(e) { return []; } }
 
 // ═══ CART BADGE ═══
