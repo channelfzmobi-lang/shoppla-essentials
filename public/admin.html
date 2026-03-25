@@ -1622,22 +1622,98 @@ contentSections = [
 renderContentSections();
 updateCounts();
 
-// ─── LOCALSTORAGE ───
+// ─── SUPABASE CLIENT ───
+const SUPABASE_URL = 'https://hztjsynioysxpumuwkys.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6dGpzeW5pb3lzeHB1bXV3a3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjE3MTUsImV4cCI6MjA4OTkzNzcxNX0.yzdmKuN_B6817Jxg3lXLr9IN83bjB6MFjdUb1caEEF8';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// ─── LOCALSTORAGE (fallback) ───
 const STORAGE_KEY='shoppla_products_v1';
 const ORDERS_KEY='shoppla_orders_v1';
 const SETTINGS_KEY='shoppla_settings_v1';
 const AGENTS_KEY='shoppla_agents_v1';
 
-function saveToStorage(){
+async function saveToStorage(){
+  // Always save to localStorage for immediate sync
   try{
-    const data=JSON.stringify(products);
-    localStorage.setItem(STORAGE_KEY,data);
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
     localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
   }catch(e){
     if(e.name==='QuotaExceededError') showToast('❌ Storage full! Use video URLs instead of uploads.');
   }
+  // Also save to cloud database
+  if(!sb) return;
+  try{
+    for(const p of products){
+      const row = {
+        id: typeof p.id==='number'? undefined : p.id,
+        name: p.name||'', brand: p.brand||'', category: p.category||'',
+        price: p.price||0, was_price: p.wasPrice||0, stock: p.stock||10,
+        description: p.desc||'', colors: p.colors||'', sizes: p.sizes||'',
+        video_url: p.videoURL||'', video_data: p.videoData||null,
+        images: p.images||[], installment: p.installment||'',
+        delivery_info: p.deliveryInfo||'', shipping_notes: p.shippingNotes||'',
+        return_days: p.returnDays||'30 days', warranty: p.warranty||'',
+        return_policy: p.returnPolicy||'', media_fit: p.mediaFit||'cover',
+        media_height_desktop: p.mediaHeightDesktop||640,
+        media_height_mobile: p.mediaHeightMobile||320,
+        page_color: p.pageColor||'#ffffff', status: p.status||'active',
+        featured: !!p.featured, icon: p.icon||'📦',
+        content_sections: p.contentSections||[],
+        checkout_method: p.checkoutMethod||'standard',
+        payment_route: p.paymentRoute||'pod',
+        form_config: p.formConfig||{}, ty_config: p.tyConfig||{},
+        gateway_config: p.gatewayConfig||{}, agent_id: null,
+      };
+      // Use local_id mapping
+      if(!p._cloud_id){
+        const {data}=await sb.from('products').insert(row).select('id').single();
+        if(data) p._cloud_id=data.id;
+      } else {
+        await sb.from('products').update(row).eq('id',p._cloud_id);
+      }
+    }
+  }catch(e){console.warn('Cloud save error:',e);}
 }
-function loadFromStorage(){
+
+async function loadFromStorage(){
+  // Try cloud first
+  if(sb){
+    try{
+      const {data:cloudProducts}=await sb.from('products').select('*').order('created_at',{ascending:false});
+      if(cloudProducts&&cloudProducts.length){
+        products=cloudProducts.map(p=>({
+          id:p.id, _cloud_id:p.id, name:p.name, brand:p.brand, category:p.category,
+          price:Number(p.price), wasPrice:Number(p.was_price)||0, stock:p.stock,
+          desc:p.description, colors:p.colors, sizes:p.sizes,
+          videoURL:p.video_url, videoData:p.video_data, images:p.images||[],
+          installment:p.installment, deliveryInfo:p.delivery_info,
+          shippingNotes:p.shipping_notes, returnDays:p.return_days,
+          warranty:p.warranty, returnPolicy:p.return_policy,
+          mediaFit:p.media_fit, mediaHeightDesktop:p.media_height_desktop,
+          mediaHeightMobile:p.media_height_mobile, pageColor:p.page_color,
+          status:p.status, featured:p.featured, icon:p.icon,
+          contentSections:p.content_sections||[], checkoutMethod:p.checkout_method,
+          paymentRoute:p.payment_route, formConfig:p.form_config||{},
+          tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
+        }));
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
+      }
+      const {data:cloudOrders}=await sb.from('orders').select('*').order('created_at',{ascending:false});
+      if(cloudOrders&&cloudOrders.length){
+        orders=cloudOrders.map(o=>({
+          id:o.order_number||o.id, _cloud_id:o.id, customer:o.customer,
+          email:o.email, phone:o.phone, address:o.address, city:o.city,
+          products:o.products_text, qty:o.qty, color:o.color, size:o.size,
+          notes:o.notes, total:Number(o.total), status:o.status,
+          paymentMethod:o.payment_method, date:o.created_at,
+        }));
+        localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
+      }
+      return;
+    }catch(e){console.warn('Cloud load error, falling back to localStorage:',e);}
+  }
+  // Fallback to localStorage
   try{
     const p=localStorage.getItem(STORAGE_KEY);
     const o=localStorage.getItem(ORDERS_KEY);
@@ -2254,7 +2330,12 @@ function refreshLivePreview(){
 }
 
 // ─── INIT ───
-loadFromStorage();loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
+// ─── ASYNC INIT ───
+(async function(){
+  await loadFromStorage();
+  loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
+  renderProductsTable();
+})();
 </script>
 </body>
 </html>
