@@ -761,6 +761,7 @@ img,video,iframe{max-width:100%;}
 .sp-layout,.sp-info{overflow:visible;}
 .sp-media,.prod-card,.ip-card,.rev-card{overflow:hidden;}
 .prod-name,.sp-title,.ip-hero-title{overflow-wrap:break-word;word-break:break-word;}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </style>
 </head>
 <body>
@@ -1661,6 +1662,11 @@ img,video,iframe{max-width:100%;}
 ████████████████████ -->
 <script data-cfasync="false">
 'use strict';
+// ═══ SUPABASE CLIENT ═══
+const SUPABASE_URL = 'https://hztjsynioysxpumuwkys.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6dGpzeW5pb3lzeHB1bXV3a3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjE3MTUsImV4cCI6MjA4OTkzNzcxNX0.yzdmKuN_B6817Jxg3lXLr9IN83bjB6MFjdUb1caEEF8';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
 // ═══ CONSTANTS ═══
 const STORAGE_KEY = 'shoppla_products_v1';
 const ORDERS_KEY  = 'shoppla_orders_v1';
@@ -1688,7 +1694,32 @@ let activeOrderData = {};
 let toastTimer = null;
 
 // ═══ STORAGE ═══
-function loadData() {
+async function loadData() {
+  // Try cloud first
+  if(sb){
+    try{
+      const {data:cloudProducts}=await sb.from('products').select('*').order('created_at',{ascending:false});
+      if(cloudProducts&&cloudProducts.length){
+        products=cloudProducts.map(p=>({
+          id:p.id, _cloud_id:p.id, name:p.name, brand:p.brand, category:p.category,
+          price:Number(p.price), wasPrice:Number(p.was_price)||0, stock:p.stock,
+          desc:p.description, colors:p.colors, sizes:p.sizes,
+          videoURL:p.video_url, videoData:p.video_data, images:p.images||[],
+          installment:p.installment, deliveryInfo:p.delivery_info,
+          shippingNotes:p.shipping_notes, returnDays:p.return_days,
+          warranty:p.warranty, returnPolicy:p.return_policy,
+          mediaFit:p.media_fit, mediaHeightDesktop:p.media_height_desktop,
+          mediaHeightMobile:p.media_height_mobile, pageColor:p.page_color,
+          status:p.status, featured:p.featured, icon:p.icon,
+          contentSections:p.content_sections||[], checkoutMethod:p.checkout_method,
+          paymentRoute:p.payment_route, formConfig:p.form_config||{},
+          tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
+        }));
+        return;
+      }
+    }catch(e){console.warn('Cloud load error, falling back to localStorage:',e);}
+  }
+  // Fallback to localStorage
   try {
     const p = localStorage.getItem(STORAGE_KEY);
     products = p ? JSON.parse(p) : DEFAULT_PRODUCTS;
