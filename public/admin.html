@@ -2283,8 +2283,8 @@ function nav(el,panelId){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   const panel=document.getElementById('panel-'+panelId);
   if(panel)panel.classList.add('active');
-  const titles={'dash':'Dashboard','analytics':'Analytics','products':'Products','add-product':editingProductId?'Edit Product':'Add New Product','categories':'Categories','orders':'Orders','customers':'Customers','agents':'Support Agents','pages':'Pages','media':'Media Library','banners':'Banners & Hero','appearance':'Appearance','settings':'Store Settings'};
-  const subs={'dash':'Welcome back!','products':'Manage your product catalogue.','add-product':editingProductId?'Editing existing product':'Create a new product listing.','orders':'Track and fulfil customer orders.','customers':'View all your buyers.','analytics':'Store performance overview.','agents':'Manage your live call support team.','appearance':'Customize your store look.','settings':'Configure your store.','categories':'Organise products into categories.','pages':'Manage static pages.','media':'All uploaded files.','banners':'Manage hero & promo banners.'};
+  const titles={'dash':'Dashboard','analytics':'Analytics','products':'Products','add-product':editingProductId?'Edit Product':'Add New Product','categories':'Categories','orders':'Orders','customers':'Customers','agents':'Support Agents','reviews':'Reviews','pages':'Pages','media':'Media Library','banners':'Banners & Hero','appearance':'Appearance','settings':'Store Settings'};
+  const subs={'dash':'Welcome back!','products':'Manage your product catalogue.','add-product':editingProductId?'Editing existing product':'Create a new product listing.','orders':'Track and fulfil customer orders.','customers':'View all your buyers.','analytics':'Store performance overview.','agents':'Manage your live call support team.','reviews':'Write and manage customer reviews.','appearance':'Customize your store look.','settings':'Configure your store.','categories':'Organise products into categories.','pages':'Manage static pages.','media':'All uploaded files.','banners':'Manage hero & promo banners.'};
   const titleEl=document.getElementById('header-title');const subEl=document.getElementById('header-sub');
   if(titleEl)titleEl.textContent=titles[panelId]||panelId;
   if(subEl)subEl.textContent=subs[panelId]||'';
@@ -2297,6 +2297,7 @@ function nav(el,panelId){
   if(panelId==='pages')setTimeout(renderPages,50);
   if(panelId==='banners')setTimeout(renderBanners,50);
   if(panelId==='agents'){loadAgents();renderAgents();}
+  if(panelId==='reviews'){loadAdminReviews();}
 }
 
 // ─── REFRESH STATS ───
