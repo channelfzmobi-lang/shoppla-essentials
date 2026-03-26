@@ -798,7 +798,66 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       </div>
     </div>
 
-    <!-- ═══ CATEGORIES ═══ -->
+    <!-- ═══ REVIEWS ═══ -->
+    <div class="panel" id="panel-reviews">
+      <div class="section-card">
+        <div class="sc-head">
+          <div><div class="sc-title">Customer Reviews</div><div class="sc-sub">Write and manage reviews with images/video attachments</div></div>
+          <button class="hdr-btn hdr-btn-primary" onclick="openAdminReviewModal()">✍️ Write Review</button>
+        </div>
+        <div class="sc-body">
+          <div style="margin-bottom:16px;">
+            <select class="form-input" id="review-product-filter" style="max-width:300px;" onchange="renderAdminReviews()">
+              <option value="">All Products</option>
+            </select>
+          </div>
+          <div id="admin-reviews-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="admin-review-modal" style="display:none;position:fixed;inset:0;background:rgba(10,8,6,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;" onclick="if(event.target===this)closeAdminReviewModal()">
+      <div style="background:#fff;border-radius:18px;padding:32px;max-width:520px;width:95%;max-height:90vh;overflow-y:auto;">
+        <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;margin-bottom:18px;">✍️ Write Customer Review</h3>
+        <div class="form-group">
+          <label class="form-lbl">Product</label>
+          <select class="form-input" id="rev-admin-product"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Reviewer Name</label>
+          <input class="form-input" id="rev-admin-name" placeholder="Customer name"/>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Rating</label>
+          <div id="rev-admin-stars" style="display:flex;gap:6px;font-size:28px;cursor:pointer;">
+            <span onclick="setAdminStars(1)" style="color:#f7b84a;">★</span>
+            <span onclick="setAdminStars(2)" style="color:#f7b84a;">★</span>
+            <span onclick="setAdminStars(3)" style="color:#f7b84a;">★</span>
+            <span onclick="setAdminStars(4)" style="color:#f7b84a;">★</span>
+            <span onclick="setAdminStars(5)" style="color:#f7b84a;">★</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Review Text</label>
+          <textarea class="form-input" id="rev-admin-text" rows="4" placeholder="Write the customer review…" style="resize:vertical;min-height:80px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-lbl">Attachments (images/videos)</label>
+          <input type="file" id="rev-admin-files" multiple accept="image/*,video/*" style="font-size:13px;"/>
+          <div id="rev-admin-file-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;">
+            <input type="checkbox" id="rev-admin-verified" checked/> Mark as Verified Buyer
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="hdr-btn hdr-btn-primary" onclick="saveAdminReview()" style="flex:1;">💾 Save Review</button>
+          <button class="hdr-btn hdr-btn-outline" onclick="closeAdminReviewModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
     <div class="panel" id="panel-categories">
       <div class="section-card">
         <div class="sc-head"><div class="sc-title">Categories</div><div class="sc-sub">Manage your store categories</div></div>
