@@ -2104,7 +2104,7 @@ function buildCTAs(p) {
   wrap.innerHTML = html2;
   // Wire mobile sticky bar
   if (mobBar) {
-    mobBar.style.display = 'flex';
+    mobBar.classList.add('mob-buy-active');
     const mbBuy  = document.getElementById('mob-btn-buy');
     const mbCart = document.getElementById('mob-btn-cart');
     if (mbBuy && mbCart) {
