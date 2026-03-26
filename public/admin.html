@@ -2390,8 +2390,169 @@ function refreshLivePreview(){
   if(iframe) iframe.src = iframe.src;
 }
 
+// ─── REVIEWS MANAGEMENT ───
+let adminReviews = [];
+let adminReviewStars = 5;
+let editingReviewId = null;
+let reviewAttachmentFiles = [];
+
+function setAdminStars(n) {
+  adminReviewStars = n;
+  document.querySelectorAll('#rev-admin-stars span').forEach((s,i) => {
+    s.style.color = i < n ? '#f7b84a' : '#e0dbd2';
+  });
+}
+
+function openAdminReviewModal(reviewId) {
+  editingReviewId = reviewId || null;
+  reviewAttachmentFiles = [];
+  const sel = document.getElementById('rev-admin-product');
+  sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+  if (reviewId) {
+    const r = adminReviews.find(x => x.id === reviewId);
+    if (r) {
+      sel.value = r.product_id || '';
+      document.getElementById('rev-admin-name').value = r.reviewer_name || '';
+      document.getElementById('rev-admin-text').value = r.review_text || '';
+      document.getElementById('rev-admin-verified').checked = r.verified;
+      setAdminStars(r.rating || 5);
+    }
+  } else {
+    document.getElementById('rev-admin-name').value = '';
+    document.getElementById('rev-admin-text').value = '';
+    document.getElementById('rev-admin-verified').checked = true;
+    setAdminStars(5);
+  }
+  document.getElementById('rev-admin-file-preview').innerHTML = '';
+  document.getElementById('rev-admin-files').value = '';
+  document.getElementById('admin-review-modal').style.display = 'flex';
+}
+
+function closeAdminReviewModal() {
+  document.getElementById('admin-review-modal').style.display = 'none';
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.id !== 'rev-admin-files') return;
+  const preview = document.getElementById('rev-admin-file-preview');
+  preview.innerHTML = '';
+  reviewAttachmentFiles = Array.from(e.target.files);
+  reviewAttachmentFiles.forEach(file => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:#f5f4f0;display:flex;align-items:center;justify-content:center;';
+    if (file.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      wrap.appendChild(img);
+    } else if (file.type.startsWith('video/')) {
+      wrap.innerHTML = '<span style="font-size:24px;">🎬</span>';
+    }
+    preview.appendChild(wrap);
+  });
+});
+
+async function saveAdminReview() {
+  const productId = document.getElementById('rev-admin-product').value;
+  const name = document.getElementById('rev-admin-name').value.trim();
+  const text = document.getElementById('rev-admin-text').value.trim();
+  const verified = document.getElementById('rev-admin-verified').checked;
+  if (!name || !text) { showToast('⚠️ Please enter name and review text'); return; }
+
+  const attachments = [];
+  for (const file of reviewAttachmentFiles) {
+    const b64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+    attachments.push({ name: file.name, type: file.type, base64: b64 });
+  }
+
+  const reviewData = {
+    product_id: productId || null,
+    reviewer_name: name,
+    rating: adminReviewStars,
+    review_text: text,
+    verified: verified,
+    attachments: attachments
+  };
+
+  try {
+    if (editingReviewId) {
+      await sb.from('reviews').update(reviewData).eq('id', editingReviewId);
+    } else {
+      await sb.from('reviews').insert(reviewData);
+    }
+    showToast('✅ Review saved!');
+    closeAdminReviewModal();
+    loadAdminReviews();
+  } catch(e) {
+    showToast('❌ Failed to save review');
+    console.error(e);
+  }
+}
+
+async function loadAdminReviews() {
+  const fSel = document.getElementById('review-product-filter');
+  if (fSel) fSel.innerHTML = '<option value="">All Products</option>' + products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  try {
+    const { data } = await sb.from('reviews').select('*').order('created_at', { ascending: false });
+    adminReviews = data || [];
+  } catch(e) { adminReviews = []; }
+  renderAdminReviews();
+}
+
+function renderAdminReviews() {
+  const filterProd = document.getElementById('review-product-filter')?.value || '';
+  const filtered = filterProd ? adminReviews.filter(r => r.product_id === filterProd) : adminReviews;
+  const el = document.getElementById('admin-reviews-list');
+  if (!el) return;
+  if (!filtered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">⭐</div><div style="font-weight:700;margin-bottom:6px;">No reviews yet</div><div style="font-size:13px;">Click "Write Review" to add customer reviews.</div></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(r => {
+    const prod = products.find(p => p.id === r.product_id);
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const attachHTML = (r.attachments && r.attachments.length) ?
+      `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${r.attachments.map(a =>
+        a.type?.startsWith('image/') ?
+          `<img src="${a.base64}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border);"/>` :
+          `<div style="width:56px;height:56px;border-radius:8px;background:#f5f4f0;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;">🎬</div>`
+      ).join('')}</div>` : '';
+    return `<div style="background:#f9f8f6;border-radius:14px;padding:18px;margin-bottom:12px;border:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">${(r.reviewer_name||'?')[0].toUpperCase()}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px;">${r.reviewer_name} ${r.verified ? '<span style="color:var(--green);font-size:11px;">✓ Verified</span>' : ''}</div>
+            <div style="font-size:12px;color:var(--muted);">${prod ? prod.name : 'Unknown product'} · ${new Date(r.created_at).toLocaleDateString()}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="tbl-btn" onclick="openAdminReviewModal('${r.id}')">✏️</button>
+          <button class="tbl-btn" style="color:var(--red);" onclick="deleteAdminReview('${r.id}')">🗑</button>
+        </div>
+      </div>
+      <div style="color:#f7b84a;font-size:16px;margin-bottom:6px;">${stars}</div>
+      <div style="font-size:14px;line-height:1.65;color:#555;">${r.review_text}</div>
+      ${attachHTML}
+    </div>`;
+  }).join('');
+}
+
+async function deleteAdminReview(id) {
+  if (!confirm('Delete this review?')) return;
+  try {
+    await sb.from('reviews').delete().eq('id', id);
+    showToast('🗑 Review deleted');
+    loadAdminReviews();
+  } catch(e) { showToast('❌ Failed to delete'); }
+}
+
 // ─── INIT ───
-// ─── ASYNC INIT ───
 (async function(){
   await loadFromStorage();
   loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
