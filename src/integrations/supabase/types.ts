@@ -271,6 +271,47 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          product_id: string | null
+          rating: number
+          review_text: string
+          reviewer_name: string
+          verified: boolean | null
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          rating?: number
+          review_text?: string
+          reviewer_name?: string
+          verified?: boolean | null
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          rating?: number
+          review_text?: string
+          reviewer_name?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_settings: {
         Row: {
           id: string
