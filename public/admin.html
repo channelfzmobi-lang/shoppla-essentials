@@ -1744,6 +1744,7 @@ async function loadFromStorage(){
           contentSections:p.content_sections||[], checkoutMethod:p.checkout_method,
           paymentRoute:p.payment_route, formConfig:p.form_config||{},
           tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
+          agentId:p.agent_id||null,
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
