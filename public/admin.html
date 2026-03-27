@@ -495,6 +495,21 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               <input class="form-input" id="fp-tags" placeholder="sofa, living room, velvet, modern, comfort"/>
               <div class="form-hint">Helps customers find your product in search</div>
             </div>
+            <div class="form-group">
+              <label class="form-lbl">🎧 Assigned Support Agent</label>
+              <select class="form-select" id="fp-agent">
+                <option value="">Default (Store settings)</option>
+              </select>
+              <div class="form-hint">This agent's name, photo, and contact will appear on the Live Call button for this product.</div>
+            </div>
+            <div id="fp-agent-preview" style="display:none;background:var(--warm);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:4px;align-items:center;gap:12px;">
+              <div id="fp-agent-avatar" style="width:44px;height:44px;border-radius:50%;background:#e8541a;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">?</div>
+              <div style="flex:1;">
+                <div id="fp-agent-name" style="font-weight:700;font-size:14px;">Agent Name</div>
+                <div id="fp-agent-role" style="font-size:12.5px;color:var(--muted);">Role</div>
+                <div id="fp-agent-status" style="font-size:11.5px;margin-top:3px;"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1008,36 +1023,9 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
 
     <!-- ═══ BANNERS ═══ -->
     <div class="panel" id="panel-banners">
-      <div class="section-card">
-        <div class="sc-head"><div class="sc-title">Banners & Hero Slides</div></div>
-        <div class="sc-body">
-          <div style="background:linear-gradient(135deg,#100e0b,#2d1e10);border-radius:16px;padding:36px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <div>
-              <div style="font-size:12px;letter-spacing:.2em;color:var(--accent2);font-weight:700;margin-bottom:8px;">CURRENT HERO</div>
-              <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#fff;">Shop <em style="color:var(--accent);">Everything</em> You Love</div>
-              <div style="font-size:14px;color:rgba(255,255,255,.5);margin-top:8px;">UGC video · Live calls · Guest checkout</div>
-            </div>
-            <button class="hdr-btn hdr-btn-primary" onclick="nav(document.querySelector('.sb-item[onclick*=appearance]'),'appearance')">Edit Hero →</button>
-          </div>
-          <div style="font-weight:800;margin-bottom:14px;">Promo Banners</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
-            <div style="background:linear-gradient(140deg,#ffe4cc,#ffb87a);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
-              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;">NEW SEASON</div>
-              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;">Refresh Your Bedroom</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:6px;">✏️ Click to edit</div>
-            </div>
-            <div style="background:linear-gradient(140deg,#d0f0d8,#8dd4a0);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
-              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--green);margin-bottom:6px;">OUTDOOR LIVING</div>
-              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;">Garden Ready</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:6px;">✏️ Click to edit</div>
-            </div>
-            <div style="background:linear-gradient(140deg,#181310,#2e2118);border-radius:14px;padding:24px;cursor:pointer;" onclick="showToast('Edit banner panel would open')">
-              <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--accent2);margin-bottom:6px;">SMART HOME</div>
-              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;color:#fff;">Light Up Your Space</div>
-              <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;">✏️ Click to edit</div>
-            </div>
-          </div>
-        </div>
+      <div id="banners-list"></div>
+      <div style="margin-top:16px;">
+        <button class="hdr-btn hdr-btn-primary" onclick="bannerData.push({id:'promo-'+Date.now(),label:'New Banner',active:true,headline:'New Promo',sub:'Promo subtext',cta:'Shop Now →',bg:'#e8541a'});renderBanners();showToast('✅ New banner added!')">➕ Add New Banner</button>
       </div>
     </div>
 
