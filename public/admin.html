@@ -2458,8 +2458,19 @@ async function saveAdminReview() {
     attachments.push({ name: file.name, type: file.type, base64: b64 });
   }
 
+  // Find cloud ID for product - local products may have numeric IDs but cloud uses UUIDs
+  let cloudProductId = null;
+  if (productId) {
+    const prod = products.find(p => String(p.id) === String(productId));
+    if (prod && prod._cloud_id) {
+      cloudProductId = prod._cloud_id;
+    } else if (typeof productId === 'string' && productId.includes('-')) {
+      cloudProductId = productId; // Already a UUID
+    }
+  }
+
   const reviewData = {
-    product_id: productId || null,
+    product_id: cloudProductId,
     reviewer_name: name,
     rating: adminReviewStars,
     review_text: text,
@@ -2467,18 +2478,22 @@ async function saveAdminReview() {
     attachments: attachments
   };
 
+  if (!sb) { showToast('❌ Database not connected'); return; }
+
   try {
     if (editingReviewId) {
-      await sb.from('reviews').update(reviewData).eq('id', editingReviewId);
+      const { error } = await sb.from('reviews').update(reviewData).eq('id', editingReviewId);
+      if (error) throw error;
     } else {
-      await sb.from('reviews').insert(reviewData);
+      const { error } = await sb.from('reviews').insert(reviewData);
+      if (error) throw error;
     }
     showToast('✅ Review saved!');
     closeAdminReviewModal();
     loadAdminReviews();
   } catch(e) {
-    showToast('❌ Failed to save review');
-    console.error(e);
+    console.error('Review save error:', e);
+    showToast('❌ Failed to save review: ' + (e.message || e.details || 'Unknown error'));
   }
 }
 
