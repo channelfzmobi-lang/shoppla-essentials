@@ -510,6 +510,23 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 <div id="fp-agent-status" style="font-size:11.5px;margin-top:3px;"></div>
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-lbl">🎨 Salespage Template</label>
+              <select class="form-select" id="fp-template">
+                <option value="classic">Classic (White/Clean)</option>
+                <option value="dark">Dark Premium</option>
+                <option value="bold">Bold Modern</option>
+              </select>
+              <div class="form-hint">Choose the visual style for this product's salespage.</div>
+              <div id="fp-template-preview" style="margin-top:8px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);display:flex;height:60px;">
+                <div id="tpl-preview-media" style="width:50%;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:28px;">🛋️</div>
+                <div id="tpl-preview-info" style="width:50%;padding:8px 12px;display:flex;flex-direction:column;justify-content:center;background:#fff;">
+                  <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:.08em;">BRAND</div>
+                  <div style="font-size:12px;font-weight:800;margin-top:2px;" id="tpl-preview-title">Product Name</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:1px;">$99.00</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
