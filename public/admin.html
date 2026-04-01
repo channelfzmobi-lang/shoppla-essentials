@@ -1874,6 +1874,28 @@ function previewSelectedAgent(agentId){
   preview.style.display='flex';
 }
 
+// ─── TEMPLATE PREVIEW ───
+document.addEventListener('change',e=>{if(e.target?.id==='fp-template')updateTemplatePreview(e.target.value);});
+function updateTemplatePreview(tpl){
+  const media=document.getElementById('tpl-preview-media');
+  const info=document.getElementById('tpl-preview-info');
+  const title=document.getElementById('tpl-preview-title');
+  if(!media||!info)return;
+  if(tpl==='dark'){
+    media.style.background='linear-gradient(145deg,#1a1210,#2e1e14)';
+    info.style.background='#1a1612';
+    if(title)title.style.color='#fff';
+  } else if(tpl==='bold'){
+    media.style.background='linear-gradient(145deg,#e0d8c8,#d5c9b5)';
+    info.style.background='#f8f7f2';
+    if(title)title.style.color='var(--ink)';
+  } else {
+    media.style.background='linear-gradient(145deg,#eee8dd,#e0d8c8)';
+    info.style.background='#fff';
+    if(title)title.style.color='var(--ink)';
+  }
+}
+
 function openAgentModal(agentId){
   const a=agentId?agents.find(x=>x.id===agentId):null;
   document.getElementById('agent-modal')?.remove();
