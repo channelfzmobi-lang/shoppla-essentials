@@ -1276,6 +1276,10 @@ function editProduct(id){
     else { agentSel.value=''; const pr=document.getElementById('fp-agent-preview'); if(pr) pr.style.display='none'; }
   }
 
+  // Template
+  const tplSel = document.getElementById('fp-template');
+  if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
+
   nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
