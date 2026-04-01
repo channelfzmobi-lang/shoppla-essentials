@@ -510,6 +510,23 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 <div id="fp-agent-status" style="font-size:11.5px;margin-top:3px;"></div>
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-lbl">🎨 Salespage Template</label>
+              <select class="form-select" id="fp-template">
+                <option value="classic">Classic (White/Clean)</option>
+                <option value="dark">Dark Premium</option>
+                <option value="bold">Bold Modern</option>
+              </select>
+              <div class="form-hint">Choose the visual style for this product's salespage.</div>
+              <div id="fp-template-preview" style="margin-top:8px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);display:flex;height:60px;">
+                <div id="tpl-preview-media" style="width:50%;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:28px;">🛋️</div>
+                <div id="tpl-preview-info" style="width:50%;padding:8px 12px;display:flex;flex-direction:column;justify-content:center;background:#fff;">
+                  <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:.08em;">BRAND</div>
+                  <div style="font-size:12px;font-weight:800;margin-top:2px;" id="tpl-preview-title">Product Name</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:1px;">$99.00</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1259,6 +1276,10 @@ function editProduct(id){
     else { agentSel.value=''; const pr=document.getElementById('fp-agent-preview'); if(pr) pr.style.display='none'; }
   }
 
+  // Template
+  const tplSel = document.getElementById('fp-template');
+  if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
+
   nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
@@ -1284,6 +1305,7 @@ function saveProduct(draft=false){
   const mediaHeightMobile  = Math.max(220, Math.min(560, parseInt(document.getElementById('fp-media-height-mobile')?.value)||320));
   const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
+  const pageTemplate = document.getElementById('fp-template')?.value||'classic';
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
@@ -1321,7 +1343,7 @@ function saveProduct(draft=false){
 
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
-    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId,
+    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
     videoData, videoURL:effectiveUrl, images,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
@@ -1367,6 +1389,9 @@ function clearProductForm(){
   contentSections = [];
   renderContentSections();
   editingProductId = null;
+  // Reset template
+  const tplSel = document.getElementById('fp-template');
+  if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
 }
 
 function updateCounts(){
@@ -1712,6 +1737,7 @@ async function saveToStorage(){
         payment_route: p.paymentRoute||'pod',
         form_config: p.formConfig||{}, ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: p.agentId||null,
+        page_template: p.pageTemplate||'classic',
       };
       // Use local_id mapping
       if(!p._cloud_id){
@@ -1745,6 +1771,7 @@ async function loadFromStorage(){
           paymentRoute:p.payment_route, formConfig:p.form_config||{},
           tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
           agentId:p.agent_id||null,
+          pageTemplate:p.page_template||'classic',
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
@@ -1845,6 +1872,28 @@ function previewSelectedAgent(agentId){
   if(rl)rl.textContent=a.role;
   if(st)st.innerHTML=`<span style="color:${a.status==='online'?'#1a8a4a':'#c8840a'};font-weight:600;">● ${a.status==='online'?'Online':'Busy'}</span> · ${a.availability}`;
   preview.style.display='flex';
+}
+
+// ─── TEMPLATE PREVIEW ───
+document.addEventListener('change',e=>{if(e.target?.id==='fp-template')updateTemplatePreview(e.target.value);});
+function updateTemplatePreview(tpl){
+  const media=document.getElementById('tpl-preview-media');
+  const info=document.getElementById('tpl-preview-info');
+  const title=document.getElementById('tpl-preview-title');
+  if(!media||!info)return;
+  if(tpl==='dark'){
+    media.style.background='linear-gradient(145deg,#1a1210,#2e1e14)';
+    info.style.background='#1a1612';
+    if(title)title.style.color='#fff';
+  } else if(tpl==='bold'){
+    media.style.background='linear-gradient(145deg,#e0d8c8,#d5c9b5)';
+    info.style.background='#f8f7f2';
+    if(title)title.style.color='var(--ink)';
+  } else {
+    media.style.background='linear-gradient(145deg,#eee8dd,#e0d8c8)';
+    info.style.background='#fff';
+    if(title)title.style.color='var(--ink)';
+  }
 }
 
 function openAgentModal(agentId){

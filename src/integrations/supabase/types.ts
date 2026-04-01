@@ -180,6 +180,7 @@ export type Database = {
           media_height_mobile: number | null
           name: string
           page_color: string | null
+          page_template: string | null
           payment_route: string | null
           price: number
           return_days: string | null
@@ -217,6 +218,7 @@ export type Database = {
           media_height_mobile?: number | null
           name: string
           page_color?: string | null
+          page_template?: string | null
           payment_route?: string | null
           price?: number
           return_days?: string | null
@@ -254,6 +256,7 @@ export type Database = {
           media_height_mobile?: number | null
           name?: string
           page_color?: string | null
+          page_template?: string | null
           payment_route?: string | null
           price?: number
           return_days?: string | null
