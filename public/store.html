@@ -2030,12 +2030,18 @@ function buildMediaPanel(p) {
     vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
     main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
   } else if (p.images && p.images.length) {
-    const img = document.createElement('img');
-    img.className = 'sp-real';
-    img.src = p.images[0].base64;
-    img.alt = p.name;
-    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
-    main.appendChild(img); vidBg.style.display = 'none';
+    const imgSrc = typeof p.images[0] === 'string' ? p.images[0] : (p.images[0].base64 || '');
+    if (imgSrc) {
+      const img = document.createElement('img');
+      img.className = 'sp-real';
+      img.src = imgSrc;
+      img.alt = p.name;
+      img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
+      main.appendChild(img); vidBg.style.display = 'none';
+    } else {
+      vidBg.style.display = 'flex';
+      document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
+    }
   } else {
     vidBg.style.display = 'flex';
     document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
@@ -2043,6 +2049,7 @@ function buildMediaPanel(p) {
 
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
   const addThumb = (content, isImg, onClick) => {
     const t = document.createElement('div');
     t.className = 'sp-thumb';
@@ -2062,9 +2069,11 @@ function buildMediaPanel(p) {
   t0.classList.add('active');
   if (p.images) {
     p.images.forEach((img) => {
-      addThumb(img.base64, true, () => {
+      const src = getImgSrc(img);
+      if (!src) return;
+      addThumb(src, true, () => {
         main.querySelectorAll('.sp-real').forEach(el => el.remove());
-        const el = document.createElement('img'); el.className='sp-real'; el.src=img.base64;
+        const el = document.createElement('img'); el.className='sp-real'; el.src=src;
         el.style.cssText=`position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
         main.appendChild(el); vidBg.style.display='none';
       });
