@@ -1730,6 +1730,7 @@ async function saveToStorage(){
         payment_route: p.paymentRoute||'pod',
         form_config: p.formConfig||{}, ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: p.agentId||null,
+        page_template: p.pageTemplate||'classic',
       };
       // Use local_id mapping
       if(!p._cloud_id){
