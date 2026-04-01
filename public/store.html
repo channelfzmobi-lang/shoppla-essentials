@@ -654,8 +654,10 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
   .hero-p{font-size:13.5px;}
   .hero-btns{flex-direction:column;gap:8px;}
   .btn-primary,.btn-outline{padding:13px 20px;font-size:14px;text-align:center;justify-content:center;}
-  .hero-stats{gap:14px;}
-  .stat-n{font-size:18px;}
+  .hero-stats{gap:0;padding-top:20px;overflow:hidden;}
+  .hero-stats-inner{display:flex;gap:28px;animation:statsMarquee 12s linear infinite;white-space:nowrap;}
+  @keyframes statsMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .stat-n{font-size:18px;white-space:nowrap;}
   /* Sections */
   .section{padding:26px 14px;}
   /* Category grid */
