@@ -20,8 +20,10 @@ button{font-family:'Satoshi',sans-serif;}
 .page{display:none;}.page.active{display:block;}
 
 /* ═══ TOPBAR ═══ */
-.topbar{background:var(--ink);color:#fff;text-align:center;font-size:12.5px;padding:9px 20px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar{background:var(--ink);color:#fff;font-size:12.5px;padding:9px 20px;cursor:pointer;overflow:hidden;position:relative;height:32px;display:flex;align-items:center;}
 .topbar b{color:var(--accent2);}
+.topbar-inner{display:inline-block;white-space:nowrap;animation:marquee 18s linear infinite;position:absolute;}
+@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
 
 /* ═══ NAV ═══ */
 nav{position:sticky;top:0;z-index:200;background:rgba(250,248,244,.96);backdrop-filter:blur(14px);
@@ -773,7 +775,7 @@ img,video,iframe{max-width:100%;}
 <div id="home-page" class="page active">
 
 <div class="topbar" onclick="openModal('call-modal')">
-  🎉 Free shipping on orders over <b>$49</b> &nbsp;·&nbsp; <b>No account needed</b> &nbsp;·&nbsp; <b>📞 Live call</b> — tap here
+  <span class="topbar-inner">🎉 Free shipping on orders over <b>$49</b> &nbsp;·&nbsp; <b>No account needed</b> &nbsp;·&nbsp; <b>📞 Live call</b> — tap here &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🎉 Free shipping on orders over <b>$49</b> &nbsp;·&nbsp; <b>No account needed</b> &nbsp;·&nbsp; <b>📞 Live call</b> — tap here</span>
 </div>
 
 <nav>
@@ -1810,22 +1812,24 @@ function closeModal(id) {
 
 // ═══ PRODUCT CARDS ═══
 function makeCardHTML(p, showActions) {
+  const pid = typeof p.id === 'string' ? `'${p.id}'` : p.id;
   const disc = p.wasPrice ? '-'+Math.round((1-p.price/p.wasPrice)*100)+'%' : '';
   const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
   let mediaHTML;
+  // Determine image src - handle both {base64:...} objects and plain URL strings
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
   if (p.videoURL) {
-    mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${p.id})" style="cursor:pointer;">
+    mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${pid})" style="cursor:pointer;">
       <div class="play-ring">▶</div>
       <div class="vid-emoji">${p.icon||'📦'}</div>
       <div class="vid-lbl">▶ Watch video</div>
     </div>`;
   } else if (p.videoData && p.videoData.base64) {
-    // Uploaded base64 video — plays on hover
     mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
       onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
       <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
-  } else if (p.images && p.images.length) {
-    mediaHTML = `<img src="${p.images[0].base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
+  } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
+    mediaHTML = `<img src="${getImgSrc(p.images[0])}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
   } else {
     mediaHTML = `<div class="vid-placeholder">
       <div class="play-ring">▶</div>
@@ -1834,16 +1838,16 @@ function makeCardHTML(p, showActions) {
     </div>`;
   }
   const actions = showActions ? `<div class="prod-actions">
-    <button class="btn-cart-sm" onclick="event.stopPropagation();addToCart(${p.id});this.textContent='✓ Added!';this.style.background='#1a8a4a';setTimeout(()=>{this.textContent='Add to Cart';this.style.background='';},1500)">Add to Cart</button>
-    <button class="btn-view-sm" onclick="event.stopPropagation();openSalesPage(${p.id})">View →</button>
+    <button class="btn-cart-sm" onclick="event.stopPropagation();addToCart(${pid});this.textContent='✓ Added!';this.style.background='#1a8a4a';setTimeout(()=>{this.textContent='Add to Cart';this.style.background='';},1500)">Add to Cart</button>
+    <button class="btn-view-sm" onclick="event.stopPropagation();openSalesPage(${pid})">View →</button>
   </div>` : '';
-  return `<div class="prod-card" onclick="openSalesPage(${p.id})">
+  return `<div class="prod-card" onclick="openSalesPage(${pid})">
     <div class="prod-media">
       ${mediaHTML}
       <div class="ugc-tag">▶ UGC</div>
       ${disc?`<div class="disc-tag">${disc}</div>`:''}
       <button class="live-btn" onclick="event.stopPropagation();openModal('call-modal')"><div class="live-dot"></div>Live Call</button>
-      <button class="wish-btn" onclick="event.stopPropagation();toggleWish(this,${p.id})">${getWish().includes(p.id)?'♥':'♡'}</button>
+      <button class="wish-btn" onclick="event.stopPropagation();toggleWish(this,${pid})">${getWish().includes(p.id)?'♥':'♡'}</button>
     </div>
     <div class="prod-info">
       <div class="prod-brand">${p.brand||''}</div>
@@ -2026,12 +2030,18 @@ function buildMediaPanel(p) {
     vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
     main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
   } else if (p.images && p.images.length) {
-    const img = document.createElement('img');
-    img.className = 'sp-real';
-    img.src = p.images[0].base64;
-    img.alt = p.name;
-    img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
-    main.appendChild(img); vidBg.style.display = 'none';
+    const imgSrc = typeof p.images[0] === 'string' ? p.images[0] : (p.images[0].base64 || '');
+    if (imgSrc) {
+      const img = document.createElement('img');
+      img.className = 'sp-real';
+      img.src = imgSrc;
+      img.alt = p.name;
+      img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
+      main.appendChild(img); vidBg.style.display = 'none';
+    } else {
+      vidBg.style.display = 'flex';
+      document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
+    }
   } else {
     vidBg.style.display = 'flex';
     document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
@@ -2039,6 +2049,7 @@ function buildMediaPanel(p) {
 
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
   const addThumb = (content, isImg, onClick) => {
     const t = document.createElement('div');
     t.className = 'sp-thumb';
@@ -2058,9 +2069,11 @@ function buildMediaPanel(p) {
   t0.classList.add('active');
   if (p.images) {
     p.images.forEach((img) => {
-      addThumb(img.base64, true, () => {
+      const src = getImgSrc(img);
+      if (!src) return;
+      addThumb(src, true, () => {
         main.querySelectorAll('.sp-real').forEach(el => el.remove());
-        const el = document.createElement('img'); el.className='sp-real'; el.src=img.base64;
+        const el = document.createElement('img'); el.className='sp-real'; el.src=src;
         el.style.cssText=`position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:${fitMode==='contain'?'#f5f2ec':'transparent'};`;
         main.appendChild(el); vidBg.style.display='none';
       });
