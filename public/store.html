@@ -2017,11 +2017,36 @@ function openSalesPage(id) {
   buildMediaPanel(p);
   buildVariants(p);
   buildCTAs(p);
+  applyTemplate(p);
 
   gotoPage('sales-page');
   showAgentOnCallBar(p);
   loadCloudReviews(p.id || p._cloud_id).then(() => renderCloudReviews(p.id || p._cloud_id));
   setTimeout(() => { renderGrid('related-grid', products.filter(x => x.id !== id).slice(0,4), false); }, 0);
+}
+
+function applyTemplate(p) {
+  const salesPage = document.getElementById('sales-page');
+  if (!salesPage) return;
+  // Remove old template classes
+  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold');
+  const tpl = p.pageTemplate || 'classic';
+  salesPage.classList.add('tpl-' + tpl);
+  
+  // Show/hide benefit badges based on template
+  const badges = document.getElementById('sp-benefit-badges');
+  if (badges) {
+    badges.style.display = (tpl === 'dark' || tpl === 'bold') ? 'flex' : 'none';
+  }
+  
+  // Adjust page background
+  if (tpl === 'dark') {
+    salesPage.style.background = '#100e0b';
+  } else if (tpl === 'bold') {
+    salesPage.style.background = '#f0ede5';
+  } else {
+    salesPage.style.background = '#f5f4f0';
+  }
 }
 
 // ── Media panel ──
