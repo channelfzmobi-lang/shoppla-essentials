@@ -20,8 +20,10 @@ button{font-family:'Satoshi',sans-serif;}
 .page{display:none;}.page.active{display:block;}
 
 /* ═══ TOPBAR ═══ */
-.topbar{background:var(--ink);color:#fff;text-align:center;font-size:12.5px;padding:9px 20px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar{background:var(--ink);color:#fff;font-size:12.5px;padding:9px 20px;cursor:pointer;overflow:hidden;position:relative;height:32px;display:flex;align-items:center;}
 .topbar b{color:var(--accent2);}
+.topbar-inner{display:inline-block;white-space:nowrap;animation:marquee 18s linear infinite;position:absolute;}
+@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
 
 /* ═══ NAV ═══ */
 nav{position:sticky;top:0;z-index:200;background:rgba(250,248,244,.96);backdrop-filter:blur(14px);
