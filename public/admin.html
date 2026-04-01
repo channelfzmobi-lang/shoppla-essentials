@@ -1389,6 +1389,9 @@ function clearProductForm(){
   contentSections = [];
   renderContentSections();
   editingProductId = null;
+  // Reset template
+  const tplSel = document.getElementById('fp-template');
+  if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
 }
 
 function updateCounts(){
