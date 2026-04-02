@@ -1320,6 +1320,9 @@ function saveProduct(draft=false){
   const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
   const pageTemplate = document.getElementById('fp-template')?.value||'classic';
+  const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
+  const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
+  const bundles = [...currentBundles].filter(b=>b.label&&b.price);
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
