@@ -2034,24 +2034,82 @@ function openSalesPage(id) {
 function applyTemplate(p) {
   const salesPage = document.getElementById('sales-page');
   if (!salesPage) return;
-  // Remove old template classes
-  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold');
+  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold','tpl-warm');
   const tpl = p.pageTemplate || 'classic';
   salesPage.classList.add('tpl-' + tpl);
   
-  // Show/hide benefit badges based on template
+  // Build benefit badges from product data or defaults
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
-    badges.style.display = (tpl === 'dark' || tpl === 'bold') ? 'flex' : 'none';
+    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+      (tpl === 'dark' || tpl === 'bold') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
+    if (bb.length && (tpl === 'dark' || tpl === 'bold')) {
+      badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
+      badges.style.display = 'flex';
+    } else {
+      badges.style.display = 'none';
+    }
   }
   
-  // Adjust page background
-  if (tpl === 'dark') {
-    salesPage.style.background = '#100e0b';
-  } else if (tpl === 'bold') {
-    salesPage.style.background = '#f0ede5';
-  } else {
-    salesPage.style.background = '#f5f4f0';
+  // Adjust page background per template
+  if (tpl === 'dark') salesPage.style.background = '#0f1a2e';
+  else if (tpl === 'bold') salesPage.style.background = '#f0ede5';
+  else if (tpl === 'warm') salesPage.style.background = '#f5edd8';
+  else salesPage.style.background = '#f5f4f0';
+  
+  // Build bundle cards
+  buildBundleCards(p);
+}
+
+function buildBundleCards(p) {
+  const wrap = document.getElementById('sp-bundles');
+  const cards = document.getElementById('sp-bundle-cards');
+  if (!wrap || !cards) return;
+  const bundles = p.bundles || [];
+  if (!bundles.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const tpl = p.pageTemplate || 'classic';
+  const isDark = tpl === 'dark';
+  cards.innerHTML = bundles.map((b, i) => {
+    const isTagged = !!b.tag;
+    const perUnit = b.qty > 1 ? `$${(b.price / b.qty).toFixed(2)}/each` : '';
+    const savings = p.price && b.qty > 1 ? `You save $${((p.price * b.qty) - b.price).toFixed(2)}` : '';
+    return `<div onclick="selectBundle(${i})" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;cursor:pointer;transition:all .2s;border:2px solid ${isTagged ? 'var(--accent)' : (isDark ? 'rgba(255,255,255,.15)' : 'var(--border)')};background:${isDark ? 'rgba(255,255,255,.05)' : '#fff'};" class="bundle-card" data-idx="${i}">
+      ${b.tag ? `<div style="position:absolute;top:-10px;right:12px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:10px;letter-spacing:.05em;">${b.tag}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${isDark ? 'rgba(255,255,255,.3)' : 'var(--border)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;" id="bundle-radio-${i}"></div>
+        <div>
+          <div style="font-weight:700;font-size:14px;${isDark?'color:#fff;':''}">${b.label || 'Buy '+b.qty}</div>
+          ${savings ? `<div style="font-size:11.5px;color:${isDark?'rgba(255,255,255,.5)':'var(--muted)'};margin-top:2px;">${savings}</div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">$${b.price.toFixed(2)}</div>
+        ${perUnit ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  // Select first by default
+  selectBundle(0);
+}
+
+let selectedBundleIdx = 0;
+function selectBundle(idx) {
+  selectedBundleIdx = idx;
+  document.querySelectorAll('.bundle-card').forEach((c, i) => {
+    const radio = document.getElementById('bundle-radio-' + i);
+    if (i === idx) {
+      c.style.borderColor = 'var(--accent)';
+      if (radio) radio.innerHTML = '<div style="width:10px;height:10px;background:var(--accent);border-radius:50%;"></div>';
+    } else {
+      c.style.borderColor = c.closest('#sales-page')?.classList.contains('tpl-dark') ? 'rgba(255,255,255,.15)' : 'var(--border)';
+      if (radio) radio.innerHTML = '';
+    }
+  });
+  // Update displayed price to bundle price
+  const p = products.find(x => x.id === currentProductId);
+  if (p && p.bundles && p.bundles[idx]) {
+    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
   }
 }
 
