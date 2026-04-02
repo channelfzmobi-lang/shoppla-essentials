@@ -1803,6 +1803,8 @@ async function loadFromStorage(){
           tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
           agentId:p.agent_id||null,
           pageTemplate:p.page_template||'classic',
+          bundles:(p.form_config&&p.form_config.bundles)||[],
+          benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
