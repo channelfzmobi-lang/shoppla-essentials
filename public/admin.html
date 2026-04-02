@@ -1361,7 +1361,7 @@ function saveProduct(draft=false){
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
     pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
-    videoData, videoURL:effectiveUrl, images,
+    videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
     checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
