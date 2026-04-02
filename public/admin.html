@@ -1294,6 +1294,16 @@ function editProduct(id){
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
 
+  // Benefit badges
+  const bbEl = document.getElementById('fp-benefit-badges');
+  if(bbEl && p.benefitBadges && p.benefitBadges.length) {
+    bbEl.value = p.benefitBadges.map(b => b.icon+'|'+b.text).join('\n');
+  } else if(bbEl) { bbEl.value = ''; }
+
+  // Bundles
+  currentBundles = p.bundles ? [...p.bundles] : [];
+  renderBundles();
+
   nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
