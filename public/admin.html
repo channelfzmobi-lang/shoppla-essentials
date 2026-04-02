@@ -1892,22 +1892,43 @@ function previewSelectedAgent(agentId){
 document.addEventListener('change',e=>{if(e.target?.id==='fp-template')updateTemplatePreview(e.target.value);});
 function updateTemplatePreview(tpl){
   const media=document.getElementById('tpl-preview-media');
-  const info=document.getElementById('tpl-preview-info');
-  const title=document.getElementById('tpl-preview-title');
-  if(!media||!info)return;
-  if(tpl==='dark'){
-    media.style.background='linear-gradient(145deg,#1a1210,#2e1e14)';
-    info.style.background='#1a1612';
-    if(title)title.style.color='#fff';
-  } else if(tpl==='bold'){
-    media.style.background='linear-gradient(145deg,#e0d8c8,#d5c9b5)';
-    info.style.background='#f8f7f2';
-    if(title)title.style.color='var(--ink)';
-  } else {
-    media.style.background='linear-gradient(145deg,#eee8dd,#e0d8c8)';
-    info.style.background='#fff';
-    if(title)title.style.color='var(--ink)';
-  }
+  const label=document.getElementById('tpl-preview-label');
+  const badges=document.getElementById('tpl-preview-badges');
+  if(!media)return;
+  const themes={
+    classic:{bg:'linear-gradient(145deg,#eee8dd,#e0d8c8)',label:'Classic Layout',badges:false},
+    dark:{bg:'linear-gradient(145deg,#0f1a2e,#1a2a4a)',label:'Dark Premium',badges:true},
+    bold:{bg:'linear-gradient(145deg,#c8f7c5,#56ab2f)',label:'Bold Supplement',badges:true},
+    warm:{bg:'linear-gradient(145deg,#f5d89a,#d4a04a)',label:'Warm Vintage',badges:false},
+  };
+  const t=themes[tpl]||themes.classic;
+  media.style.background=t.bg;
+  if(label)label.textContent=t.label;
+  if(badges)badges.style.display=t.badges?'flex':'none';
+}
+
+// ─── BUNDLES ───
+let currentBundles = [];
+function renderBundles(){
+  const list=document.getElementById('bundle-list');
+  if(!list)return;
+  list.innerHTML=currentBundles.map((b,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+      <input class="form-input" value="${b.qty||1}" type="number" min="1" style="padding:8px;" placeholder="Qty" oninput="currentBundles[${i}].qty=parseInt(this.value)||1"/>
+      <input class="form-input" value="${b.label||''}" placeholder="e.g. 2 Pack" style="padding:8px;" oninput="currentBundles[${i}].label=this.value"/>
+      <input class="form-input" value="${b.price||''}" type="number" step="0.01" placeholder="Price" style="padding:8px;" oninput="currentBundles[${i}].price=parseFloat(this.value)||0"/>
+      <select class="form-select" style="padding:8px;" onchange="currentBundles[${i}].tag=this.value">
+        <option value="" ${!b.tag?'selected':''}>No tag</option>
+        <option value="POPULAR" ${b.tag==='POPULAR'?'selected':''}>POPULAR</option>
+        <option value="BEST VALUE" ${b.tag==='BEST VALUE'?'selected':''}>BEST VALUE</option>
+        <option value="MOST POPULAR" ${b.tag==='MOST POPULAR'?'selected':''}>MOST POPULAR</option>
+      </select>
+      <button class="tbl-btn danger" onclick="currentBundles.splice(${i},1);renderBundles()">✕</button>
+    </div>`).join('');
+}
+function addBundle(){
+  currentBundles.push({qty:1,label:'Single',price:0,tag:''});
+  renderBundles();
 }
 
 function openAgentModal(agentId){
