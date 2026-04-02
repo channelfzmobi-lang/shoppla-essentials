@@ -1419,6 +1419,9 @@ function clearProductForm(){
   // Reset template
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
+  // Reset bundles & badges
+  currentBundles = []; renderBundles();
+  const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = '';
 }
 
 function updateCounts(){
