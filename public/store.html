@@ -530,8 +530,8 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14));border-radius:3px;padding:1px 5px;}
 
 /* ═══ TEMPLATE: DARK PREMIUM ═══ */
-#sales-page.tpl-dark{--sp-bg:#1a1612;}
-#sales-page.tpl-dark .sp-info{background:#1a1612;color:#fff;}
+#sales-page.tpl-dark{--sp-bg:#0f1a2e;}
+#sales-page.tpl-dark .sp-info{background:#0f1a2e;color:#fff;}
 #sales-page.tpl-dark .sp-title{color:#fff;}
 #sales-page.tpl-dark .sp-price{color:#fff;}
 #sales-page.tpl-dark .sp-was{color:rgba(255,255,255,.4);}
@@ -543,7 +543,7 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
 #sales-page.tpl-dark #color-txt{color:rgba(255,255,255,.5)!important;}
 #sales-page.tpl-dark .sp-size{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
 #sales-page.tpl-dark .sp-size:hover:not(.out){border-color:#fff;}
-#sales-page.tpl-dark .sp-size.active{background:#fff;color:#1a1612;border-color:#fff;}
+#sales-page.tpl-dark .sp-size.active{background:#fff;color:#0f1a2e;border-color:#fff;}
 #sales-page.tpl-dark .qty-ctrl{border-color:rgba(255,255,255,.15);}
 #sales-page.tpl-dark .qty-btn{color:#fff;}
 #sales-page.tpl-dark .qty-btn:hover{background:rgba(255,255,255,.1);}
@@ -561,14 +561,16 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
 #sales-page.tpl-dark .sp-breadcrumb a{color:rgba(255,255,255,.4);}
 #sales-page.tpl-dark .btn-add-sp{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);}
 #sales-page.tpl-dark .btn-add-sp:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);}
+#sales-page.tpl-dark .sp-main{background:linear-gradient(145deg,#0d1826,#1a2844);}
 .tpl-dark .sp-benefit-badges{position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:10px;}
 .sp-benefit-badges{display:none;}
 .tpl-dark .sp-benefit-badges .bb-item{background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:12px;padding:10px 14px;color:#fff;text-align:center;min-width:80px;}
 .tpl-dark .sp-benefit-badges .bb-ico{font-size:20px;margin-bottom:4px;}
 .tpl-dark .sp-benefit-badges .bb-txt{font-size:10px;font-weight:600;line-height:1.3;}
 
-/* ═══ TEMPLATE: BOLD MODERN ═══ */
+/* ═══ TEMPLATE: BOLD SUPPLEMENT ═══ */
 #sales-page.tpl-bold .sp-info{background:#f8f7f2;}
+#sales-page.tpl-bold .sp-main{background:linear-gradient(145deg,#c8f7c5,#56ab2f);}
 #sales-page.tpl-bold .btn-buy-now{background:linear-gradient(135deg,#0d2b1a,#1a5c35);border-radius:50px;padding:18px;font-size:16px;}
 #sales-page.tpl-bold .btn-buy-now:hover{box-shadow:0 12px 28px rgba(26,92,53,.35);}
 #sales-page.tpl-bold .sp-save{background:rgba(26,138,74,.1);color:var(--green);}
@@ -577,6 +579,16 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
 .tpl-bold .sp-benefit-badges .bb-item{background:#fff;border-radius:12px;padding:10px 14px;color:var(--ink);text-align:center;min-width:80px;box-shadow:0 2px 10px rgba(0,0,0,.1);}
 .tpl-bold .sp-benefit-badges .bb-ico{font-size:20px;margin-bottom:4px;}
 .tpl-bold .sp-benefit-badges .bb-txt{font-size:10px;font-weight:600;line-height:1.3;}
+
+/* ═══ TEMPLATE: WARM VINTAGE ═══ */
+#sales-page.tpl-warm .sp-info{background:#fdf5e6;}
+#sales-page.tpl-warm .sp-main{background:linear-gradient(145deg,#f5d89a,#d4a04a);}
+#sales-page.tpl-warm .btn-buy-now{background:#8b5e3c;border-radius:8px;}
+#sales-page.tpl-warm .btn-buy-now:hover{background:#6e4630;box-shadow:0 8px 20px rgba(139,94,60,.3);}
+#sales-page.tpl-warm .sp-brand{color:#8b5e3c;}
+#sales-page.tpl-warm .sp-save{background:rgba(139,94,60,.1);color:#8b5e3c;}
+#sales-page.tpl-warm .trust-b{background:#fff8e8;border-color:#e8d5a8;}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 /* ═══════════════════════════════════
    RESPONSIVE — TABLET (≤860px)
@@ -880,9 +892,6 @@ img,video,iframe{max-width:100%;}
         <div><div class="stat-n">12M+</div><div class="stat-l">Products</div></div>
         <div><div class="stat-n">4.8★</div><div class="stat-l">Rating</div></div>
         <div><div class="stat-n">2M+</div><div class="stat-l">Customers</div></div>
-        <div><div class="stat-n">12M+</div><div class="stat-l">Products</div></div>
-        <div><div class="stat-n">4.8★</div><div class="stat-l">Rating</div></div>
-        <div><div class="stat-n">2M+</div><div class="stat-l">Customers</div></div>
       </div>
     </div>
   </div>
@@ -1123,6 +1132,12 @@ img,video,iframe{max-width:100%;}
         <input class="qty-num" id="qty-val" value="1" readonly/>
         <button class="qty-btn" onclick="chgQty(1)">+</button>
       </div>
+    </div>
+
+    <!-- Bundle Pricing Cards -->
+    <div id="sp-bundles" style="display:none;margin-bottom:18px;">
+      <div class="sp-lbl">Choose Your Quantity</div>
+      <div id="sp-bundle-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
     <!-- CTAs — dynamically rendered -->
@@ -1782,6 +1797,8 @@ async function loadData() {
           tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
           agentId:p.agent_id||null,
           pageTemplate:p.page_template||'classic',
+          bundles:(p.form_config&&p.form_config.bundles)||[],
+          benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
         }));
         return;
       }
@@ -2029,24 +2046,82 @@ function openSalesPage(id) {
 function applyTemplate(p) {
   const salesPage = document.getElementById('sales-page');
   if (!salesPage) return;
-  // Remove old template classes
-  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold');
+  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold','tpl-warm');
   const tpl = p.pageTemplate || 'classic';
   salesPage.classList.add('tpl-' + tpl);
   
-  // Show/hide benefit badges based on template
+  // Build benefit badges from product data or defaults
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
-    badges.style.display = (tpl === 'dark' || tpl === 'bold') ? 'flex' : 'none';
+    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+      (tpl === 'dark' || tpl === 'bold') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
+    if (bb.length && (tpl === 'dark' || tpl === 'bold')) {
+      badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
+      badges.style.display = 'flex';
+    } else {
+      badges.style.display = 'none';
+    }
   }
   
-  // Adjust page background
-  if (tpl === 'dark') {
-    salesPage.style.background = '#100e0b';
-  } else if (tpl === 'bold') {
-    salesPage.style.background = '#f0ede5';
-  } else {
-    salesPage.style.background = '#f5f4f0';
+  // Adjust page background per template
+  if (tpl === 'dark') salesPage.style.background = '#0f1a2e';
+  else if (tpl === 'bold') salesPage.style.background = '#f0ede5';
+  else if (tpl === 'warm') salesPage.style.background = '#f5edd8';
+  else salesPage.style.background = '#f5f4f0';
+  
+  // Build bundle cards
+  buildBundleCards(p);
+}
+
+function buildBundleCards(p) {
+  const wrap = document.getElementById('sp-bundles');
+  const cards = document.getElementById('sp-bundle-cards');
+  if (!wrap || !cards) return;
+  const bundles = p.bundles || [];
+  if (!bundles.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const tpl = p.pageTemplate || 'classic';
+  const isDark = tpl === 'dark';
+  cards.innerHTML = bundles.map((b, i) => {
+    const isTagged = !!b.tag;
+    const perUnit = b.qty > 1 ? `$${(b.price / b.qty).toFixed(2)}/each` : '';
+    const savings = p.price && b.qty > 1 ? `You save $${((p.price * b.qty) - b.price).toFixed(2)}` : '';
+    return `<div onclick="selectBundle(${i})" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;cursor:pointer;transition:all .2s;border:2px solid ${isTagged ? 'var(--accent)' : (isDark ? 'rgba(255,255,255,.15)' : 'var(--border)')};background:${isDark ? 'rgba(255,255,255,.05)' : '#fff'};" class="bundle-card" data-idx="${i}">
+      ${b.tag ? `<div style="position:absolute;top:-10px;right:12px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:10px;letter-spacing:.05em;">${b.tag}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${isDark ? 'rgba(255,255,255,.3)' : 'var(--border)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;" id="bundle-radio-${i}"></div>
+        <div>
+          <div style="font-weight:700;font-size:14px;${isDark?'color:#fff;':''}">${b.label || 'Buy '+b.qty}</div>
+          ${savings ? `<div style="font-size:11.5px;color:${isDark?'rgba(255,255,255,.5)':'var(--muted)'};margin-top:2px;">${savings}</div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">$${b.price.toFixed(2)}</div>
+        ${perUnit ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  // Select first by default
+  selectBundle(0);
+}
+
+let selectedBundleIdx = 0;
+function selectBundle(idx) {
+  selectedBundleIdx = idx;
+  document.querySelectorAll('.bundle-card').forEach((c, i) => {
+    const radio = document.getElementById('bundle-radio-' + i);
+    if (i === idx) {
+      c.style.borderColor = 'var(--accent)';
+      if (radio) radio.innerHTML = '<div style="width:10px;height:10px;background:var(--accent);border-radius:50%;"></div>';
+    } else {
+      c.style.borderColor = c.closest('#sales-page')?.classList.contains('tpl-dark') ? 'rgba(255,255,255,.15)' : 'var(--border)';
+      if (radio) radio.innerHTML = '';
+    }
+  });
+  // Update displayed price to bundle price
+  const p = products.find(x => x.id === currentProductId);
+  if (p && p.bundles && p.bundles[idx]) {
+    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
   }
 }
 

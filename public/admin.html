@@ -513,19 +513,33 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             <div class="form-group">
               <label class="form-lbl">🎨 Salespage Template</label>
               <select class="form-select" id="fp-template">
-                <option value="classic">Classic (White/Clean)</option>
-                <option value="dark">Dark Premium</option>
-                <option value="bold">Bold Modern</option>
+                <option value="classic">Classic — Clean white, standard layout</option>
+                <option value="dark">Dark Premium — Navy/dark hero, floating badges</option>
+                <option value="bold">Bold Supplement — Green accents, gradient hero, benefit badges on sides</option>
+                <option value="warm">Warm Vintage — Warm tones, retro feel, large product image</option>
               </select>
-              <div class="form-hint">Choose the visual style for this product's salespage.</div>
-              <div id="fp-template-preview" style="margin-top:8px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);display:flex;height:60px;">
-                <div id="tpl-preview-media" style="width:50%;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:28px;">🛋️</div>
-                <div id="tpl-preview-info" style="width:50%;padding:8px 12px;display:flex;flex-direction:column;justify-content:center;background:#fff;">
-                  <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:.08em;">BRAND</div>
-                  <div style="font-size:12px;font-weight:800;margin-top:2px;" id="tpl-preview-title">Product Name</div>
-                  <div style="font-size:11px;color:var(--muted);margin-top:1px;">$99.00</div>
+              <div class="form-hint">Each template changes layout structure, badge placement, and overall visual feel — not just colours.</div>
+              <div id="fp-template-preview" style="margin-top:8px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);height:90px;position:relative;">
+                <div id="tpl-preview-media" style="width:100%;height:100%;background:linear-gradient(145deg,#eee8dd,#e0d8c8);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;">
+                  <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;" id="tpl-preview-label">Classic Layout</div>
+                  <div id="tpl-preview-badges" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:4px;">
+                    <div style="background:rgba(0,0,0,.5);color:#fff;border-radius:6px;padding:3px 6px;font-size:8px;text-align:center;">💪 Premium</div>
+                    <div style="background:rgba(0,0,0,.5);color:#fff;border-radius:6px;padding:3px 6px;font-size:8px;text-align:center;">✅ Tested</div>
+                  </div>
+                  🛋️
                 </div>
               </div>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">📦 Bundle Pricing (Optional)</label>
+              <div class="form-hint" style="margin-bottom:8px;">Add quantity-based bundle pricing like "Buy 2 Get 1 Free". Leave empty to hide bundles.</div>
+              <div id="bundle-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+              <button class="add-sec-btn" onclick="addBundle()" style="margin-top:8px;">➕ Add Bundle Option</button>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">🏷️ Benefit Badges (Optional)</label>
+              <div class="form-hint" style="margin-bottom:8px;">Custom badges that appear on the product image (Dark/Bold templates only). One per line: emoji|text</div>
+              <textarea class="form-textarea" id="fp-benefit-badges" placeholder="💪|Premium Quality&#10;🧠|Expert Tested&#10;✅|Third-Party Verified&#10;🔬|13.6x Absorption" style="min-height:80px;"></textarea>
             </div>
           </div>
         </div>
@@ -1280,6 +1294,16 @@ function editProduct(id){
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
 
+  // Benefit badges
+  const bbEl = document.getElementById('fp-benefit-badges');
+  if(bbEl && p.benefitBadges && p.benefitBadges.length) {
+    bbEl.value = p.benefitBadges.map(b => b.icon+'|'+b.text).join('\n');
+  } else if(bbEl) { bbEl.value = ''; }
+
+  // Bundles
+  currentBundles = p.bundles ? [...p.bundles] : [];
+  renderBundles();
+
   nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
@@ -1306,6 +1330,9 @@ function saveProduct(draft=false){
   const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
   const pageTemplate = document.getElementById('fp-template')?.value||'classic';
+  const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
+  const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
+  const bundles = [...currentBundles].filter(b=>b.label&&b.price);
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
@@ -1344,7 +1371,7 @@ function saveProduct(draft=false){
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
     pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
-    videoData, videoURL:effectiveUrl, images,
+    videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
     checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
@@ -1392,6 +1419,9 @@ function clearProductForm(){
   // Reset template
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
+  // Reset bundles & badges
+  currentBundles = []; renderBundles();
+  const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = '';
 }
 
 function updateCounts(){
@@ -1735,7 +1765,8 @@ async function saveToStorage(){
         content_sections: p.contentSections||[],
         checkout_method: p.checkoutMethod||'standard',
         payment_route: p.paymentRoute||'pod',
-        form_config: p.formConfig||{}, ty_config: p.tyConfig||{},
+        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[]},
+        ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: p.agentId||null,
         page_template: p.pageTemplate||'classic',
       };
@@ -1772,6 +1803,8 @@ async function loadFromStorage(){
           tyConfig:p.ty_config||{}, gatewayConfig:p.gateway_config||{},
           agentId:p.agent_id||null,
           pageTemplate:p.page_template||'classic',
+          bundles:(p.form_config&&p.form_config.bundles)||[],
+          benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
@@ -1878,22 +1911,43 @@ function previewSelectedAgent(agentId){
 document.addEventListener('change',e=>{if(e.target?.id==='fp-template')updateTemplatePreview(e.target.value);});
 function updateTemplatePreview(tpl){
   const media=document.getElementById('tpl-preview-media');
-  const info=document.getElementById('tpl-preview-info');
-  const title=document.getElementById('tpl-preview-title');
-  if(!media||!info)return;
-  if(tpl==='dark'){
-    media.style.background='linear-gradient(145deg,#1a1210,#2e1e14)';
-    info.style.background='#1a1612';
-    if(title)title.style.color='#fff';
-  } else if(tpl==='bold'){
-    media.style.background='linear-gradient(145deg,#e0d8c8,#d5c9b5)';
-    info.style.background='#f8f7f2';
-    if(title)title.style.color='var(--ink)';
-  } else {
-    media.style.background='linear-gradient(145deg,#eee8dd,#e0d8c8)';
-    info.style.background='#fff';
-    if(title)title.style.color='var(--ink)';
-  }
+  const label=document.getElementById('tpl-preview-label');
+  const badges=document.getElementById('tpl-preview-badges');
+  if(!media)return;
+  const themes={
+    classic:{bg:'linear-gradient(145deg,#eee8dd,#e0d8c8)',label:'Classic Layout',badges:false},
+    dark:{bg:'linear-gradient(145deg,#0f1a2e,#1a2a4a)',label:'Dark Premium',badges:true},
+    bold:{bg:'linear-gradient(145deg,#c8f7c5,#56ab2f)',label:'Bold Supplement',badges:true},
+    warm:{bg:'linear-gradient(145deg,#f5d89a,#d4a04a)',label:'Warm Vintage',badges:false},
+  };
+  const t=themes[tpl]||themes.classic;
+  media.style.background=t.bg;
+  if(label)label.textContent=t.label;
+  if(badges)badges.style.display=t.badges?'flex':'none';
+}
+
+// ─── BUNDLES ───
+let currentBundles = [];
+function renderBundles(){
+  const list=document.getElementById('bundle-list');
+  if(!list)return;
+  list.innerHTML=currentBundles.map((b,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+      <input class="form-input" value="${b.qty||1}" type="number" min="1" style="padding:8px;" placeholder="Qty" oninput="currentBundles[${i}].qty=parseInt(this.value)||1"/>
+      <input class="form-input" value="${b.label||''}" placeholder="e.g. 2 Pack" style="padding:8px;" oninput="currentBundles[${i}].label=this.value"/>
+      <input class="form-input" value="${b.price||''}" type="number" step="0.01" placeholder="Price" style="padding:8px;" oninput="currentBundles[${i}].price=parseFloat(this.value)||0"/>
+      <select class="form-select" style="padding:8px;" onchange="currentBundles[${i}].tag=this.value">
+        <option value="" ${!b.tag?'selected':''}>No tag</option>
+        <option value="POPULAR" ${b.tag==='POPULAR'?'selected':''}>POPULAR</option>
+        <option value="BEST VALUE" ${b.tag==='BEST VALUE'?'selected':''}>BEST VALUE</option>
+        <option value="MOST POPULAR" ${b.tag==='MOST POPULAR'?'selected':''}>MOST POPULAR</option>
+      </select>
+      <button class="tbl-btn danger" onclick="currentBundles.splice(${i},1);renderBundles()">✕</button>
+    </div>`).join('');
+}
+function addBundle(){
+  currentBundles.push({qty:1,label:'Single',price:0,tag:''});
+  renderBundles();
 }
 
 function openAgentModal(agentId){
