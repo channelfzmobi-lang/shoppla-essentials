@@ -1151,9 +1151,22 @@ let contentSections = [];
 let editingProductId = null;
 let deleteTargetId = null;
 let productPageColor = '#ffffff';
-let currentVideoData = null;   // {base64, name, size, type}
+let currentVideoData = null;   // {base64, name, size, type} or {url, name, size, type}
 let currentVideoURL  = '';
-let currentImages    = [];     // [{base64, name}]
+let currentImages    = [];     // [{base64, name}] or [{url, name}]
+
+// ─── SUPABASE STORAGE UPLOAD HELPER ───
+async function uploadToStorage(file, folder='images') {
+  if (!sb) return null;
+  const ext = file.name.split('.').pop();
+  const uniqueName = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+  try {
+    const { data, error } = await sb.storage.from('product-media').upload(uniqueName, file, { upsert: true });
+    if (error) { console.error('Upload error:', error); return null; }
+    const { data: urlData } = sb.storage.from('product-media').getPublicUrl(uniqueName);
+    return urlData?.publicUrl || null;
+  } catch(e) { console.error('Storage upload failed:', e); return null; }
+}
 let checkoutMethod   = 'standard'; // 'standard'|'form'|'both'
 let paymentRoute     = 'pod';      // 'pod'|'online'|'both'
 
@@ -1225,7 +1238,7 @@ function editProduct(id){
   // Restore video upload
   currentVideoData = null; currentImages = [];
   removeVideo();
-  if(p.videoData && p.videoData.base64){
+  if(p.videoData && (p.videoData.url || p.videoData.base64)){
     currentVideoData = p.videoData;
     document.getElementById('video-filename').textContent = p.videoData.name||'video.mp4';
     document.getElementById('video-filesize').textContent = (p.videoData.size||'?')+' MB';
@@ -1233,7 +1246,7 @@ function editProduct(id){
     document.getElementById('video-preview-wrap').style.display='block';
     let vEl = document.getElementById('admin-video-preview');
     if(!vEl){ vEl=document.createElement('video'); vEl.id='admin-video-preview'; vEl.controls=true; vEl.style.cssText='width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;'; document.getElementById('video-preview-wrap').appendChild(vEl); }
-    vEl.src = p.videoData.base64;
+    vEl.src = p.videoData.url||p.videoData.base64;
   }
 
   // Restore images
@@ -1244,7 +1257,7 @@ function editProduct(id){
       grid.querySelectorAll('.media-item:not(.add-media)').forEach(el=>el.remove());
       currentImages.forEach((imgData,idx)=>{
         const div=document.createElement('div'); div.className='media-item'; div.dataset.idx=idx;
-        const img=document.createElement('img'); img.src=imgData.base64; img.style.cssText='width:100%;height:100%;object-fit:cover;';
+        const img=document.createElement('img'); img.src=imgData.url||imgData.base64; img.style.cssText='width:100%;height:100%;object-fit:cover;';
         const btn=document.createElement('button'); btn.className='del-media'; btn.textContent='✕';
         btn.onclick=()=>{ currentImages.splice(parseInt(div.dataset.idx),1); div.remove(); };
         div.append(img,btn); grid.insertBefore(div, grid.lastElementChild);
@@ -1602,23 +1615,21 @@ PAGE_COLORS.forEach(c=>{
 });
 
 // ─── VIDEO UPLOAD ───
-function handleVideoUpload(input){
+async function handleVideoUpload(input){
   if(!input.files[0]) return;
   const f = input.files[0];
-  const maxMB = 50;
-  if(f.size > maxMB*1024*1024){
+  if(f.size > 50*1024*1024){
     showToast('⚠️ Video too large (max 50MB). Paste a YouTube/Vimeo URL instead.');
     return;
   }
-  showToast('⏳ Reading video… please wait');
-  const reader = new FileReader();
-  reader.onload = e => {
-    currentVideoData = { base64: e.target.result, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
+  showToast('⏳ Uploading video…');
+  const publicUrl = await uploadToStorage(f, 'videos');
+  if (publicUrl) {
+    currentVideoData = { url: publicUrl, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
     document.getElementById('video-filename').textContent = f.name;
     document.getElementById('video-filesize').textContent = currentVideoData.size + ' MB';
     document.getElementById('video-drop').style.display = 'none';
     document.getElementById('video-preview-wrap').style.display = 'block';
-    // Show preview player
     let vEl = document.getElementById('admin-video-preview');
     if(!vEl){
       vEl = document.createElement('video');
@@ -1627,11 +1638,31 @@ function handleVideoUpload(input){
       vEl.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;';
       document.getElementById('video-preview-wrap').appendChild(vEl);
     }
-    vEl.src = e.target.result;
-    showToast('✅ Video ready: ' + f.name);
-  };
-  reader.onerror = () => showToast('❌ Failed to read video file');
-  reader.readAsDataURL(f);
+    vEl.src = publicUrl;
+    showToast('✅ Video uploaded: ' + f.name);
+  } else {
+    showToast('⏳ Cloud upload failed, reading locally…');
+    const reader = new FileReader();
+    reader.onload = e => {
+      currentVideoData = { base64: e.target.result, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
+      document.getElementById('video-filename').textContent = f.name;
+      document.getElementById('video-filesize').textContent = currentVideoData.size + ' MB';
+      document.getElementById('video-drop').style.display = 'none';
+      document.getElementById('video-preview-wrap').style.display = 'block';
+      let vEl = document.getElementById('admin-video-preview');
+      if(!vEl){
+        vEl = document.createElement('video');
+        vEl.id = 'admin-video-preview';
+        vEl.controls = true;
+        vEl.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;';
+        document.getElementById('video-preview-wrap').appendChild(vEl);
+      }
+      vEl.src = e.target.result;
+      showToast('✅ Video ready (local): ' + f.name);
+    };
+    reader.onerror = () => showToast('❌ Failed to read video file');
+    reader.readAsDataURL(f);
+  }
 }
 function handleVideoDrop(e){
   e.preventDefault(); document.getElementById('video-drop').classList.remove('drag');
@@ -1649,38 +1680,46 @@ function removeVideo(){
   const fi = document.getElementById('video-file-input');
   if(fi) fi.value = '';
 }
-function handleImageUpload(input){
+async function handleImageUpload(input){
   const grid = document.getElementById('media-grid');
   const files = Array.from(input.files);
   let loaded = 0;
-  files.forEach(f => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const data = { base64: e.target.result, name: f.name };
-      currentImages.push(data);                          // ← save to state
-      const div = document.createElement('div');
-      div.className = 'media-item';
-      div.dataset.idx = currentImages.length - 1;
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-      const btn = document.createElement('button');
-      btn.className = 'del-media'; btn.textContent = '✕';
-      btn.onclick = () => {
-        const idx = parseInt(div.dataset.idx);
-        currentImages.splice(idx, 1);
-        div.remove();
-        // re-index remaining items
-        grid.querySelectorAll('.media-item[data-idx]').forEach((el,i) => el.dataset.idx = i);
-        showToast('🗑 Image removed');
-      };
-      div.append(img, btn);
-      grid.insertBefore(div, grid.lastElementChild);
-      loaded++;
-      if(loaded === files.length) showToast(`✅ ${loaded} image(s) loaded`);
+  for (const f of files) {
+    showToast(`⏳ Uploading ${f.name}…`);
+    // Try Supabase storage first
+    const publicUrl = await uploadToStorage(f, 'images');
+    const src = publicUrl || await readFileAsBase64(f);
+    if (!src) { showToast('❌ Failed to process ' + f.name); continue; }
+    const data = publicUrl ? { url: publicUrl, name: f.name } : { base64: src, name: f.name };
+    currentImages.push(data);
+    const div = document.createElement('div');
+    div.className = 'media-item';
+    div.dataset.idx = currentImages.length - 1;
+    const img = document.createElement('img');
+    img.src = publicUrl || src;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    const btn = document.createElement('button');
+    btn.className = 'del-media'; btn.textContent = '✕';
+    btn.onclick = () => {
+      const idx = parseInt(div.dataset.idx);
+      currentImages.splice(idx, 1);
+      div.remove();
+      grid.querySelectorAll('.media-item[data-idx]').forEach((el,i) => el.dataset.idx = i);
+      showToast('🗑 Image removed');
     };
-    reader.onerror = () => showToast('❌ Failed to read image');
-    reader.readAsDataURL(f);
+    div.append(img, btn);
+    grid.insertBefore(div, grid.lastElementChild);
+    loaded++;
+  }
+  if(loaded) showToast(`✅ ${loaded} image(s) uploaded`);
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
   });
 }
 
@@ -2212,8 +2251,8 @@ function renderMediaLibrary(){
   if(!grid)return;
   const allMedia=[];
   products.forEach(p=>{
-    if(p.videoData?.base64)allMedia.push({type:'video',name:p.videoData.name||'video.mp4',src:p.videoData.base64,product:p.name,size:p.videoData.size||'?'});
-    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',name:`${p.name} — photo ${i+1}`,src:img.base64,product:p.name}));
+    if(p.videoData?.url || p.videoData?.base64)allMedia.push({type:'video',name:p.videoData.name||'video.mp4',src:p.videoData.url||p.videoData.base64,product:p.name,size:p.videoData.size||'?'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',name:`${p.name} — photo ${i+1}`,src:img.url||img.base64,product:p.name}));
   });
   if(countEl)countEl.textContent=`${allMedia.length} file(s)`;
   if(!allMedia.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;"><div style="font-size:52px;margin-bottom:14px;">📁</div><div style="font-weight:700;">No media uploaded yet</div><div style="font-size:13.5px;color:var(--muted);margin-top:6px;">Upload images and videos on product pages.</div></div>';return;}
@@ -2226,8 +2265,8 @@ function renderMediaLibrary(){
 function openMediaPreview(name){
   const allMedia=[];
   products.forEach(p=>{
-    if(p.videoData?.base64)allMedia.push({type:'video',src:p.videoData.base64,name:p.videoData.name||'video.mp4'});
-    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',src:img.base64,name:`${p.name} — photo ${i+1}`}));
+    if(p.videoData?.url || p.videoData?.base64)allMedia.push({type:'video',src:p.videoData.url||p.videoData.base64,name:p.videoData.name||'video.mp4'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',src:img.url||img.base64,name:`${p.name} — photo ${i+1}`}));
   });
   const item=allMedia.find(m=>m.name===name);if(!item)return;
   const el=document.createElement('div');
@@ -2441,7 +2480,7 @@ function openPreview(productId){
   .trust span{background:#f3ede3;border:1px solid #e5e0d6;border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:600;}
   </style></head><body>
   <div class="banner">👁 ADMIN PREVIEW</div>
-  <div class="vid">${p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
+  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>

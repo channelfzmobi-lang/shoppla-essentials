@@ -1898,15 +1898,16 @@ function makeCardHTML(p, showActions) {
   const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
   let mediaHTML;
   // Determine image src - handle both {base64:...} objects and plain URL strings
-  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
   if (p.videoURL) {
     mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${pid})" style="cursor:pointer;">
       <div class="play-ring">▶</div>
       <div class="vid-emoji">${p.icon||'📦'}</div>
       <div class="vid-lbl">▶ Watch video</div>
     </div>`;
-  } else if (p.videoData && p.videoData.base64) {
-    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
+  } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
+    const vidSrc = p.videoData.url || p.videoData.base64;
+    mediaHTML = `<video src="${vidSrc}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
       onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
       <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
   } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
@@ -2186,15 +2187,15 @@ function buildMediaPanel(p) {
       vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
       main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(()=>{});
     }
-  } else if (p.videoData && p.videoData.base64) {
+  } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vid = document.createElement('video');
     vid.className = 'sp-real';
-    vid.src = p.videoData.base64;
+    vid.src = p.videoData.url || p.videoData.base64;
     vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.controls = true;
     vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
     main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
   } else if (p.images && p.images.length) {
-    const imgSrc = typeof p.images[0] === 'string' ? p.images[0] : (p.images[0].base64 || '');
+    const imgSrc = typeof p.images[0] === 'string' ? p.images[0] : (p.images[0].url || p.images[0].base64 || '');
     if (imgSrc) {
       const img = document.createElement('img');
       img.className = 'sp-real';
@@ -2213,7 +2214,7 @@ function buildMediaPanel(p) {
 
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
-  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
   const addThumb = (content, isImg, onClick) => {
     const t = document.createElement('div');
     t.className = 'sp-thumb';
@@ -2226,7 +2227,7 @@ function buildMediaPanel(p) {
     thumbsWrap.appendChild(t);
     return t;
   };
-  const hasVideo = (p.videoURL) || (p.videoData && p.videoData.base64);
+  const hasVideo = (p.videoURL) || (p.videoData && (p.videoData.url || p.videoData.base64));
   const t0 = addThumb(hasVideo ? '▶' : (p.images&&p.images.length?'🖼':p.icon||'📦'), false, () => {
     main.querySelectorAll('.sp-real').forEach(el => el.remove()); buildMediaPanel(p);
   });
