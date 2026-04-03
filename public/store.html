@@ -1905,8 +1905,9 @@ function makeCardHTML(p, showActions) {
       <div class="vid-emoji">${p.icon||'📦'}</div>
       <div class="vid-lbl">▶ Watch video</div>
     </div>`;
-  } else if (p.videoData && p.videoData.base64) {
-    mediaHTML = `<video src="${p.videoData.base64}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
+  } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
+    const vidSrc = p.videoData.url || p.videoData.base64;
+    mediaHTML = `<video src="${vidSrc}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
       onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
       <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
   } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
