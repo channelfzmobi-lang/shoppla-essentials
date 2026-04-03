@@ -2186,10 +2186,10 @@ function buildMediaPanel(p) {
       vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
       main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(()=>{});
     }
-  } else if (p.videoData && p.videoData.base64) {
+  } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vid = document.createElement('video');
     vid.className = 'sp-real';
-    vid.src = p.videoData.base64;
+    vid.src = p.videoData.url || p.videoData.base64;
     vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.controls = true;
     vid.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};z-index:2;background:#0d0b09;`;
     main.appendChild(vid); vidBg.style.display = 'none'; vid.play().catch(() => {});
