@@ -1238,7 +1238,7 @@ function editProduct(id){
   // Restore video upload
   currentVideoData = null; currentImages = [];
   removeVideo();
-  if(p.videoData && p.videoData.base64){
+  if(p.videoData && (p.videoData.url || p.videoData.base64)){
     currentVideoData = p.videoData;
     document.getElementById('video-filename').textContent = p.videoData.name||'video.mp4';
     document.getElementById('video-filesize').textContent = (p.videoData.size||'?')+' MB';
@@ -1246,7 +1246,7 @@ function editProduct(id){
     document.getElementById('video-preview-wrap').style.display='block';
     let vEl = document.getElementById('admin-video-preview');
     if(!vEl){ vEl=document.createElement('video'); vEl.id='admin-video-preview'; vEl.controls=true; vEl.style.cssText='width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;'; document.getElementById('video-preview-wrap').appendChild(vEl); }
-    vEl.src = p.videoData.base64;
+    vEl.src = p.videoData.url||p.videoData.base64;
   }
 
   // Restore images
@@ -1257,7 +1257,7 @@ function editProduct(id){
       grid.querySelectorAll('.media-item:not(.add-media)').forEach(el=>el.remove());
       currentImages.forEach((imgData,idx)=>{
         const div=document.createElement('div'); div.className='media-item'; div.dataset.idx=idx;
-        const img=document.createElement('img'); img.src=imgData.base64; img.style.cssText='width:100%;height:100%;object-fit:cover;';
+        const img=document.createElement('img'); img.src=imgData.url||imgData.base64; img.style.cssText='width:100%;height:100%;object-fit:cover;';
         const btn=document.createElement('button'); btn.className='del-media'; btn.textContent='✕';
         btn.onclick=()=>{ currentImages.splice(parseInt(div.dataset.idx),1); div.remove(); };
         div.append(img,btn); grid.insertBefore(div, grid.lastElementChild);
@@ -2251,8 +2251,8 @@ function renderMediaLibrary(){
   if(!grid)return;
   const allMedia=[];
   products.forEach(p=>{
-    if(p.videoData?.base64)allMedia.push({type:'video',name:p.videoData.name||'video.mp4',src:p.videoData.base64,product:p.name,size:p.videoData.size||'?'});
-    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',name:`${p.name} — photo ${i+1}`,src:img.base64,product:p.name}));
+    if(p.videoData?.url || p.videoData?.base64)allMedia.push({type:'video',name:p.videoData.name||'video.mp4',src:p.videoData.url||p.videoData.base64,product:p.name,size:p.videoData.size||'?'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',name:`${p.name} — photo ${i+1}`,src:img.url||img.base64,product:p.name}));
   });
   if(countEl)countEl.textContent=`${allMedia.length} file(s)`;
   if(!allMedia.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;"><div style="font-size:52px;margin-bottom:14px;">📁</div><div style="font-weight:700;">No media uploaded yet</div><div style="font-size:13.5px;color:var(--muted);margin-top:6px;">Upload images and videos on product pages.</div></div>';return;}
@@ -2265,8 +2265,8 @@ function renderMediaLibrary(){
 function openMediaPreview(name){
   const allMedia=[];
   products.forEach(p=>{
-    if(p.videoData?.base64)allMedia.push({type:'video',src:p.videoData.base64,name:p.videoData.name||'video.mp4'});
-    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',src:img.base64,name:`${p.name} — photo ${i+1}`}));
+    if(p.videoData?.url || p.videoData?.base64)allMedia.push({type:'video',src:p.videoData.url||p.videoData.base64,name:p.videoData.name||'video.mp4'});
+    (p.images||[]).forEach((img,i)=>allMedia.push({type:'image',src:img.url||img.base64,name:`${p.name} — photo ${i+1}`}));
   });
   const item=allMedia.find(m=>m.name===name);if(!item)return;
   const el=document.createElement('div');
@@ -2480,7 +2480,7 @@ function openPreview(productId){
   .trust span{background:#f3ede3;border:1px solid #e5e0d6;border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:600;}
   </style></head><body>
   <div class="banner">👁 ADMIN PREVIEW</div>
-  <div class="vid">${p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
+  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>

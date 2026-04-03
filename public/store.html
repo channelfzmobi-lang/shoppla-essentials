@@ -2227,7 +2227,7 @@ function buildMediaPanel(p) {
     thumbsWrap.appendChild(t);
     return t;
   };
-  const hasVideo = (p.videoURL) || (p.videoData && p.videoData.base64);
+  const hasVideo = (p.videoURL) || (p.videoData && (p.videoData.url || p.videoData.base64));
   const t0 = addThumb(hasVideo ? '▶' : (p.images&&p.images.length?'🖼':p.icon||'📦'), false, () => {
     main.querySelectorAll('.sp-real').forEach(el => el.remove()); buildMediaPanel(p);
   });
