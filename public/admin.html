@@ -1615,23 +1615,21 @@ PAGE_COLORS.forEach(c=>{
 });
 
 // ─── VIDEO UPLOAD ───
-function handleVideoUpload(input){
+async function handleVideoUpload(input){
   if(!input.files[0]) return;
   const f = input.files[0];
-  const maxMB = 50;
-  if(f.size > maxMB*1024*1024){
+  if(f.size > 50*1024*1024){
     showToast('⚠️ Video too large (max 50MB). Paste a YouTube/Vimeo URL instead.');
     return;
   }
-  showToast('⏳ Reading video… please wait');
-  const reader = new FileReader();
-  reader.onload = e => {
-    currentVideoData = { base64: e.target.result, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
+  showToast('⏳ Uploading video…');
+  const publicUrl = await uploadToStorage(f, 'videos');
+  if (publicUrl) {
+    currentVideoData = { url: publicUrl, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
     document.getElementById('video-filename').textContent = f.name;
     document.getElementById('video-filesize').textContent = currentVideoData.size + ' MB';
     document.getElementById('video-drop').style.display = 'none';
     document.getElementById('video-preview-wrap').style.display = 'block';
-    // Show preview player
     let vEl = document.getElementById('admin-video-preview');
     if(!vEl){
       vEl = document.createElement('video');
@@ -1640,11 +1638,31 @@ function handleVideoUpload(input){
       vEl.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;';
       document.getElementById('video-preview-wrap').appendChild(vEl);
     }
-    vEl.src = e.target.result;
-    showToast('✅ Video ready: ' + f.name);
-  };
-  reader.onerror = () => showToast('❌ Failed to read video file');
-  reader.readAsDataURL(f);
+    vEl.src = publicUrl;
+    showToast('✅ Video uploaded: ' + f.name);
+  } else {
+    showToast('⏳ Cloud upload failed, reading locally…');
+    const reader = new FileReader();
+    reader.onload = e => {
+      currentVideoData = { base64: e.target.result, name: f.name, size: (f.size/1024/1024).toFixed(1), type: f.type };
+      document.getElementById('video-filename').textContent = f.name;
+      document.getElementById('video-filesize').textContent = currentVideoData.size + ' MB';
+      document.getElementById('video-drop').style.display = 'none';
+      document.getElementById('video-preview-wrap').style.display = 'block';
+      let vEl = document.getElementById('admin-video-preview');
+      if(!vEl){
+        vEl = document.createElement('video');
+        vEl.id = 'admin-video-preview';
+        vEl.controls = true;
+        vEl.style.cssText = 'width:100%;border-radius:10px;margin-top:12px;max-height:200px;background:#000;';
+        document.getElementById('video-preview-wrap').appendChild(vEl);
+      }
+      vEl.src = e.target.result;
+      showToast('✅ Video ready (local): ' + f.name);
+    };
+    reader.onerror = () => showToast('❌ Failed to read video file');
+    reader.readAsDataURL(f);
+  }
 }
 function handleVideoDrop(e){
   e.preventDefault(); document.getElementById('video-drop').classList.remove('drag');
