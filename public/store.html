@@ -2213,7 +2213,7 @@ function buildMediaPanel(p) {
 
   const thumbsWrap = document.getElementById('sp-thumbs');
   thumbsWrap.innerHTML = '';
-  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
   const addThumb = (content, isImg, onClick) => {
     const t = document.createElement('div');
     t.className = 'sp-thumb';
