@@ -1898,7 +1898,7 @@ function makeCardHTML(p, showActions) {
   const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
   let mediaHTML;
   // Determine image src - handle both {base64:...} objects and plain URL strings
-  const getImgSrc = (img) => typeof img === 'string' ? img : (img && img.base64 ? img.base64 : '');
+  const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
   if (p.videoURL) {
     mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${pid})" style="cursor:pointer;">
       <div class="play-ring">▶</div>
