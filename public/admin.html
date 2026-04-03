@@ -1151,9 +1151,22 @@ let contentSections = [];
 let editingProductId = null;
 let deleteTargetId = null;
 let productPageColor = '#ffffff';
-let currentVideoData = null;   // {base64, name, size, type}
+let currentVideoData = null;   // {base64, name, size, type} or {url, name, size, type}
 let currentVideoURL  = '';
-let currentImages    = [];     // [{base64, name}]
+let currentImages    = [];     // [{base64, name}] or [{url, name}]
+
+// ─── SUPABASE STORAGE UPLOAD HELPER ───
+async function uploadToStorage(file, folder='images') {
+  if (!sb) return null;
+  const ext = file.name.split('.').pop();
+  const uniqueName = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+  try {
+    const { data, error } = await sb.storage.from('product-media').upload(uniqueName, file, { upsert: true });
+    if (error) { console.error('Upload error:', error); return null; }
+    const { data: urlData } = sb.storage.from('product-media').getPublicUrl(uniqueName);
+    return urlData?.publicUrl || null;
+  } catch(e) { console.error('Storage upload failed:', e); return null; }
+}
 let checkoutMethod   = 'standard'; // 'standard'|'form'|'both'
 let paymentRoute     = 'pod';      // 'pod'|'online'|'both'
 
