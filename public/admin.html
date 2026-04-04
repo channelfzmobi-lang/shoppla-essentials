@@ -1956,9 +1956,10 @@ function updateTemplatePreview(tpl){
   if(!media)return;
   const themes={
     classic:{bg:'linear-gradient(145deg,#eee8dd,#e0d8c8)',label:'Classic Layout',badges:false},
+    aero:{bg:'linear-gradient(145deg,#fff5ee,#ffe0cc)',label:'Aero — Bundle Kits',badges:false},
+    luvea:{bg:'linear-gradient(145deg,#fef5f0,#fce4d8)',label:'LUVEA — Clean CTA',badges:false},
+    radiance:{bg:'linear-gradient(145deg,#ffe8f0,#ffc8d8)',label:'Radiance — Variants',badges:false},
     dark:{bg:'linear-gradient(145deg,#0f1a2e,#1a2a4a)',label:'Dark Premium',badges:true},
-    bold:{bg:'linear-gradient(145deg,#c8f7c5,#56ab2f)',label:'Bold Supplement',badges:true},
-    warm:{bg:'linear-gradient(145deg,#f5d89a,#d4a04a)',label:'Warm Vintage',badges:false},
   };
   const t=themes[tpl]||themes.classic;
   media.style.background=t.bg;
