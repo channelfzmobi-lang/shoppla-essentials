@@ -568,26 +568,76 @@ mark{background:linear-gradient(120deg,rgba(232,84,26,.16),rgba(247,184,74,.14))
 .tpl-dark .sp-benefit-badges .bb-ico{font-size:20px;margin-bottom:4px;}
 .tpl-dark .sp-benefit-badges .bb-txt{font-size:10px;font-weight:600;line-height:1.3;}
 
-/* ═══ TEMPLATE: BOLD SUPPLEMENT ═══ */
-#sales-page.tpl-bold .sp-info{background:#f8f7f2;}
-#sales-page.tpl-bold .sp-main{background:linear-gradient(145deg,#c8f7c5,#56ab2f);}
-#sales-page.tpl-bold .btn-buy-now{background:linear-gradient(135deg,#0d2b1a,#1a5c35);border-radius:50px;padding:18px;font-size:16px;}
-#sales-page.tpl-bold .btn-buy-now:hover{box-shadow:0 12px 28px rgba(26,92,53,.35);}
-#sales-page.tpl-bold .sp-save{background:rgba(26,138,74,.1);color:var(--green);}
-#sales-page.tpl-bold .trust-b{background:#fff;border-color:var(--border);border-radius:50px;}
-.tpl-bold .sp-benefit-badges{position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:10px;}
-.tpl-bold .sp-benefit-badges .bb-item{background:#fff;border-radius:12px;padding:10px 14px;color:var(--ink);text-align:center;min-width:80px;box-shadow:0 2px 10px rgba(0,0,0,.1);}
-.tpl-bold .sp-benefit-badges .bb-ico{font-size:20px;margin-bottom:4px;}
-.tpl-bold .sp-benefit-badges .bb-txt{font-size:10px;font-weight:600;line-height:1.3;}
+/* ═══ TEMPLATE: AERO (BUNDLE KIT) ═══ */
+#sales-page.tpl-aero .sp-info{background:#fff;}
+.tpl-aero .sp-checklist{list-style:none;margin-bottom:16px;}
+.tpl-aero .sp-checklist li{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:7px;font-weight:500;}
+.tpl-aero .sp-checklist li svg{width:18px;height:18px;color:var(--green);flex-shrink:0;}
+.tpl-aero .sp-free-gift{color:var(--accent);font-size:13.5px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:6px;}
+.tpl-aero .sp-upsell{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--warm);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:16px;}
+.tpl-aero .sp-upsell-info{display:flex;align-items:center;gap:10px;}
+.tpl-aero .sp-upsell-img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#eee;}
+.tpl-aero .sp-upsell-name{font-size:13px;font-weight:700;}
+.tpl-aero .sp-upsell-desc{font-size:11.5px;color:var(--muted);}
+.tpl-aero .sp-upsell-price{font-size:13px;font-weight:700;white-space:nowrap;}
+.tpl-aero .sp-stock-bar{margin-bottom:16px;}
+.tpl-aero .sp-stock-bar-inner{height:5px;background:var(--warm);border-radius:10px;overflow:hidden;margin-top:6px;}
+.tpl-aero .sp-stock-bar-fill{height:100%;background:linear-gradient(90deg,#ff4444,#ff8844);border-radius:10px;}
+.tpl-aero .sp-stock-text{font-size:13px;font-weight:700;color:#c0392b;}
+.tpl-aero .sp-hassle{display:flex;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--muted);margin:12px 0;}
+.tpl-aero .sp-pay-icons{display:flex;gap:6px;justify-content:center;margin:8px 0 16px;flex-wrap:wrap;}
+.tpl-aero .sp-pay-icon{width:42px;height:28px;background:#fff;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);}
+.tpl-aero .sp-guarantee-strip{display:flex;gap:20px;justify-content:center;border-top:1px solid var(--border);padding-top:16px;margin-top:8px;flex-wrap:wrap;}
+.tpl-aero .sp-guarantee-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;}
+.tpl-aero .sp-guarantee-item svg{width:24px;height:24px;color:var(--muted);}
+.tpl-aero .sp-guarantee-item .gi-title{font-size:12px;font-weight:700;}
+.tpl-aero .sp-guarantee-item .gi-sub{font-size:10.5px;color:var(--muted);}
 
-/* ═══ TEMPLATE: WARM VINTAGE ═══ */
-#sales-page.tpl-warm .sp-info{background:#fdf5e6;}
-#sales-page.tpl-warm .sp-main{background:linear-gradient(145deg,#f5d89a,#d4a04a);}
-#sales-page.tpl-warm .btn-buy-now{background:#8b5e3c;border-radius:8px;}
-#sales-page.tpl-warm .btn-buy-now:hover{background:#6e4630;box-shadow:0 8px 20px rgba(139,94,60,.3);}
-#sales-page.tpl-warm .sp-brand{color:#8b5e3c;}
-#sales-page.tpl-warm .sp-save{background:rgba(139,94,60,.1);color:#8b5e3c;}
-#sales-page.tpl-warm .trust-b{background:#fff8e8;border-color:#e8d5a8;}
+/* ═══ TEMPLATE: LUVEA (CLEAN CTA) ═══ */
+#sales-page.tpl-luvea .sp-info{background:#fff;}
+.tpl-luvea .sp-benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.tpl-luvea .sp-bg-item{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:500;}
+.tpl-luvea .sp-bg-icon{width:36px;height:36px;border-radius:50%;background:var(--warm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tpl-luvea .sp-delivery-date{display:inline-flex;align-items:center;gap:6px;background:var(--warm);border:1.5px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;font-weight:600;margin-bottom:18px;}
+.tpl-luvea .sp-delivery-date .dd-dot{width:7px;height:7px;background:var(--green);border-radius:50%;}
+.tpl-luvea .btn-buy-now{background:linear-gradient(135deg,var(--accent),#d4450e);border-radius:12px;padding:18px;font-size:16.5px;}
+.tpl-luvea .sp-guarantee-banner{background:var(--ink);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin:18px 0;color:#fff;}
+.tpl-luvea .sp-guarantee-banner .gb-icon{font-size:28px;flex-shrink:0;}
+.tpl-luvea .sp-guarantee-banner .gb-text{font-size:13.5px;line-height:1.5;}
+.tpl-luvea .sp-guarantee-banner .gb-text strong{color:#fff;}
+.tpl-luvea .sp-faq-section{margin-top:18px;border-top:1px solid var(--border);padding-top:6px;}
+.tpl-luvea .sp-faq-item{border-bottom:1px solid var(--border);padding:14px 0;}
+.tpl-luvea .sp-faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:600;user-select:none;}
+.tpl-luvea .sp-faq-q .faq-plus{font-size:20px;color:var(--muted);transition:transform .2s;line-height:1;}
+.tpl-luvea .sp-faq-item.open .faq-plus{transform:rotate(45deg);}
+.tpl-luvea .sp-faq-a{display:none;font-size:13.5px;color:var(--muted);line-height:1.7;margin-top:10px;}
+.tpl-luvea .sp-faq-item.open .sp-faq-a{display:block;}
+
+/* ═══ TEMPLATE: RADIANCE (VARIANT CARDS) ═══ */
+#sales-page.tpl-radiance .sp-info{background:#fff;}
+.tpl-radiance .sp-free-gift-banner{color:var(--accent);font-size:13.5px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.tpl-radiance .sp-variant-cards{display:flex;gap:12px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.tpl-radiance .sp-variant-cards::-webkit-scrollbar{display:none;}
+.tpl-radiance .sp-variant-card{min-width:140px;flex:1;border:2px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fff;}
+.tpl-radiance .sp-variant-card.active{border-color:var(--accent);}
+.tpl-radiance .sp-variant-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.tpl-radiance .sp-vc-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:10px;white-space:nowrap;}
+.tpl-radiance .sp-vc-bonus{position:absolute;top:12px;right:-4px;background:var(--green);color:#fff;font-size:8.5px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;}
+.tpl-radiance .sp-vc-img{width:80px;height:80px;object-fit:contain;margin:0 auto 8px;}
+.tpl-radiance .sp-vc-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.tpl-radiance .sp-vc-was{font-size:11px;color:var(--muted);text-decoration:line-through;}
+.tpl-radiance .sp-vc-price{font-family:'Fraunces',serif;font-size:18px;font-weight:900;}
+.tpl-radiance .sp-free-gift-included{background:linear-gradient(135deg,#fef0f5,#fce4ec);border:1.5px solid #f8bbd0;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px;font-weight:600;}
+.tpl-radiance .sp-free-gift-included .fg-icon{font-size:20px;flex-shrink:0;}
+.tpl-radiance .sp-selling-out{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:12px;}
+.tpl-radiance .sp-selling-out .so-header{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin-bottom:6px;}
+.tpl-radiance .sp-selling-out .so-sub{font-size:12.5px;color:var(--muted);margin-bottom:8px;}
+.tpl-radiance .sp-selling-out .so-bar{height:8px;background:var(--warm);border-radius:10px;overflow:hidden;}
+.tpl-radiance .sp-selling-out .so-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff6b35);border-radius:10px;transition:width .6s ease;}
+.tpl-radiance .sp-selling-out .so-pct{font-size:12px;font-weight:800;color:var(--accent);margin-top:6px;}
+.tpl-radiance .sp-money-back{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;}
+.tpl-radiance .sp-money-back .mb-title{font-size:14px;font-weight:800;margin-bottom:6px;}
+.tpl-radiance .sp-money-back .mb-text{font-size:12.5px;color:var(--muted);line-height:1.6;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 /* ═══════════════════════════════════
@@ -2047,16 +2097,19 @@ function openSalesPage(id) {
 function applyTemplate(p) {
   const salesPage = document.getElementById('sales-page');
   if (!salesPage) return;
-  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold','tpl-warm');
+  salesPage.classList.remove('tpl-classic','tpl-dark','tpl-bold','tpl-warm','tpl-aero','tpl-luvea','tpl-radiance');
   const tpl = p.pageTemplate || 'classic';
   salesPage.classList.add('tpl-' + tpl);
   
-  // Build benefit badges from product data or defaults
+  // Clean up any previously injected template sections
+  document.querySelectorAll('.tpl-injected').forEach(el => el.remove());
+  
+  // Build benefit badges for dark template
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
     const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
-      (tpl === 'dark' || tpl === 'bold') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
-    if (bb.length && (tpl === 'dark' || tpl === 'bold')) {
+      (tpl === 'dark') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
+    if (bb.length && tpl === 'dark') {
       badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
       badges.style.display = 'flex';
     } else {
@@ -2066,12 +2119,180 @@ function applyTemplate(p) {
   
   // Adjust page background per template
   if (tpl === 'dark') salesPage.style.background = '#0f1a2e';
-  else if (tpl === 'bold') salesPage.style.background = '#f0ede5';
-  else if (tpl === 'warm') salesPage.style.background = '#f5edd8';
   else salesPage.style.background = '#f5f4f0';
   
-  // Build bundle cards
-  buildBundleCards(p);
+  const spInfo = document.getElementById('sp-info');
+  const spCtas = document.getElementById('sp-ctas');
+  const trustRow = spInfo?.querySelector('.trust-row');
+  
+  // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
+  if (tpl === 'aero') {
+    // Inject checklist benefits after description/install area
+    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+      [{icon:'✓',text:'Powerful multi-surface suction'},{icon:'✓',text:'Lightweight, easy-to-use design'},{icon:'✓',text:'Works on carpet, rugs, stairs & upholstery'}];
+    const checklistHTML = `<div class="tpl-injected">
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${p.desc ? p.desc.split('.')[0] : 'Key Benefits'}</div>
+      <ul class="sp-checklist">${bb.map(b => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${b.text}</li>`).join('')}</ul>
+      ${p.wasPrice ? `<div class="sp-free-gift">🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}</div>` : ''}
+    </div>`;
+    
+    // Inject after call bar or guest notice
+    const callBar = spInfo?.querySelector('.sp-call-bar');
+    const insertAfter = callBar || spInfo?.querySelector('.guest-notice') || spInfo?.querySelector('.sp-delivery');
+    if (insertAfter) insertAfter.insertAdjacentHTML('afterend', checklistHTML);
+    
+    // Inject stock urgency bar + hassle-free + payment icons after CTAs
+    const afterCta = `<div class="tpl-injected">
+      <div class="sp-stock-bar">
+        <div class="sp-stock-text">🔴 Only a few left in stock</div>
+        <div class="sp-stock-bar-inner"><div class="sp-stock-bar-fill" style="width:${Math.min(92, Math.max(60, 100 - (p.stock||10)*3))}%;"></div></div>
+      </div>
+      <div class="sp-hassle">↩️ ${p.returnDays || '100 Day'} hassle free returns</div>
+      <div class="sp-pay-icons">
+        <div class="sp-pay-icon">Visa</div><div class="sp-pay-icon">MC</div><div class="sp-pay-icon">Amex</div>
+        <div class="sp-pay-icon">Apple</div><div class="sp-pay-icon">GPay</div><div class="sp-pay-icon">PayPal</div>
+      </div>
+      <div class="sp-guarantee-strip">
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">Durability guaranteed</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over $${Math.round(p.price*1.5)}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">Risk-free</div></div>
+      </div>
+    </div>`;
+    if (trustRow) trustRow.insertAdjacentHTML('afterend', afterCta);
+  }
+  
+  // ═══ LUVEA TEMPLATE: Benefit Grid + Delivery Date + Single CTA + Guarantee + FAQ ═══
+  if (tpl === 'luvea') {
+    // Hide guest notice, call bar, qty row for cleaner look
+    const guestNotice = spInfo?.querySelector('.guest-notice');
+    if (guestNotice) { guestNotice.classList.add('tpl-injected'); guestNotice.style.display = 'none'; }
+    
+    // Benefit grid
+    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+      [{icon:'🌊',text:'Reduced Wrinkles'},{icon:'☀️',text:'Radiant Skin'},{icon:'⊞',text:'Less Dark Spots'},{icon:'🔬',text:'Reduced Acne'}];
+    const gridHTML = `<div class="tpl-injected">
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">After 6 weeks, visibly see:</div>
+      <div class="sp-benefit-grid">${bb.slice(0,4).map(b => `<div class="sp-bg-item"><div class="sp-bg-icon">${b.icon}</div><span>${b.text}</span></div>`).join('')}</div>
+      <div class="sp-delivery-date"><div class="dd-dot"></div>Order Today And Receive By <strong id="luvea-date" style="margin-left:4px;">${getDeliveryDate()}</strong></div>
+    </div>`;
+    
+    const priceRow = spInfo?.querySelector('.sp-price-row');
+    const installEl = spInfo?.querySelector('.sp-install');
+    const insertPt = installEl || priceRow;
+    if (insertPt) insertPt.insertAdjacentHTML('afterend', gridHTML);
+    
+    // Guarantee banner + FAQ after trust row
+    const faqItems = p.contentSections && p.contentSections.length ? 
+      p.contentSections.slice(0,5).map(s => ({q: s.heading||s.eyebrow||'Question', a: s.body||'Answer'})) :
+      [{q:'Description',a:p.desc||'Product description goes here.'},{q:'How to use',a:'Application instructions go here.'},{q:'Does it really work?',a:'Information about efficacy goes here.'},{q:'What is the 100% results guarantee?',a:'Details about the guarantee go here.'}];
+    
+    const afterCtaHTML = `<div class="tpl-injected">
+      <div class="sp-guarantee-banner">
+        <div class="gb-icon">🏅</div>
+        <div class="gb-text"><strong>Less than 1%</strong> of customers claim our Money Back Guarantee</div>
+      </div>
+      <div class="sp-faq-section">
+        ${faqItems.map(f => `<div class="sp-faq-item" onclick="this.classList.toggle('open')"><div class="sp-faq-q"><span>${f.q}</span><span class="faq-plus">+</span></div><div class="sp-faq-a">${f.a}</div></div>`).join('')}
+      </div>
+    </div>`;
+    if (trustRow) trustRow.insertAdjacentHTML('afterend', afterCtaHTML);
+  }
+  
+  // ═══ RADIANCE TEMPLATE: Variant Cards + Free Gift + Selling-Out Bar ═══
+  if (tpl === 'radiance') {
+    // Free gift banner
+    const freeGiftHTML = `<div class="tpl-injected sp-free-gift-banner">🔴 <strong>Free</strong> Gift reserved for the next ${Math.floor(Math.random()*40+20)} orders!</div>`;
+    const installEl = spInfo?.querySelector('.sp-install');
+    if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
+    
+    // Benefit grid (2x2)
+    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+      [{icon:'✨',text:'Short Benefit 1'},{icon:'⏱',text:'Short Benefit 2'},{icon:'💎',text:'Short Benefit 3'},{icon:'🎯',text:'Short Benefit 4'}];
+    const benefitHTML = `<div class="tpl-injected" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      ${bb.slice(0,4).map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;"><span style="font-size:16px;">${b.icon}</span>${b.text}</div>`).join('')}
+      <div style="grid-column:span 2;font-size:11px;color:var(--muted);font-style:italic;">*based on a third-party consumer study</div>
+    </div>`;
+    
+    // Variant cards from bundles
+    const bundles = p.bundles || [];
+    let variantHTML = '';
+    if (bundles.length) {
+      const imgSrc = p.images && p.images.length ? (typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||'')) : '';
+      variantHTML = `<div class="tpl-injected sp-variant-cards">${bundles.map((b, i) => {
+        const tag = b.tag || (i===bundles.length-1 ? 'BEST DEAL' : '');
+        const bonus = b.qty > 1 ? `${b.qty-1} FREE GIFTS` : '';
+        return `<div class="sp-variant-card${i===0?' active':''}" onclick="selectVariantCard(${i})">
+          ${tag ? `<div class="sp-vc-tag">${tag}</div>` : ''}
+          ${bonus ? `<div class="sp-vc-bonus">${bonus}</div>` : ''}
+          ${imgSrc ? `<img class="sp-vc-img" src="${imgSrc}" alt="${b.label}"/>` : '<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;">${p.icon||"📦"}</div>'}
+          <div class="sp-vc-name">${b.label || 'Option '+(i+1)}</div>
+          ${b.qty > 1 ? `<div class="sp-vc-was">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+          <div class="sp-vc-price">$${b.price.toFixed(2)}</div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+    
+    // Free gift included banner
+    const freeGiftIncludedHTML = bundles.length > 1 ? `<div class="tpl-injected sp-free-gift-included"><div class="fg-icon">🎁</div><strong>FREE "YOUR GIFT" INCLUDED</strong></div>` : '';
+    
+    // Insert all before CTAs
+    const callBar = spInfo?.querySelector('.sp-call-bar');
+    const insertPt = callBar || spInfo?.querySelector('.guest-notice') || spInfo?.querySelector('.sp-delivery');
+    if (insertPt) {
+      insertPt.insertAdjacentHTML('afterend', benefitHTML + variantHTML + freeGiftIncludedHTML);
+    }
+    
+    // Selling out bar + money back after trust row
+    const soldPct = Math.floor(Math.random()*15 + 80);
+    const afterTrustHTML = `<div class="tpl-injected">
+      <div class="sp-selling-out">
+        <div class="so-header">🔥 SELLING OUT FAST</div>
+        <div class="so-sub">Due to high demand, limited quantities available</div>
+        <div class="so-bar"><div class="so-fill" style="width:${soldPct}%;"></div></div>
+        <div class="so-pct">${soldPct}% SOLD</div>
+      </div>
+      <div class="sp-money-back">
+        <div class="mb-title">📦 ${p.returnDays||'90-Days'} Money-Back Guarantee</div>
+        <div class="mb-text">We're confident in the results you'll achieve. If you're not completely satisfied, simply return it, and we'll issue a full refund.</div>
+      </div>
+    </div>`;
+    if (trustRow) trustRow.insertAdjacentHTML('afterend', afterTrustHTML);
+  }
+  
+  // Build bundle cards (for aero template uses the standard bundle system)
+  if (tpl === 'aero') {
+    buildBundleCards(p);
+  } else if (tpl !== 'radiance') {
+    // For classic, dark, luvea — show bundles if present
+    buildBundleCards(p);
+  } else {
+    // Radiance uses variant cards instead
+    const wrap = document.getElementById('sp-bundles');
+    if (wrap) wrap.style.display = 'none';
+  }
+}
+
+function getDeliveryDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + 4);
+  return d.toLocaleDateString('en-US', {month:'long', day:'numeric'});
+}
+
+// Radiance variant card selection
+let selectedVariantIdx = 0;
+function selectVariantCard(idx) {
+  selectedVariantIdx = idx;
+  document.querySelectorAll('.sp-variant-card').forEach((c, i) => {
+    c.classList.toggle('active', i === idx);
+  });
+  const p = products.find(x => x.id === currentProductId);
+  if (p && p.bundles && p.bundles[idx]) {
+    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
+    const wasEl = document.getElementById('sp-was');
+    if (wasEl && p.bundles[idx].qty > 1) {
+      wasEl.textContent = '$' + (p.price * p.bundles[idx].qty).toFixed(2);
+    }
+  }
 }
 
 function buildBundleCards(p) {
@@ -2083,26 +2304,29 @@ function buildBundleCards(p) {
   wrap.style.display = 'block';
   const tpl = p.pageTemplate || 'classic';
   const isDark = tpl === 'dark';
+  const isAero = tpl === 'aero';
+  const imgSrc = isAero && p.images && p.images.length ? (typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||'')) : '';
+  
   cards.innerHTML = bundles.map((b, i) => {
     const isTagged = !!b.tag;
-    const perUnit = b.qty > 1 ? `$${(b.price / b.qty).toFixed(2)}/each` : '';
-    const savings = p.price && b.qty > 1 ? `You save $${((p.price * b.qty) - b.price).toFixed(2)}` : '';
-    return `<div onclick="selectBundle(${i})" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;cursor:pointer;transition:all .2s;border:2px solid ${isTagged ? 'var(--accent)' : (isDark ? 'rgba(255,255,255,.15)' : 'var(--border)')};background:${isDark ? 'rgba(255,255,255,.05)' : '#fff'};" class="bundle-card" data-idx="${i}">
+    const saveStr = b.qty > 1 && p.wasPrice ? `Save ${Math.round(((p.wasPrice*b.qty - b.price)/(p.wasPrice*b.qty))*100)}%` : (b.qty > 1 ? `Save $${((p.price * b.qty) - b.price).toFixed(0)}` : '');
+    return `<div onclick="selectBundle(${i})" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:${isAero?'16px 18px':'14px 16px'};border-radius:12px;cursor:pointer;transition:all .2s;border:2px solid ${isTagged ? 'var(--accent)' : (isDark ? 'rgba(255,255,255,.15)' : 'var(--border)')};background:${isDark ? 'rgba(255,255,255,.05)' : '#fff'};" class="bundle-card" data-idx="${i}">
       ${b.tag ? `<div style="position:absolute;top:-10px;right:12px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 10px;border-radius:10px;letter-spacing:.05em;">${b.tag}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:${isAero?'12px':'10px'};">
         <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${isDark ? 'rgba(255,255,255,.3)' : 'var(--border)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;" id="bundle-radio-${i}"></div>
+        ${isAero && imgSrc ? `<img src="${imgSrc}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;" alt=""/>` : ''}
         <div>
-          <div style="font-weight:700;font-size:14px;${isDark?'color:#fff;':''}">${b.label || 'Buy '+b.qty}</div>
-          ${savings ? `<div style="font-size:11.5px;color:${isDark?'rgba(255,255,255,.5)':'var(--muted)'};margin-top:2px;">${savings}</div>` : ''}
+          <div style="font-weight:700;font-size:14px;${isDark?'color:#fff;':''}display:flex;align-items:center;gap:8px;">${b.label || b.qty+' Kit'+(b.qty>1?'s':'')}
+            ${saveStr ? `<span style="background:var(--green);color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:6px;">${saveStr}</span>` : ''}
+          </div>
         </div>
       </div>
       <div style="text-align:right;">
         <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">$${b.price.toFixed(2)}</div>
-        ${perUnit ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+        ${b.qty > 1 ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
       </div>
     </div>`;
   }).join('');
-  // Select first by default
   selectBundle(0);
 }
 
@@ -2119,7 +2343,6 @@ function selectBundle(idx) {
       if (radio) radio.innerHTML = '';
     }
   });
-  // Update displayed price to bundle price
   const p = products.find(x => x.id === currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
     document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
