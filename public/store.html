@@ -1797,6 +1797,8 @@ img,video,iframe{max-width:100%;}
 const SUPABASE_URL = 'https://hztjsynioysxpumuwkys.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6dGpzeW5pb3lzeHB1bXV3a3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjE3MTUsImV4cCI6MjA4OTkzNzcxNX0.yzdmKuN_B6817Jxg3lXLr9IN83bjB6MFjdUb1caEEF8';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+if(!sb) console.warn('⚠️ Store: Supabase client not initialized — cloud data will not load');
+else console.log('✅ Store: Supabase client initialized');
 
 // ═══ CONSTANTS ═══
 const STORAGE_KEY = 'shoppla_products_v1';
