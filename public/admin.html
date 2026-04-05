@@ -268,8 +268,8 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
 .content::-webkit-scrollbar{width:6px;}
 .content::-webkit-scrollbar-track{background:transparent;}
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -1769,6 +1769,8 @@ updateCounts();
 const SUPABASE_URL = 'https://hztjsynioysxpumuwkys.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6dGpzeW5pb3lzeHB1bXV3a3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjE3MTUsImV4cCI6MjA4OTkzNzcxNX0.yzdmKuN_B6817Jxg3lXLr9IN83bjB6MFjdUb1caEEF8';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+if(!sb) console.warn('⚠️ Supabase client not initialized — window.supabase is',typeof window.supabase,'— uploads and cloud saves will fail');
+else console.log('✅ Supabase client initialized successfully');
 
 // ─── LOCALSTORAGE (fallback) ───
 const STORAGE_KEY='shoppla_products_v1';
