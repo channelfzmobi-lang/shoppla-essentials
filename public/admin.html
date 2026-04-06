@@ -1185,7 +1185,9 @@ function renderProductsTable(filter=''){
   const tbody = document.getElementById('products-table-body');
   const filtered = products.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase())||p.category.toLowerCase().includes(filter.toLowerCase()));
   document.getElementById('prod-table-sub').textContent = `${filtered.length} product${filtered.length!==1?'s':''} in your store`;
-  tbody.innerHTML = filtered.map(p=>`
+  tbody.innerHTML = filtered.map(p=>{
+    const pid = JSON.stringify(p.id);
+    return `
     <tr>
       <td><div class="prod-cell"><div class="prod-thumb">${p.icon}</div><div><div class="prod-name-cell">${p.name}</div><div class="prod-cat">${p.brand}</div></div></div></td>
       <td><span class="badge badge-gray">${p.category}</span></td>
@@ -1193,11 +1195,11 @@ function renderProductsTable(filter=''){
       <td><span class="badge ${p.stock<=3?'badge-red':p.stock<=10?'badge-orange':'badge-green'}">${p.stock} left</span></td>
       <td><span class="badge ${p.status==='active'?'badge-green':'badge-gray'}">${p.status==='active'?'Active':'Draft'}</span></td>
       <td><div class="table-actions">
-        <button class="tbl-btn" onclick="editProduct(${p.id})">✏️ Edit</button>
-        <button class="tbl-btn danger" onclick="promptDelete(${p.id})">🗑</button>
+        <button class="tbl-btn" onclick="editProduct(${pid})">✏️ Edit</button>
+        <button class="tbl-btn danger" onclick="promptDelete(${pid})">🗑</button>
       </div></td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 function filterProducts(v){ renderProductsTable(v); }
 
@@ -1322,7 +1324,7 @@ function editProduct(id){
   showToast(`✏️ Editing: ${p.name}`);
 }
 
-function saveProduct(draft=false){
+async function saveProduct(draft=false){
   const name      = document.getElementById('fp-name')?.value.trim()||'';
   const brand     = document.getElementById('fp-brand')?.value.trim()||'';
   const cat       = document.getElementById('fp-category')?.value||'';
@@ -1402,7 +1404,7 @@ function saveProduct(draft=false){
   updateCounts();
   editingProductId = null;
   clearProductForm();
-  saveToStorage();
+  await saveToStorage();
   refreshLivePreview();
   nav(document.querySelector('.sb-item[onclick*=products]'),'products');
 }
@@ -1451,11 +1453,23 @@ function promptDelete(id){
   document.getElementById('confirm-msg').textContent = `Delete "${p?.name}"? This cannot be undone.`;
   document.getElementById('confirm-modal').classList.add('open');
 }
-function confirmDelete(){
+async function confirmDelete(){
+  const removed = products.find(p=>p.id===deleteTargetId);
+  const cloudId = removed?._cloud_id || (typeof removed?.id === 'string' ? removed.id : null);
   products = products.filter(p=>p.id!==deleteTargetId);
   closeModal();
   updateCounts();
   renderProductsTable();
+  if(sb && cloudId){
+    try{
+      const { error } = await sb.from('products').delete().eq('id', cloudId);
+      if(error) throw error;
+    }catch(e){
+      console.warn('Cloud delete error:', e);
+    }
+  }
+  await saveToStorage();
+  refreshLivePreview();
   showToast('🗑 Product deleted');
 }
 function closeModal(){ document.getElementById('confirm-modal').classList.remove('open'); }
@@ -1787,9 +1801,10 @@ async function saveToStorage(){
     if(e.name==='QuotaExceededError') showToast('❌ Storage full! Use video URLs instead of uploads.');
   }
   // Also save to cloud database
-  if(!sb) return;
+  if(!sb) return true;
   try{
     for(const p of products){
+      if(!p._cloud_id && typeof p.id === 'string') p._cloud_id = p.id;
       const row = {
         id: typeof p.id==='number'? undefined : p.id,
         name: p.name||'', brand: p.brand||'', category: p.category||'',
@@ -1814,13 +1829,25 @@ async function saveToStorage(){
       };
       // Use local_id mapping
       if(!p._cloud_id){
-        const {data}=await sb.from('products').insert(row).select('id').single();
-        if(data) p._cloud_id=data.id;
+        const {data,error}=await sb.from('products').insert(row).select('id').single();
+        if(error) throw error;
+        if(data?.id){
+          p._cloud_id=data.id;
+          p.id=data.id;
+        }
       } else {
-        await sb.from('products').update(row).eq('id',p._cloud_id);
+        const { error } = await sb.from('products').update(row).eq('id',p._cloud_id);
+        if(error) throw error;
       }
     }
-  }catch(e){console.warn('Cloud save error:',e);}
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
+    localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
+    return true;
+  }catch(e){
+    console.warn('Cloud save error:',e);
+    showToast('❌ Sync failed — please try again');
+    return false;
+  }
 }
 
 async function loadFromStorage(){
@@ -2447,10 +2474,11 @@ function refreshDashStats(){
 }
 
 // ─── DUPLICATE PRODUCT ───
-function duplicateProduct(id){
+async function duplicateProduct(id){
   const p=products.find(x=>x.id===id);if(!p)return;
-  const clone={...p,id:Date.now(),name:p.name+' (Copy)',status:'draft'};
-  products.push(clone);saveToStorage();updateCounts();renderProductsTable();
+  const clone={...p,id:(window.crypto?.randomUUID?.()||Date.now()),name:p.name+' (Copy)',status:'draft'};
+  delete clone._cloud_id;
+  products.push(clone);await saveToStorage();updateCounts();renderProductsTable();refreshLivePreview();
   showToast('📋 Product duplicated as draft');
 }
 
@@ -2498,8 +2526,8 @@ function openPreview(productId){
 }
 
 // ─── OPEN STOREFRONT ───
-function openStorefront(){
-  saveToStorage();
+async function openStorefront(){
+  await saveToStorage();
   window.open('/','_blank');
   showToast('🏪 Saved & opening live store…');
 }
@@ -2522,7 +2550,12 @@ function setPreviewMode(mode){
 }
 function refreshLivePreview(){
   const iframe = document.getElementById('live-preview-iframe');
-  if(iframe) iframe.src = iframe.src;
+  if(!iframe) return;
+  try{
+    iframe.contentWindow?.location.reload();
+  }catch(e){
+    iframe.src = `/store.html?preview=${Date.now()}`;
+  }
 }
 
 // ─── REVIEWS MANAGEMENT ───
