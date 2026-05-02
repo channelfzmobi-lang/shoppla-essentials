@@ -542,6 +542,15 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               <div class="form-hint" style="margin-bottom:8px;">Custom badges that appear on the product image (Dark/Bold templates only). One per line: emoji|text</div>
               <textarea class="form-textarea" id="fp-benefit-badges" placeholder="💪|Premium Quality&#10;🧠|Expert Tested&#10;✅|Third-Party Verified&#10;🔬|13.6x Absorption" style="min-height:80px;"></textarea>
             </div>
+            <div class="form-group">
+              <label class="form-lbl">🧩 External Buy Now Form (Optional)</label>
+              <label style="display:flex;align-items:center;gap:10px;background:#f9f8f6;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;">
+                <input type="checkbox" id="fp-external-form-enabled" style="accent-color:var(--accent);">
+                <span style="font-size:13.5px;font-weight:700;">Use pasted form code instead of Shoppla collecting customer data</span>
+              </label>
+              <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;"></textarea>
+              <div class="form-hint">When enabled, the storefront opens this embedded form for the product order button.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -832,6 +841,10 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             <button class="hdr-btn hdr-btn-primary" onclick="openAgentModal(null)">➕ Add First Agent</button>
           </div>
         </div>
+      </div>
+      <div class="section-card">
+        <div class="sc-head"><div><div class="sc-title">💰 Agent Delivered Sales Split</div><div class="sc-sub">Delivered revenue grouped by assigned agent and product</div></div></div>
+        <div class="sc-body"><div id="agent-sales-split" style="overflow-x:auto;"></div></div>
       </div>
       <div class="section-card">
         <div class="sc-head"><div class="sc-title">💡 How It Works</div></div>
@@ -1160,7 +1173,8 @@ let currentImages    = [];     // [{base64, name}] or [{url, name}]
 async function uploadToStorage(file, folder='images') {
   if (!sb) return null;
   const ext = file.name.split('.').pop();
-  const uniqueName = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const uniqueName = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2,6)}_${safe}`;
   try {
     const { data, error } = await sb.storage.from('product-media').upload(uniqueName, file, { upsert: true });
     if (error) { console.error('Upload error:', error); return null; }
@@ -1279,7 +1293,7 @@ function editProduct(id){
   if(p.formConfig){
     const fc=p.formConfig;
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-    setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField);
+    setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
   }
   if(p.tyConfig){
@@ -1343,7 +1357,7 @@ async function saveProduct(draft=false){
   const returnPolicy  = document.getElementById('fp-return-policy')?.value.trim()||'';
   const mediaHeightDesktop = Math.max(380, Math.min(900, parseInt(document.getElementById('fp-media-height-desktop')?.value)||640));
   const mediaHeightMobile  = Math.max(220, Math.min(560, parseInt(document.getElementById('fp-media-height-mobile')?.value)||320));
-  const agentId   = parseInt(document.getElementById('fp-agent')?.value)||null;
+  const agentId   = document.getElementById('fp-agent')?.value || null;
   const mediaFit  = document.querySelector('input[name="fp-media-fit"]:checked')?.value||'cover';
   const pageTemplate = document.getElementById('fp-template')?.value||'classic';
   const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
@@ -1360,6 +1374,8 @@ async function saveProduct(draft=false){
     heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
     subtext:     document.getElementById('fp-form-subtext')?.value||'',
     customField: document.getElementById('fp-custom-field')?.value||'',
+    externalFormEnabled: !!document.getElementById('fp-external-form-enabled')?.checked,
+    externalFormCode: document.getElementById('fp-external-form-code')?.value||'',
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
   };
@@ -1410,7 +1426,7 @@ async function saveProduct(draft=false){
 }
 
 function clearProductForm(){
-  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku'].forEach(id=>{
+  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
@@ -1437,7 +1453,7 @@ function clearProductForm(){
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
   // Reset bundles & badges
   currentBundles = []; renderBundles();
-  const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = '';
+  const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
 }
 
 function updateCounts(){
@@ -1475,10 +1491,15 @@ async function confirmDelete(){
 function closeModal(){ document.getElementById('confirm-modal').classList.remove('open'); }
 
 
-function updateOrderStatus(id,status){
+async function updateOrderStatus(id,status){
   if(!status||status==='Update status') return;
-  const o = orders.find(x=>x.id===id);
-  if(o){ o.status=status; renderOrders(); showToast(`✅ Order #${id} → ${status}`); }
+  const o = orders.find(x=>String(x.id)===String(id));
+  if(o){
+    o.status=status;
+    if(sb && o._cloud_id){ try{ await sb.from('orders').update({status}).eq('id',o._cloud_id); }catch(e){ console.warn('Order status cloud update error:',e); } }
+    try{localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));}catch(e){}
+    renderOrders(); renderAgentSalesSplits(); showToast(`✅ Order #${id} → ${status}`);
+  }
 }
 
 
@@ -1682,7 +1703,7 @@ async function handleVideoUpload(input){
 function handleVideoDrop(e){
   e.preventDefault(); document.getElementById('video-drop').classList.remove('drag');
   const f = e.dataTransfer.files[0];
-  if(f&&f.type.startsWith('video/')){ document.getElementById('video-filename').textContent=f.name; document.getElementById('video-filesize').textContent=(f.size/1024/1024).toFixed(1)+' MB'; document.getElementById('video-drop').style.display='none'; document.getElementById('video-preview-wrap').style.display='block'; }
+  if(f&&f.type.startsWith('video/')){ const dt=new DataTransfer(); dt.items.add(f); const input=document.getElementById('video-file-input'); input.files=dt.files; handleVideoUpload(input); }
 }
 function removeVideo(){
   currentVideoData = null;
@@ -1803,6 +1824,7 @@ async function saveToStorage(){
   // Also save to cloud database
   if(!sb) return true;
   try{
+    await saveAgentsCloud();
     for(const p of products){
       if(!p._cloud_id && typeof p.id === 'string') p._cloud_id = p.id;
       const row = {
@@ -1824,7 +1846,7 @@ async function saveToStorage(){
         payment_route: p.paymentRoute||'pod',
         form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[]},
         ty_config: p.tyConfig||{},
-        gateway_config: p.gatewayConfig||{}, agent_id: p.agentId||null,
+        gateway_config: p.gatewayConfig||{}, agent_id: (p.agentId && String(p.agentId).includes('-')) ? p.agentId : null,
         page_template: p.pageTemplate||'classic',
       };
       // Use local_id mapping
@@ -1884,7 +1906,7 @@ async function loadFromStorage(){
           email:o.email, phone:o.phone, address:o.address, city:o.city,
           products:o.products_text, qty:o.qty, color:o.color, size:o.size,
           notes:o.notes, total:Number(o.total), status:o.status,
-          paymentMethod:o.payment_method, date:o.created_at,
+          paymentMethod:o.payment_method, date:o.created_at, productId:o.product_id,
         }));
         localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
       }
@@ -1907,10 +1929,40 @@ let agents=[
   {id:3,name:'Amina Khalid',role:'Fashion Consultant',phone:'+1 (555) 030-6677',whatsapp:'https://wa.me/15550306677',zoom:'',email:'amina@shoppla.com',avatar:'A',avatarColor:'#7c3aed',avatarImg:'',availability:'Mon–Fri 8am–5pm',status:'busy',bio:'Style advisor for fashion.'},
   {id:4,name:'David Chen',role:'General Support',phone:'+1 (555) 040-8899',whatsapp:'https://wa.me/15550408899',zoom:'https://zoom.us/j/444',email:'david@shoppla.com',avatar:'D',avatarColor:'#1a8a4a',avatarImg:'',availability:'24/7 Support',status:'online',bio:'General support for orders and returns.'},
 ];
-function loadAgents(){
+async function loadAgents(){
+  if(sb){
+    try{
+      const {data,error}=await sb.from('agents').select('*').order('created_at',{ascending:true});
+      if(error) throw error;
+      if(data&&data.length){
+        agents=data.map(a=>({id:a.id,name:a.name,role:a.role||'',phone:a.phone||'',whatsapp:a.whatsapp||'',zoom:a.zoom||'',email:a.email||'',avatar:a.avatar||a.name?.[0]||'?',avatarColor:a.avatar_color||'#e8541a',avatarImg:a.avatar_img||'',availability:a.availability||'',status:a.status||'online',bio:a.bio||''}));
+        localStorage.setItem(AGENTS_KEY,JSON.stringify(agents));
+        return;
+      }
+    }catch(e){console.warn('Cloud agent load error:',e);}
+  }
   try{const a=JSON.parse(localStorage.getItem(AGENTS_KEY)||'[]');if(Array.isArray(a)&&a.length)agents=a;}catch(e){}
 }
-function saveAgents(){ try{localStorage.setItem(AGENTS_KEY,JSON.stringify(agents));}catch(e){} }
+async function saveAgentsCloud(){
+  try{localStorage.setItem(AGENTS_KEY,JSON.stringify(agents));}catch(e){}
+  if(!sb) return;
+  const idMap = {};
+  for(const a of agents){
+    const row={name:a.name||'',role:a.role||'',phone:a.phone||'',whatsapp:normalizeWhatsApp(a.whatsapp||a.phone||''),zoom:a.zoom||'',email:a.email||'',avatar:a.avatar||a.name?.[0]||'',avatar_color:a.avatarColor||'#e8541a',avatar_img:a.avatarImg||'',availability:a.availability||'',status:a.status||'online',bio:a.bio||''};
+    if(String(a.id).includes('-')){ const {error}=await sb.from('agents').update(row).eq('id',a.id); if(error) throw error; }
+    else { const old=a.id; const {data,error}=await sb.from('agents').insert(row).select('id').single(); if(error) throw error; if(data?.id){ a.id=data.id; idMap[String(old)]=data.id; } }
+  }
+  if(Object.keys(idMap).length){ products.forEach(p=>{ if(idMap[String(p.agentId)]) p.agentId=idMap[String(p.agentId)]; }); localStorage.setItem(AGENTS_KEY,JSON.stringify(agents)); }
+}
+function saveAgents(){ saveAgentsCloud().catch(e=>console.warn('Agent save error:',e)); }
+function normalizeWhatsApp(v=''){
+  v=String(v||'').trim();
+  if(!v) return '';
+  if(/^https?:\/\//i.test(v)) return v;
+  const digits=v.replace(/\D/g,'');
+  return digits ? 'https://wa.me/'+digits : '';
+}
+function cleanTel(v=''){ return String(v||'').replace(/[^+0-9]/g,''); }
 
 function renderAgents(){
   const grid=document.getElementById('agents-grid');
@@ -1918,7 +1970,7 @@ function renderAgents(){
   if(!grid)return;
   if(!agents.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}
   if(empty)empty.style.display='none';
-  grid.innerHTML=agents.map(a=>`
+  grid.innerHTML=agents.map(a=>{ const aid=JSON.stringify(a.id); const split=getAgentSplitSummary(a.id); return `
     <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;position:relative;transition:box-shadow .2s;" onmouseenter="this.style.boxShadow='0 8px 24px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
         <div style="width:50px;height:50px;border-radius:50%;background:${a.avatarImg?'none':a.avatarColor};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">
@@ -1934,8 +1986,8 @@ function renderAgents(){
           </div>
         </div>
         <div style="display:flex;gap:5px;">
-          <button class="tbl-btn" onclick="openAgentModal(${a.id})" style="padding:5px 9px;font-size:12px;">✏️</button>
-          <button class="tbl-btn danger" onclick="deleteAgent(${a.id})" style="padding:5px 9px;font-size:12px;">🗑</button>
+          <button class="tbl-btn" onclick="openAgentModal(${aid})" style="padding:5px 9px;font-size:12px;">✏️</button>
+          <button class="tbl-btn danger" onclick="deleteAgent(${aid})" style="padding:5px 9px;font-size:12px;">🗑</button>
         </div>
       </div>
       ${a.bio?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;font-style:italic;">"${a.bio}"</div>`:''}
@@ -1944,8 +1996,8 @@ function renderAgents(){
         ${a.whatsapp?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>💬</span><a href="${a.whatsapp}" target="_blank" style="color:var(--green);font-weight:600;">WhatsApp</a></div>`:''}
         ${a.zoom?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>📹</span><a href="${a.zoom}" target="_blank" style="color:var(--blue);font-weight:600;">Zoom</a></div>`:''}
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--muted);">📦 Assigned to: <b>${products.filter(p=>p.agentId===a.id).length} product(s)</b></div>
-    </div>`).join('');
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);">📦 Assigned to: <b>${products.filter(p=>String(p.agentId)===String(a.id)).length} product(s)</b> · ✅ Delivered: <b>${split.orders}</b> · Revenue: <b>$${split.revenue.toLocaleString()}</b></div>
+    </div>`}).join('');
   refreshAgentDropdowns();
 }
 
@@ -1963,7 +2015,7 @@ function previewSelectedAgent(agentId){
   const preview=document.getElementById('fp-agent-preview');
   if(!preview)return;
   if(!agentId){preview.style.display='none';return;}
-  const a=agents.find(x=>x.id===parseInt(agentId));
+  const a=agents.find(x=>String(x.id)===String(agentId));
   if(!a){preview.style.display='none';return;}
   const av=document.getElementById('fp-agent-avatar');
   const nm=document.getElementById('fp-agent-name');
@@ -2068,7 +2120,7 @@ function openAgentModal(agentId){
       </div>
       <div class="form-group" style="margin-top:4px;"><label class="form-lbl">Short Bio</label><textarea class="form-textarea" id="am-bio" style="min-height:70px;" placeholder="A short sentence about this agent's expertise…">${a?.bio||''}</textarea></div>
       <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="saveAgent(${a?a.id:'null'})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">${a?'Save Changes':'Add Agent'}</button>
+        <button onclick="saveAgent(${a?JSON.stringify(a.id):'null'})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">${a?'Save Changes':'Add Agent'}</button>
         <button onclick="document.getElementById('agent-modal').remove()" style="flex:1;background:var(--warm);border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:14.5px;cursor:pointer;">Cancel</button>
       </div>
     </div>
@@ -2096,7 +2148,7 @@ function updateAgentAvatarColor(color){
   if(p&&!m?._photoBase64){p.style.background=color;p.textContent=document.getElementById('am-name')?.value?.[0]||'?';}
 }
 
-function saveAgent(agentId){
+async function saveAgent(agentId){
   const name=document.getElementById('am-name')?.value.trim();
   if(!name){showToast('⚠️ Agent name is required');return;}
   const modal=document.getElementById('agent-modal');
@@ -2114,29 +2166,29 @@ function saveAgent(agentId){
     avatarColor:document.getElementById('am-color')?.value||'#e8541a'
   };
   if(agentId&&agentId!=='null'){
-    const idx=agents.findIndex(a=>a.id===agentId);
+    const idx=agents.findIndex(a=>String(a.id)===String(agentId));
     if(idx>-1)agents[idx]={...agents[idx],...data};
     showToast('✅ Agent updated!');
   }else{
-    agents.push({...data,id:Date.now()});
+    agents.push({...data,id:(window.crypto?.randomUUID?.()||Date.now())});
     showToast('✅ Agent added!');
   }
-  saveAgents();saveToStorage();
+  await saveAgentsCloud(); await saveToStorage();
   document.getElementById('agent-modal')?.remove();
   renderAgents();refreshAgentDropdowns();
 }
 
-function deleteAgent(id){
+async function deleteAgent(id){
   if(!confirm('Remove this agent?'))return;
   agents=agents.filter(a=>a.id!==id);
   products.forEach(p=>{if(p.agentId===id)delete p.agentId;});
-  saveAgents();saveToStorage();renderAgents();
+  await saveAgentsCloud(); await saveToStorage();renderAgents();
   showToast('🗑 Agent removed');
 }
 
 // ─── VIEW ORDER MODAL ───
 function viewOrder(id){
-  const o=orders.find(x=>x.id===id);if(!o)return;
+  const o=orders.find(x=>String(x.id)===String(id));if(!o)return;
   document.getElementById('order-detail-modal')?.remove();
   const el=document.createElement('div');
   el.id='order-detail-modal';
@@ -2166,7 +2218,7 @@ function viewOrder(id){
     </div>
     <div style="margin-bottom:18px;">
       <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Update Status</div>
-      <select onchange="updateOrderStatus(${o.id},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
+      <select onchange="updateOrderStatus(${JSON.stringify(o.id)},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
         <option value="">— Choose status —</option>
         <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
         <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
@@ -2187,7 +2239,7 @@ function viewOrder(id){
 function renderOrders(){
   const tbody=document.getElementById('orders-table-body');if(!tbody)return;
   try{const so=JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]');so.forEach(o=>{if(!orders.find(x=>x.id===o.id))orders.push(o);});}catch(e){}
-  const sorted=[...orders].sort((a,b)=>b.id-a.id);
+  const sorted=[...orders].sort((a,b)=>new Date(b.date||b.created_at||0)-new Date(a.date||a.created_at||0));
   tbody.innerHTML=sorted.map(o=>`
     <tr>
       <td><b>#${o.id}</b></td>
@@ -2197,8 +2249,8 @@ function renderOrders(){
       <td>${o.date||'—'}</td>
       <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td>
       <td><div class="table-actions">
-        <button class="tbl-btn" onclick="viewOrder(${o.id})">👁 View</button>
-        <select class="tbl-btn" onchange="updateOrderStatus(${o.id},this.value);this.selectedIndex=0;" style="font-size:12px;max-width:130px;">
+        <button class="tbl-btn" onclick="viewOrder(${JSON.stringify(o.id)})">👁 View</button>
+        <select class="tbl-btn" onchange="updateOrderStatus(${JSON.stringify(o.id)},this.value);this.selectedIndex=0;" style="font-size:12px;max-width:130px;">
           <option>Update status</option>
           <option value="pending">Pending</option><option value="processing">Processing</option>
           <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
@@ -2458,7 +2510,7 @@ function nav(el,panelId){
   if(panelId==='media')renderMediaLibrary();
   if(panelId==='pages')setTimeout(renderPages,50);
   if(panelId==='banners')setTimeout(renderBanners,50);
-  if(panelId==='agents'){loadAgents();renderAgents();}
+  if(panelId==='agents'){loadAgents().then(()=>{renderAgents();renderAgentSalesSplits();});}
   if(panelId==='reviews'){loadAdminReviews();}
 }
 
@@ -2512,7 +2564,7 @@ function openPreview(productId){
   .trust span{background:#f3ede3;border:1px solid #e5e0d6;border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:600;}
   </style></head><body>
   <div class="banner">👁 ADMIN PREVIEW</div>
-  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
+  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.url||p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>
@@ -2556,6 +2608,36 @@ function refreshLivePreview(){
   }catch(e){
     iframe.src = `/store.html?preview=${Date.now()}`;
   }
+}
+
+function getAgentSplitSummary(agentId){
+  const rows = computeAgentSalesSplits().filter(r=>String(r.agentId)===String(agentId));
+  return {orders:rows.reduce((a,r)=>a+r.orders,0), revenue:rows.reduce((a,r)=>a+r.revenue,0)};
+}
+
+function computeAgentSalesSplits(){
+  return products.filter(p=>p.agentId).map(p=>{
+    const matched=orders.filter(o=>String(o.productId||'')===String(p.id||p._cloud_id||'') || (o.products&&o.products===p.name));
+    const delivered=matched.filter(o=>o.status==='delivered');
+    return {agentId:p.agentId, productId:p.id, product:p.name, orders:delivered.length, units:delivered.reduce((a,o)=>a+(parseInt(o.qty)||1),0), revenue:delivered.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0)};
+  }).filter(r=>r.orders||r.revenue||products.some(p=>String(p.agentId)===String(r.agentId)));
+}
+
+async function renderAgentSalesSplits(){
+  const el=document.getElementById('agent-sales-split'); if(!el)return;
+  let rows=[];
+  if(sb){
+    try{
+      const {data,error}=await sb.from('agent_delivered_sales').select('*').order('agent_name',{ascending:true});
+      if(error) throw error;
+      rows=(data||[]).map(r=>({agent:r.agent_name, role:r.agent_role, product:r.product_name, orders:Number(r.delivered_orders)||0, units:Number(r.delivered_units)||0, revenue:Number(r.delivered_revenue)||0}));
+    }catch(e){ console.warn('Agent split load error:',e); }
+  }
+  if(!rows.length){
+    rows=computeAgentSalesSplits().map(r=>{const a=agents.find(x=>String(x.id)===String(r.agentId))||{};return{agent:a.name||'Unassigned',role:a.role||'',product:r.product,orders:r.orders,units:r.units,revenue:r.revenue};});
+  }
+  if(!rows.length){ el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">No delivered product sales yet. Mark orders as delivered to populate this split sheet.</div>'; return; }
+  el.innerHTML=`<table class="data-table"><thead><tr><th>Agent</th><th>Product Delivered</th><th>Orders</th><th>Units</th><th>Delivered Revenue</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r.agent}</b><div style="font-size:12px;color:var(--muted);">${r.role||''}</div></td><td>${r.product||'—'}</td><td>${r.orders}</td><td>${r.units}</td><td><b>$${Number(r.revenue||0).toLocaleString()}</b></td></tr>`).join('')}</tbody></table>`;
 }
 
 // ─── REVIEWS MANAGEMENT ───
@@ -2738,7 +2820,7 @@ async function deleteAdminReview(id) {
 // ─── INIT ───
 (async function(){
   await loadFromStorage();
-  loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);
+  await loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
   renderProductsTable();
 })();
 </script>

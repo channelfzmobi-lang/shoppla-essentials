@@ -1642,15 +1642,15 @@ img,video,iframe{max-width:100%;}
     <div class="call-ring">📞</div>
     <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;margin-bottom:7px;">Talk to a Real Person</div>
     <p style="font-size:13.5px;color:var(--muted);margin-bottom:22px;line-height:1.6;">Our product experts are live right now — questions, sizing help, or take your order.</p>
-    <div class="call-opt" onclick="toast('☎️ Calling +1 (800) SHOPPLA…');closeModal('call-modal')">
+    <div class="call-opt" id="call-phone-opt" onclick="startPhoneCall()">
       <div class="call-opt-ico">☎️</div>
-      <div><div class="call-opt-ttl">Call by Phone</div><div class="call-opt-sub">+1 (800) SHOPPLA · Available now</div></div>
+      <div><div class="call-opt-ttl">Call by Phone</div><div class="call-opt-sub" id="call-phone-sub">Available now</div></div>
     </div>
-    <div class="call-opt" onclick="toast('📹 Opening video call…');closeModal('call-modal')">
+    <div class="call-opt" id="call-video-opt" onclick="startVideoCall()">
       <div class="call-opt-ico">📹</div>
       <div><div class="call-opt-ttl">Video Call (Zoom / Meet)</div><div class="call-opt-sub">See products live · &lt;5 min avg wait</div></div>
     </div>
-    <div class="call-opt" onclick="toast('💬 Opening WhatsApp…');closeModal('call-modal')">
+    <div class="call-opt" id="call-whatsapp-opt" onclick="startWhatsApp()">
       <div class="call-opt-ico">💬</div>
       <div><div class="call-opt-ttl">WhatsApp Chat or Voice</div><div class="call-opt-sub">Instant response · Send photos & videos</div></div>
     </div>
@@ -1880,7 +1880,7 @@ async function saveOrders(o){
         address:last.address||'', city:last.city||'', products_text:last.products||'',
         qty:last.qty||1, color:last.color||'', size:last.size||'',
         notes:last.notes||'', total:last.total||0, status:last.status||'pending',
-        payment_method:last.paymentMethod||'',
+        payment_method:last.paymentMethod||'', product_id:last.productId||null,
       });
       last._cloud_saved=true;
     }
@@ -1936,7 +1936,7 @@ function gotoInner(id) {
 // ═══ MODAL ═══
 function openModal(id) {
   const el = document.getElementById(id);
-  if (el) { el.classList.add('open'); document.body.style.overflow='hidden'; }
+  if (el) { if(id==='call-modal') refreshCallModal(); el.classList.add('open'); document.body.style.overflow='hidden'; }
 }
 function closeModal(id) {
   const el = document.getElementById(id);
@@ -1952,11 +1952,12 @@ function makeCardHTML(p, showActions) {
   // Determine image src - handle both {base64:...} objects and plain URL strings
   const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
   if (p.videoURL) {
-    mediaHTML = `<div class="vid-placeholder" onclick="event.stopPropagation();openSalesPage(${pid})" style="cursor:pointer;">
-      <div class="play-ring">▶</div>
-      <div class="vid-emoji">${p.icon||'📦'}</div>
-      <div class="vid-lbl">▶ Watch video</div>
-    </div>`;
+    const embedSrc = toEmbedUrl(p.videoURL);
+    if (embedSrc) {
+      mediaHTML = `<iframe src="${embedSrc}" style="width:100%;height:100%;border:none;display:block;pointer-events:none;" allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe>`;
+    } else {
+      mediaHTML = `<video src="${p.videoURL}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop autoplay preload="metadata"></video>`;
+    }
   } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vidSrc = p.videoData.url || p.videoData.base64;
     mediaHTML = `<video src="${vidSrc}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
@@ -2568,7 +2569,7 @@ function placeOrder() {
   const total = p ? p.price + Math.round(p.price*0.08) : 0;
   const oid = Math.floor(1000+Math.random()*9000);
   const orders = getOrders();
-  orders.unshift({id:oid, customer:fname, email, products: p?p.name:'Order', total, date:'Just now', status:'pending'});
+  orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, date:'Just now', status:'pending'});
   saveOrders(orders);
   saveCart([]);
   refreshBadge();
@@ -2580,6 +2581,17 @@ function placeOrder() {
 function selPayment(el) { document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('active')); el.classList.add('active'); }
 
 // ═══ ORDER FORM ═══
+function renderExternalFormEmbed(code) {
+  const raw = String(code || '').trim();
+  if (!raw) return '';
+  const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
+  const directUrl = /^https?:\/\//i.test(raw) ? raw : '';
+  const src = iframeSrc || directUrl;
+  if (src) return `<iframe src="${src}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
+  const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"></iframe>`;
+}
+
 function openOrderForm() {
   const p = products.find(x => x.id===currentProductId);
   if (!p) return;
@@ -2591,8 +2603,17 @@ function openOrderForm() {
   document.getElementById('of-total').textContent = '$'+p.price.toLocaleString();
   // Thumb
   const t = document.getElementById('of-thumb');
-  if (p.images && p.images.length) { t.innerHTML = `<img src="${p.images[0].base64}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>`; }
+  if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
   else t.textContent = p.icon||'📦';
+  if (fc.externalFormEnabled && fc.externalFormCode) {
+    document.getElementById('of-fields').innerHTML = renderExternalFormEmbed(fc.externalFormCode);
+    document.getElementById('of-total').closest('.of-total-bar').style.display = 'none';
+    document.getElementById('of-buttons').innerHTML = '';
+    openModal('order-form-modal');
+    return;
+  }
+  document.getElementById('of-total').closest('.of-total-bar').style.display = '';
+
   // Fields
   const ALL_FIELDS = [
     {k:'name',    lbl:'Full Name *',         ph:'Your full name',             type:'text',    full:true},
@@ -2655,7 +2676,7 @@ function submitOrderForm(route) {
     color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:'$'+p.price.toLocaleString(),
     total:'$'+total.toLocaleString(), route };
   const orders = getOrders();
-  orders.unshift({id:oid, customer:name, email, products:p.name, total, date:'Just now', status:'pending'});
+  orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:g('notes'), total, date:'Just now', status:'pending'});
   saveOrders(orders);
   saveCart([]); refreshBadge();
   closeModal('order-form-modal');
@@ -2862,6 +2883,28 @@ async function loadAgents() {
   } catch(e) { console.warn('Agent load error:', e); }
 }
 
+
+function normalizeTelHref(v='') { const cleaned=String(v||'').replace(/[^+0-9]/g,''); return cleaned ? 'tel:'+cleaned : ''; }
+function normalizeWaHref(v='') { v=String(v||'').trim(); if(!v) return ''; if(/^https?:\/\//i.test(v)) return v; const d=v.replace(/\D/g,''); return d?'https://wa.me/'+d:''; }
+function getActiveAgent() {
+  const p = products.find(x => x.id === currentProductId);
+  if (p?.agentId) {
+    const a = storeAgents.find(x => String(x.id) === String(p.agentId));
+    if (a) return a;
+  }
+  return storeAgents[0] || {name:'Shoppla Support', phone:'+1 (800) SHOPPLA', whatsapp:'', zoom:'', role:'Support', availability:'Available now'};
+}
+function refreshCallModal() {
+  const a=getActiveAgent();
+  const sub=document.getElementById('call-phone-sub'); if(sub) sub.textContent=(a.phone||'Phone support')+' · '+(a.availability||'Available now');
+  const phone=document.getElementById('call-phone-opt'); if(phone) phone.style.display=a.phone?'flex':'none';
+  const wa=document.getElementById('call-whatsapp-opt'); if(wa) wa.style.display=(a.whatsapp||a.phone)?'flex':'none';
+  const vid=document.getElementById('call-video-opt'); if(vid) vid.style.display=a.zoom?'flex':'none';
+}
+function startPhoneCall(){ const a=getActiveAgent(); const href=normalizeTelHref(a.phone); if(href) location.href=href; toast('☎️ Calling '+(a.phone||a.name)+'…'); closeModal('call-modal'); }
+function startWhatsApp(){ const a=getActiveAgent(); const href=normalizeWaHref(a.whatsapp||a.phone); if(href) window.open(href,'_blank'); else toast('⚠️ WhatsApp is not configured'); closeModal('call-modal'); }
+function startVideoCall(){ const a=getActiveAgent(); if(a.zoom) window.open(a.zoom,'_blank'); else toast('⚠️ Video call is not configured'); closeModal('call-modal'); }
+
 // ═══ REVIEWS FROM CLOUD ═══
 let cloudReviews = [];
 async function loadCloudReviews(productId) {
@@ -2931,9 +2974,12 @@ function renderCloudReviews(productId) {
 
 function showAgentOnCallBar(p) {
   const callBar = document.querySelector('.sp-call-bar');
-  if (!callBar || !p.agentId) return;
-  const agent = storeAgents.find(a => a.id === p.agentId || a.id === String(p.agentId));
-  if (!agent) return;
+  if (!callBar) return;
+  const agent = storeAgents.find(a => String(a.id) === String(p.agentId)) || storeAgents[0];
+  if (!agent) {
+    callBar.innerHTML = `<div><div class="sp-call-ttl">Questions? Talk to a real person</div><div class="sp-call-sub">Live · Available now</div></div><button class="btn-call-sp" onclick="openModal('call-modal')"><span style="width:7px;height:7px;background:#4dfa90;border-radius:50%;display:inline-block;animation:blink 1.4s infinite;"></span>Start Live Call</button>`;
+    return;
+  }
   
   const avatarHTML = agent.avatar_img ?
     `<img src="${agent.avatar_img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>` :
@@ -2948,10 +2994,20 @@ function showAgentOnCallBar(p) {
       </div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      ${agent.phone ? `<a href="tel:${agent.phone}" class="btn-call-sp" style="text-decoration:none;"><span style="width:7px;height:7px;background:#4dfa90;border-radius:50%;display:inline-block;animation:blink 1.4s infinite;"></span>Call</a>` : ''}
-      ${agent.whatsapp ? `<a href="${agent.whatsapp}" target="_blank" class="btn-call-sp" style="text-decoration:none;background:#25d366;color:#fff;">💬 WhatsApp</a>` : ''}
+      ${agent.phone ? `<a href="${normalizeTelHref(agent.phone)}" class="btn-call-sp" style="text-decoration:none;"><span style="width:7px;height:7px;background:#4dfa90;border-radius:50%;display:inline-block;animation:blink 1.4s infinite;"></span>Call</a>` : ''}
+      ${(agent.whatsapp||agent.phone) ? `<a href="${normalizeWaHref(agent.whatsapp||agent.phone)}" target="_blank" class="btn-call-sp" style="text-decoration:none;background:#25d366;color:#fff;">💬 WhatsApp</a>` : ''}
       ${agent.zoom ? `<a href="${agent.zoom}" target="_blank" class="btn-call-sp" style="text-decoration:none;background:#2d8cff;color:#fff;">📹 Zoom</a>` : ''}
     </div>`;
+}
+
+
+function subscribeToCloudChanges(){
+  if(!sb) return;
+  sb.channel('shoppla-storefront-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) openSalesPage(p.id);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) showAgentOnCallBar(p);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'reviews'},async()=>{if(currentProductId){await loadCloudReviews(currentProductId); renderCloudReviews(currentProductId);}})
+    .subscribe();
 }
 
 // ═══ INIT ═══
@@ -2961,6 +3017,7 @@ function showAgentOnCallBar(p) {
   await loadCloudReviews();
   renderHome();
   refreshBadge();
+  subscribeToCloudChanges();
 })();
 
 window.addEventListener('resize', () => {
@@ -2975,6 +3032,7 @@ window.addEventListener('storage', async (event) => {
   await loadData();
   renderHome();
   refreshBadge();
+  subscribeToCloudChanges();
   if (salesOpen && currentProductId) {
     const latest = products.find(x => x.id === currentProductId);
     if (latest) openSalesPage(latest.id);
