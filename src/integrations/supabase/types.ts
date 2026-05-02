@@ -152,6 +152,13 @@ export type Database = {
             foreignKeyName: "orders_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "agent_delivered_sales"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -159,7 +166,7 @@ export type Database = {
       }
       products: {
         Row: {
-          agent_id: number | null
+          agent_id: string | null
           brand: string | null
           category: string | null
           checkout_method: string | null
@@ -197,7 +204,7 @@ export type Database = {
           was_price: number | null
         }
         Insert: {
-          agent_id?: number | null
+          agent_id?: string | null
           brand?: string | null
           category?: string | null
           checkout_method?: string | null
@@ -235,7 +242,7 @@ export type Database = {
           was_price?: number | null
         }
         Update: {
-          agent_id?: number | null
+          agent_id?: string | null
           brand?: string | null
           category?: string | null
           checkout_method?: string | null
@@ -272,7 +279,22 @@ export type Database = {
           warranty?: string | null
           was_price?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_delivered_sales"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "products_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -310,6 +332,13 @@ export type Database = {
             foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "agent_delivered_sales"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -338,7 +367,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      agent_delivered_sales: {
+        Row: {
+          agent_id: string | null
+          agent_name: string | null
+          agent_role: string | null
+          delivered_orders: number | null
+          delivered_revenue: number | null
+          delivered_units: number | null
+          last_delivered_at: string | null
+          product_id: string | null
+          product_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
