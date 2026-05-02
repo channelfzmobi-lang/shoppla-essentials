@@ -2120,7 +2120,7 @@ function openAgentModal(agentId){
       </div>
       <div class="form-group" style="margin-top:4px;"><label class="form-lbl">Short Bio</label><textarea class="form-textarea" id="am-bio" style="min-height:70px;" placeholder="A short sentence about this agent's expertise…">${a?.bio||''}</textarea></div>
       <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="saveAgent(${a?a.id:'null'})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">${a?'Save Changes':'Add Agent'}</button>
+        <button onclick="saveAgent(${a?JSON.stringify(a.id):'null'})" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">${a?'Save Changes':'Add Agent'}</button>
         <button onclick="document.getElementById('agent-modal').remove()" style="flex:1;background:var(--warm);border:none;border-radius:10px;padding:13px;font-family:'Satoshi',sans-serif;font-size:14.5px;cursor:pointer;">Cancel</button>
       </div>
     </div>
@@ -2218,7 +2218,7 @@ function viewOrder(id){
     </div>
     <div style="margin-bottom:18px;">
       <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Update Status</div>
-      <select onchange="updateOrderStatus(${o.id},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
+      <select onchange="updateOrderStatus(${JSON.stringify(o.id)},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
         <option value="">— Choose status —</option>
         <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
         <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
@@ -2564,7 +2564,7 @@ function openPreview(productId){
   .trust span{background:#f3ede3;border:1px solid #e5e0d6;border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:600;}
   </style></head><body>
   <div class="banner">👁 ADMIN PREVIEW</div>
-  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
+  <div class="vid">${p.videoData?.url || p.videoData?.base64?`<video src="${p.videoData.url||p.videoData.base64}" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:${fitMode};"></video>`:`<div class="vid-fallback" style="background:#1a1210;"><div style="font-size:80px;opacity:.15;position:absolute;">${p.icon}</div><div class="play" style="position:relative;">▶</div></div>`}</div>
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>
