@@ -2609,6 +2609,9 @@ function refreshLivePreview(){
     iframe.src = `/store.html?preview=${Date.now()}`;
   }
 }
+// Alias used by inline oninput handlers in the product form
+function updateProductPreview(){ try{ refreshLivePreview(); }catch(e){} }
+window.updateProductPreview = updateProductPreview;
 
 function getAgentSplitSummary(agentId){
   const rows = computeAgentSalesSplits().filter(r=>String(r.agentId)===String(agentId));
