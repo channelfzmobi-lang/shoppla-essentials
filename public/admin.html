@@ -2613,6 +2613,20 @@ function refreshLivePreview(){
 function updateProductPreview(){ try{ refreshLivePreview(); }catch(e){} }
 window.updateProductPreview = updateProductPreview;
 
+// Global "Save Changes" — context-aware: saves the active panel
+async function globalSaveChanges(){
+  const activePanel = document.querySelector('.panel.active')?.id || '';
+  try{
+    if(activePanel==='add-product' || document.getElementById('fp-name')?.value){
+      await saveProduct(false); return;
+    }
+    showToast('⏳ Saving…');
+    const ok = await saveToStorage();
+    showToast(ok? '✅ All changes saved' : '❌ Save failed');
+  }catch(e){ console.error(e); showToast('❌ Save failed'); }
+}
+window.globalSaveChanges = globalSaveChanges;
+
 function getAgentSplitSummary(agentId){
   const rows = computeAgentSalesSplits().filter(r=>String(r.agentId)===String(agentId));
   return {orders:rows.reduce((a,r)=>a+r.orders,0), revenue:rows.reduce((a,r)=>a+r.revenue,0)};
