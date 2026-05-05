@@ -3001,9 +3001,11 @@ function showAgentOnCallBar(p) {
 }
 
 
+let _cloudChannel = null;
 function subscribeToCloudChanges(){
   if(!sb) return;
-  sb.channel('shoppla-storefront-live')
+  if(_cloudChannel){ try{ sb.removeChannel(_cloudChannel); }catch(e){} _cloudChannel=null; }
+  _cloudChannel = sb.channel('shoppla-storefront-live-'+Date.now())
     .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) openSalesPage(p.id);}})
     .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) showAgentOnCallBar(p);}})
     .on('postgres_changes',{event:'*',schema:'public',table:'reviews'},async()=>{if(currentProductId){await loadCloudReviews(currentProductId); renderCloudReviews(currentProductId);}})

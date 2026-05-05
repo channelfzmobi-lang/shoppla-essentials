@@ -332,7 +332,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
     </div>
     <div class="header-right">
       <button class="hdr-btn hdr-btn-outline" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ New Product</button>
-      <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Changes saved successfully!')">💾 Save Changes</button>
+      <button class="hdr-btn hdr-btn-primary" onclick="globalSaveChanges()">💾 Save Changes</button>
     </div>
   </div>
 
@@ -2609,6 +2609,23 @@ function refreshLivePreview(){
     iframe.src = `/store.html?preview=${Date.now()}`;
   }
 }
+// Alias used by inline oninput handlers in the product form
+function updateProductPreview(){ try{ refreshLivePreview(); }catch(e){} }
+window.updateProductPreview = updateProductPreview;
+
+// Global "Save Changes" — context-aware: saves the active panel
+async function globalSaveChanges(){
+  const activePanel = document.querySelector('.panel.active')?.id || '';
+  try{
+    if(activePanel==='add-product' || document.getElementById('fp-name')?.value){
+      await saveProduct(false); return;
+    }
+    showToast('⏳ Saving…');
+    const ok = await saveToStorage();
+    showToast(ok? '✅ All changes saved' : '❌ Save failed');
+  }catch(e){ console.error(e); showToast('❌ Save failed'); }
+}
+window.globalSaveChanges = globalSaveChanges;
 
 function getAgentSplitSummary(agentId){
   const rows = computeAgentSalesSplits().filter(r=>String(r.agentId)===String(agentId));
