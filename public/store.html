@@ -2011,7 +2011,7 @@ function renderGrid(gridId, data, actions=true) {
 
 // ═══ HOME GRID ═══
 function renderHome(cat) {
-  const featured = cat ? products.filter(p => p.category.toLowerCase().includes(cat.toLowerCase())) : products.filter(p => p.featured !== false);
+  const featured = cat ? products.filter(p => (p.category||'').toLowerCase().includes(cat.toLowerCase())) : products;
   renderGrid('home-grid', featured.length ? featured : products);
 }
 
@@ -2062,9 +2062,9 @@ function openSalesPage(id) {
   if (!p) return;
   currentProductId = id;
   qty = 1;
-  const priceStr = '$'+p.price.toLocaleString();
-  const wasStr   = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
-  const saveStr  = p.wasPrice ? 'Save $'+(p.wasPrice-p.price) : '';
+  const priceStr = formatMoney(p.price, p);
+  const wasStr   = p.wasPrice ? formatMoney(p.wasPrice, p) : '';
+  const saveStr  = p.wasPrice ? 'Save '+formatMoney(p.wasPrice-p.price, p) : '';
 
   document.getElementById('sp-title').textContent = p.name;
   document.getElementById('sp-brand').textContent = p.brand||'';
@@ -2081,8 +2081,8 @@ function openSalesPage(id) {
   document.getElementById('ck-prod-name').textContent = p.name;
   document.getElementById('ck-prod-price').textContent = priceStr;
   const tax = Math.round(p.price * 0.08);
-  document.getElementById('ck-tax').textContent  = '$'+tax;
-  document.getElementById('ck-total').textContent = '$'+(p.price+tax).toLocaleString();
+  document.getElementById('ck-tax').textContent  = formatMoney(tax, p);
+  document.getElementById('ck-total').textContent = formatMoney(p.price+tax, p);
 
   const spInfo = document.getElementById('sp-info');
   if (spInfo) spInfo.style.background = p.pageColor||'#fff';
