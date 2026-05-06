@@ -2603,8 +2603,8 @@ function openOrderForm() {
   document.getElementById('of-title').textContent = fc.heading || 'Order Now — Quick & Easy';
   document.getElementById('of-sub').textContent   = fc.subtext || 'Fill your details and we\'ll get it to you fast';
   document.getElementById('of-prod').textContent  = p.name;
-  document.getElementById('of-price').textContent = '$'+p.price.toLocaleString();
-  document.getElementById('of-total').textContent = '$'+p.price.toLocaleString();
+  document.getElementById('of-price').textContent = formatMoney(p.price, p);
+  document.getElementById('of-total').textContent = formatMoney(p.price, p);
   // Thumb
   const t = document.getElementById('of-thumb');
   if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
@@ -2649,7 +2649,7 @@ function openOrderForm() {
   const qEl = document.getElementById('of-qty');
   if (qEl) qEl.addEventListener('input', () => {
     const q = parseInt(qEl.value)||1;
-    document.getElementById('of-total').textContent = '$'+(p.price*q).toLocaleString();
+    document.getElementById('of-total').textContent = formatMoney(p.price*q, p);
   });
 
   // Buttons
@@ -2677,8 +2677,8 @@ function submitOrderForm(route) {
   const total  = p.price * qtyV;
   const oid    = Math.floor(1000+Math.random()*9000);
   activeOrderData = { id:oid, name, email, phone, address, city:g('city'), qty:qtyV,
-    color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:'$'+p.price.toLocaleString(),
-    total:'$'+total.toLocaleString(), route };
+    color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:formatMoney(p.price, p),
+    total:formatMoney(total, p), route };
   const orders = getOrders();
   orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:g('notes'), total, date:'Just now', status:'pending'});
   saveOrders(orders);
@@ -2687,7 +2687,7 @@ function submitOrderForm(route) {
   if (route==='pod') {
     const tc = p.tyConfig || {};
     showThankyou({ id:oid, name, email, product:p.name, qty:qtyV, color:g('color'), size:g('size'),
-      address, city:g('city'), phone, total:'$'+total.toLocaleString(),
+      address, city:g('city'), phone, total:formatMoney(total, p),
       heading: tc.heading||'Order Confirmed! 🎉',
       sub:     tc.sub    ||"We've received your order and will contact you to confirm delivery.",
       body:    tc.body   ||'Our team will call you within 2 hours to confirm your delivery slot.' });
@@ -2713,9 +2713,9 @@ function openPaymentScreen(p, total) {
   document.getElementById('pay-name').textContent    = GW_NAMES[gw]||'Secure Payment';
   document.getElementById('pay-sub').textContent     = `Pay securely via ${GW_NAMES[gw]||'our payment gateway'}`;
   document.getElementById('pay-badge').textContent   = GW_NAMES[gw]||'Gateway';
-  document.getElementById('pay-amount').textContent  = '$'+total.toLocaleString();
+  document.getElementById('pay-amount').textContent  = formatMoney(total, p);
   document.getElementById('pay-currency').textContent = gc.currency||'USD';
-  document.getElementById('pay-submit-btn').textContent = `🔒 Pay $${total.toLocaleString()} ${gc.currency||'USD'}`;
+  document.getElementById('pay-submit-btn').textContent = `🔒 Pay ${formatMoney(total, p)} ${gc.currency||getCurrency(p)}`;
   document.getElementById('pay-submit-btn').disabled = false;
   document.getElementById('pay-submit-btn').style.background = 'var(--accent)';
   openModal('payment-modal');
