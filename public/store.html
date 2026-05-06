@@ -2585,12 +2585,15 @@ function placeOrder() {
 function selPayment(el) { document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('active')); el.classList.add('active'); }
 
 // ═══ ORDER FORM ═══
-function renderExternalFormEmbed(code) {
+function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
   const directUrl = /^https?:\/\//i.test(raw) ? raw : '';
-  const src = iframeSrc || directUrl;
+  let src = iframeSrc || directUrl;
+  if (src && product) {
+    try { const u = new URL(src); u.searchParams.set('product', product.name||''); u.searchParams.set('product_id', product._cloud_id||product.id||''); u.searchParams.set('amount', product.price||0); u.searchParams.set('currency', getCurrency(product)); src = u.toString(); } catch(_) {}
+  }
   if (src) return `<iframe src="${src}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
   const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
   return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"></iframe>`;
@@ -2610,7 +2613,7 @@ function openOrderForm() {
   if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
   else t.textContent = p.icon||'📦';
   if (fc.externalFormEnabled && fc.externalFormCode) {
-    document.getElementById('of-fields').innerHTML = renderExternalFormEmbed(fc.externalFormCode);
+    document.getElementById('of-fields').innerHTML = renderExternalFormEmbed(fc.externalFormCode, p);
     document.getElementById('of-total').closest('.of-total-bar').style.display = 'none';
     document.getElementById('of-buttons').innerHTML = '';
     openModal('order-form-modal');
