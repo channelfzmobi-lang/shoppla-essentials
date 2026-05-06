@@ -697,6 +697,15 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
           <div class="sc-body">
             <div class="form-grid-2">
               <div class="form-group">
+                <label class="form-lbl">Currency</label>
+                <select class="form-select" id="fp-currency">
+                  <option value="NGN">Naira (₦)</option>
+                  <option value="GHS">Ghana Cedis (₵)</option>
+                  <option value="USD">US Dollar ($)</option>
+                </select>
+                <div class="form-hint">This symbol reflects on product cards, sales pages, bundles and order forms.</div>
+              </div>
+              <div class="form-group">
                 <label class="form-lbl">Price <span>*</span></label>
                 <input class="form-input" id="fp-price" type="number" placeholder="0.00" oninput="updateProductPreview()"/>
               </div>
