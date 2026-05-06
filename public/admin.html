@@ -1226,10 +1226,16 @@ function renderProductsTable(filter=''){
 }
 function filterProducts(v){ renderProductsTable(v); }
 
+function navToPanel(panelId){
+  const item = Array.from(document.querySelectorAll('.sb-item')).find(el => (el.getAttribute('onclick')||'').includes("'"+panelId+"'") || (el.getAttribute('onclick')||'').includes('"'+panelId+'"'));
+  nav(item || null, panelId);
+}
+window.navToPanel = navToPanel;
+
 // ─── EDIT PRODUCT ───
 function editProduct(id){
-  const p = products.find(x=>x.id===id);
-  if(!p) return;
+  const p = products.find(x=>String(x.id)===String(id) || String(x._cloud_id||'')===String(id));
+  if(!p){ showToast('⚠️ Product not found. Refreshing list…'); renderProductsTable(); return; }
   editingProductId = id;
 
   // Basic fields
@@ -1254,6 +1260,8 @@ function editProduct(id){
   syncMediaHeight('desktop', p.mediaHeightDesktop||640);
   syncMediaHeight('mobile', p.mediaHeightMobile||320);
   if(document.getElementById('fp-category')) document.getElementById('fp-category').value = p.category||'';
+  const activeToggle = document.getElementById('toggle-active'); if(activeToggle) activeToggle.classList.toggle('on', p.status !== 'draft');
+  const featuredToggle = document.getElementById('toggle-featured'); if(featuredToggle) featuredToggle.classList.toggle('on', p.featured !== false);
   setProductPageColor(p.pageColor||'#ffffff');
 
   // Media fit
@@ -1343,9 +1351,11 @@ function editProduct(id){
   currentBundles = p.bundles ? [...p.bundles] : [];
   renderBundles();
 
-  nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
+  navToPanel('add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
+window.editProduct = editProduct;
+window.promptDelete = promptDelete;
 
 async function saveProduct(draft=false){
   const name      = document.getElementById('fp-name')?.value.trim()||'';
