@@ -331,7 +331,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       <div class="header-sub" id="header-sub">Welcome back! Here's what's happening in your store.</div>
     </div>
     <div class="header-right">
-      <button class="hdr-btn hdr-btn-outline" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ New Product</button>
+      <button class="hdr-btn hdr-btn-outline" onclick="navToPanel('add-product')">➕ New Product</button>
       <button class="hdr-btn hdr-btn-primary" onclick="globalSaveChanges()">💾 Save Changes</button>
     </div>
   </div>
@@ -369,7 +369,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       </div>
 
       <div class="quick-actions">
-        <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">
+        <div class="qa-card" onclick="navToPanel('add-product')">
           <div class="qa-icon">➕</div>
           <div class="qa-title">Add Product</div>
           <div class="qa-sub">List a new item</div>
@@ -426,7 +426,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
           <div><div class="sc-title">All Products</div><div class="sc-sub" id="prod-table-sub">8 products in your store</div></div>
           <div class="sc-actions">
             <input type="text" class="form-input" style="width:220px;padding:8px 14px;font-size:13.5px;" placeholder="🔍 Search products…" oninput="filterProducts(this.value)"/>
-            <button class="hdr-btn hdr-btn-primary" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ Add Product</button>
+            <button class="hdr-btn hdr-btn-primary" onclick="navToPanel('add-product')">➕ Add Product</button>
           </div>
         </div>
         <div style="padding:0;overflow-x:auto;">
