@@ -1178,6 +1178,12 @@ let currentVideoData = null;   // {base64, name, size, type} or {url, name, size
 let currentVideoURL  = '';
 let currentImages    = [];     // [{base64, name}] or [{url, name}]
 
+const CURRENCIES={NGN:{symbol:'₦',code:'NGN'},GHS:{symbol:'₵',code:'GHS'},USD:{symbol:'$',code:'USD'}};
+function formatAdminMoney(amount, currency='USD'){
+  const cfg=CURRENCIES[currency]||CURRENCIES.USD;
+  return cfg.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2});
+}
+
 // ─── SUPABASE STORAGE UPLOAD HELPER ───
 async function uploadToStorage(file, folder='images') {
   if (!sb) return null;
@@ -1214,7 +1220,7 @@ function renderProductsTable(filter=''){
     <tr>
       <td><div class="prod-cell"><div class="prod-thumb">${p.icon}</div><div><div class="prod-name-cell">${p.name}</div><div class="prod-cat">${p.brand}</div></div></div></td>
       <td><span class="badge badge-gray">${p.category}</span></td>
-      <td><b>$${p.price}</b>${p.wasPrice?`<span style="color:var(--muted);font-size:12px;text-decoration:line-through;margin-left:6px;">$${p.wasPrice}</span>`:''}</td>
+      <td><b>${formatAdminMoney(p.price,p.gatewayConfig?.currency)}</b>${p.wasPrice?`<span style="color:var(--muted);font-size:12px;text-decoration:line-through;margin-left:6px;">${formatAdminMoney(p.wasPrice,p.gatewayConfig?.currency)}</span>`:''}</td>
       <td><span class="badge ${p.stock<=3?'badge-red':p.stock<=10?'badge-orange':'badge-green'}">${p.stock} left</span></td>
       <td><span class="badge ${p.status==='active'?'badge-green':'badge-gray'}">${p.status==='active'?'Active':'Draft'}</span></td>
       <td><div class="table-actions">
