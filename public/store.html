@@ -2161,7 +2161,7 @@ function applyTemplate(p) {
       </div>
       <div class="sp-guarantee-strip">
         <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">Durability guaranteed</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over $${Math.round(p.price*1.5)}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over ${formatMoney(Math.round(p.price*1.5), p)}</div></div>
         <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">Risk-free</div></div>
       </div>
     </div>`;
@@ -2329,8 +2329,8 @@ function buildBundleCards(p) {
         </div>
       </div>
       <div style="text-align:right;">
-        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">$${b.price.toFixed(2)}</div>
-        ${b.qty > 1 ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">${formatMoney(b.price, p)}</div>
+        ${b.qty > 1 ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">${formatMoney(p.price * b.qty, p)}</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -2352,7 +2352,7 @@ function selectBundle(idx) {
   });
   const p = products.find(x => x.id === currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
+    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
   }
 }
 
