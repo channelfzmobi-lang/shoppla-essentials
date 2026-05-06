@@ -1382,19 +1382,23 @@ async function saveProduct(draft=false){
   const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
   const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
   const bundles = [...currentBundles].filter(b=>b.label&&b.price);
+  const isActive = document.getElementById('toggle-active')?.classList.contains('on') !== false;
+  const isFeatured = document.getElementById('toggle-featured')?.classList.contains('on') !== false;
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
   // Collect checkout / form / gateway settings
-  const cm = checkoutMethod||'standard';
+  const externalCode = document.getElementById('fp-external-form-code')?.value||'';
+  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked || !!externalCode.trim();
+  const cm = externalEnabled ? 'form' : (checkoutMethod||'standard');
   const pr = paymentRoute||'pod';
   const formConfig = {
     btnLabel:    document.getElementById('fp-form-btn-label')?.value||'Place My Order →',
     heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
     subtext:     document.getElementById('fp-form-subtext')?.value||'',
     customField: document.getElementById('fp-custom-field')?.value||'',
-    externalFormEnabled: !!document.getElementById('fp-external-form-enabled')?.checked,
-    externalFormCode: document.getElementById('fp-external-form-code')?.value||'',
+    externalFormEnabled: externalEnabled,
+    externalFormCode: externalCode,
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
   };
@@ -1421,7 +1425,7 @@ async function saveProduct(draft=false){
 
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
-    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
+    pageColor:productPageColor, status:(draft||!isActive)?'draft':'active', featured:isFeatured, mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
     videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
@@ -1429,11 +1433,11 @@ async function saveProduct(draft=false){
   };
 
   if(editingProductId){
-    const p = products.find(x=>x.id===editingProductId);
+    const p = products.find(x=>String(x.id)===String(editingProductId) || String(x._cloud_id||'')===String(editingProductId));
     if(p) Object.assign(p, payload);
     showToast('✅ Product updated!');
   } else {
-    products.push({id:Date.now(), featured:false, icon:icons[cat]||'📦', ...payload});
+    products.push({id:Date.now(), icon:icons[cat]||'📦', ...payload});
     showToast(draft?'📝 Saved as draft!':'✅ Product published!');
   }
   updateCounts();
