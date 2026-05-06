@@ -2233,8 +2233,8 @@ function applyTemplate(p) {
           ${bonus ? `<div class="sp-vc-bonus">${bonus}</div>` : ''}
           ${imgSrc ? `<img class="sp-vc-img" src="${imgSrc}" alt="${b.label}"/>` : '<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;">${p.icon||"📦"}</div>'}
           <div class="sp-vc-name">${b.label || 'Option '+(i+1)}</div>
-          ${b.qty > 1 ? `<div class="sp-vc-was">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
-          <div class="sp-vc-price">$${b.price.toFixed(2)}</div>
+          ${b.qty > 1 ? `<div class="sp-vc-was">${formatMoney(p.price * b.qty, p)}</div>` : ''}
+          <div class="sp-vc-price">${formatMoney(b.price, p)}</div>
         </div>`;
       }).join('')}</div>`;
     }
@@ -2294,10 +2294,10 @@ function selectVariantCard(idx) {
   });
   const p = products.find(x => x.id === currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
+    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
     const wasEl = document.getElementById('sp-was');
     if (wasEl && p.bundles[idx].qty > 1) {
-      wasEl.textContent = '$' + (p.price * p.bundles[idx].qty).toFixed(2);
+      wasEl.textContent = formatMoney(p.price * p.bundles[idx].qty, p);
     }
   }
 }
