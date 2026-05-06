@@ -331,7 +331,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       <div class="header-sub" id="header-sub">Welcome back! Here's what's happening in your store.</div>
     </div>
     <div class="header-right">
-      <button class="hdr-btn hdr-btn-outline" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ New Product</button>
+      <button class="hdr-btn hdr-btn-outline" onclick="navToPanel('add-product')">➕ New Product</button>
       <button class="hdr-btn hdr-btn-primary" onclick="globalSaveChanges()">💾 Save Changes</button>
     </div>
   </div>
@@ -369,7 +369,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
       </div>
 
       <div class="quick-actions">
-        <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">
+        <div class="qa-card" onclick="navToPanel('add-product')">
           <div class="qa-icon">➕</div>
           <div class="qa-title">Add Product</div>
           <div class="qa-sub">List a new item</div>
@@ -426,7 +426,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
           <div><div class="sc-title">All Products</div><div class="sc-sub" id="prod-table-sub">8 products in your store</div></div>
           <div class="sc-actions">
             <input type="text" class="form-input" style="width:220px;padding:8px 14px;font-size:13.5px;" placeholder="🔍 Search products…" oninput="filterProducts(this.value)"/>
-            <button class="hdr-btn hdr-btn-primary" onclick="nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product')">➕ Add Product</button>
+            <button class="hdr-btn hdr-btn-primary" onclick="navToPanel('add-product')">➕ Add Product</button>
           </div>
         </div>
         <div style="padding:0;overflow-x:auto;">
@@ -696,6 +696,15 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
           <div class="sc-head"><div class="sc-title">Pricing & Inventory</div></div>
           <div class="sc-body">
             <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-lbl">Currency</label>
+                <select class="form-select" id="fp-currency">
+                  <option value="NGN">Naira (₦)</option>
+                  <option value="GHS">Ghana Cedis (₵)</option>
+                  <option value="USD">US Dollar ($)</option>
+                </select>
+                <div class="form-hint">This symbol reflects on product cards, sales pages, bundles and order forms.</div>
+              </div>
               <div class="form-group">
                 <label class="form-lbl">Price <span>*</span></label>
                 <input class="form-input" id="fp-price" type="number" placeholder="0.00" oninput="updateProductPreview()"/>
@@ -1169,6 +1178,12 @@ let currentVideoData = null;   // {base64, name, size, type} or {url, name, size
 let currentVideoURL  = '';
 let currentImages    = [];     // [{base64, name}] or [{url, name}]
 
+const CURRENCIES={NGN:{symbol:'₦',code:'NGN'},GHS:{symbol:'₵',code:'GHS'},USD:{symbol:'$',code:'USD'}};
+function formatAdminMoney(amount, currency='USD'){
+  const cfg=CURRENCIES[currency]||CURRENCIES.USD;
+  return cfg.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2});
+}
+
 // ─── SUPABASE STORAGE UPLOAD HELPER ───
 async function uploadToStorage(file, folder='images') {
   if (!sb) return null;
@@ -1205,7 +1220,7 @@ function renderProductsTable(filter=''){
     <tr>
       <td><div class="prod-cell"><div class="prod-thumb">${p.icon}</div><div><div class="prod-name-cell">${p.name}</div><div class="prod-cat">${p.brand}</div></div></div></td>
       <td><span class="badge badge-gray">${p.category}</span></td>
-      <td><b>$${p.price}</b>${p.wasPrice?`<span style="color:var(--muted);font-size:12px;text-decoration:line-through;margin-left:6px;">$${p.wasPrice}</span>`:''}</td>
+      <td><b>${formatAdminMoney(p.price,p.gatewayConfig?.currency)}</b>${p.wasPrice?`<span style="color:var(--muted);font-size:12px;text-decoration:line-through;margin-left:6px;">${formatAdminMoney(p.wasPrice,p.gatewayConfig?.currency)}</span>`:''}</td>
       <td><span class="badge ${p.stock<=3?'badge-red':p.stock<=10?'badge-orange':'badge-green'}">${p.stock} left</span></td>
       <td><span class="badge ${p.status==='active'?'badge-green':'badge-gray'}">${p.status==='active'?'Active':'Draft'}</span></td>
       <td><div class="table-actions">
@@ -1217,10 +1232,16 @@ function renderProductsTable(filter=''){
 }
 function filterProducts(v){ renderProductsTable(v); }
 
+function navToPanel(panelId){
+  const item = Array.from(document.querySelectorAll('.sb-item')).find(el => (el.getAttribute('onclick')||'').includes("'"+panelId+"'") || (el.getAttribute('onclick')||'').includes('"'+panelId+'"'));
+  nav(item || null, panelId);
+}
+window.navToPanel = navToPanel;
+
 // ─── EDIT PRODUCT ───
 function editProduct(id){
-  const p = products.find(x=>x.id===id);
-  if(!p) return;
+  const p = products.find(x=>String(x.id)===String(id) || String(x._cloud_id||'')===String(id));
+  if(!p){ showToast('⚠️ Product not found. Refreshing list…'); renderProductsTable(); return; }
   editingProductId = id;
 
   // Basic fields
@@ -1245,6 +1266,8 @@ function editProduct(id){
   syncMediaHeight('desktop', p.mediaHeightDesktop||640);
   syncMediaHeight('mobile', p.mediaHeightMobile||320);
   if(document.getElementById('fp-category')) document.getElementById('fp-category').value = p.category||'';
+  const activeToggle = document.getElementById('toggle-active'); if(activeToggle) activeToggle.classList.toggle('on', p.status !== 'draft');
+  const featuredToggle = document.getElementById('toggle-featured'); if(featuredToggle) featuredToggle.classList.toggle('on', p.featured !== false);
   setProductPageColor(p.pageColor||'#ffffff');
 
   // Media fit
@@ -1334,9 +1357,11 @@ function editProduct(id){
   currentBundles = p.bundles ? [...p.bundles] : [];
   renderBundles();
 
-  nav(document.querySelector('.sb-item[onclick*=add-product]'),'add-product');
+  navToPanel('add-product');
   showToast(`✏️ Editing: ${p.name}`);
 }
+window.editProduct = editProduct;
+window.promptDelete = promptDelete;
 
 async function saveProduct(draft=false){
   const name      = document.getElementById('fp-name')?.value.trim()||'';
@@ -1363,19 +1388,23 @@ async function saveProduct(draft=false){
   const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
   const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
   const bundles = [...currentBundles].filter(b=>b.label&&b.price);
+  const isActive = document.getElementById('toggle-active')?.classList.contains('on') !== false;
+  const isFeatured = document.getElementById('toggle-featured')?.classList.contains('on') !== false;
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
   // Collect checkout / form / gateway settings
-  const cm = checkoutMethod||'standard';
+  const externalCode = document.getElementById('fp-external-form-code')?.value||'';
+  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked || !!externalCode.trim();
+  const cm = externalEnabled ? 'form' : (checkoutMethod||'standard');
   const pr = paymentRoute||'pod';
   const formConfig = {
     btnLabel:    document.getElementById('fp-form-btn-label')?.value||'Place My Order →',
     heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
     subtext:     document.getElementById('fp-form-subtext')?.value||'',
     customField: document.getElementById('fp-custom-field')?.value||'',
-    externalFormEnabled: !!document.getElementById('fp-external-form-enabled')?.checked,
-    externalFormCode: document.getElementById('fp-external-form-code')?.value||'',
+    externalFormEnabled: externalEnabled,
+    externalFormCode: externalCode,
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
   };
@@ -1402,7 +1431,7 @@ async function saveProduct(draft=false){
 
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
-    pageColor:productPageColor, status:draft?'draft':'active', mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
+    pageColor:productPageColor, status:(draft||!isActive)?'draft':'active', featured:isFeatured, mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
     videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections],
@@ -1410,11 +1439,11 @@ async function saveProduct(draft=false){
   };
 
   if(editingProductId){
-    const p = products.find(x=>x.id===editingProductId);
+    const p = products.find(x=>String(x.id)===String(editingProductId) || String(x._cloud_id||'')===String(editingProductId));
     if(p) Object.assign(p, payload);
     showToast('✅ Product updated!');
   } else {
-    products.push({id:Date.now(), featured:false, icon:icons[cat]||'📦', ...payload});
+    products.push({id:Date.now(), icon:icons[cat]||'📦', ...payload});
     showToast(draft?'📝 Saved as draft!':'✅ Product published!');
   }
   updateCounts();
@@ -1448,6 +1477,9 @@ function clearProductForm(){
   contentSections = [];
   renderContentSections();
   editingProductId = null;
+  const curEl=document.getElementById('fp-currency'); if(curEl) curEl.value='NGN';
+  const activeToggle=document.getElementById('toggle-active'); if(activeToggle) activeToggle.classList.add('on');
+  const featuredToggle=document.getElementById('toggle-featured'); if(featuredToggle) featuredToggle.classList.add('on');
   // Reset template
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
@@ -2725,7 +2757,7 @@ async function saveAdminReview() {
   const name = document.getElementById('rev-admin-name').value.trim();
   const text = document.getElementById('rev-admin-text').value.trim();
   const verified = document.getElementById('rev-admin-verified').checked;
-  if (!name || !text) { showToast('⚠️ Please enter name and review text'); return; }
+  if (!name || (!text && !reviewAttachmentFiles.length)) { showToast('⚠️ Add reviewer name and either text, image, or video'); return; }
 
   const attachments = [];
   for (const file of reviewAttachmentFiles) {

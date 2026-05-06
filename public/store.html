@@ -1826,6 +1826,10 @@ let stars = 5;
 let activeOrderData = {};
 let toastTimer = null;
 
+const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
+function getCurrency(p){ return (p?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
+function formatMoney(amount, p){ const c=CURRENCIES[getCurrency(p)]||CURRENCIES.NGN; return c.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+
 // ═══ STORAGE ═══
 async function loadData() {
   // Try cloud first
@@ -1901,7 +1905,7 @@ function addToCart(id) {
   const c = getCart();
   const ex = c.find(x => x.id === id);
   if (ex) ex.qty = (ex.qty||1) + 1;
-  else c.push({id, name:p.name, price:p.price, icon:p.icon||'📦', qty:1});
+  else c.push({id, name:p.name, price:p.price, currency:getCurrency(p), icon:p.icon||'📦', qty:1});
   saveCart(c);
   refreshBadge();
 }
@@ -1947,7 +1951,7 @@ function closeModal(id) {
 function makeCardHTML(p, showActions) {
   const pid = typeof p.id === 'string' ? `'${p.id}'` : p.id;
   const disc = p.wasPrice ? '-'+Math.round((1-p.price/p.wasPrice)*100)+'%' : '';
-  const wasStr = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
+  const wasStr = p.wasPrice ? formatMoney(p.wasPrice, p) : '';
   let mediaHTML;
   // Determine image src - handle both {base64:...} objects and plain URL strings
   const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
@@ -1960,9 +1964,9 @@ function makeCardHTML(p, showActions) {
     }
   } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vidSrc = p.videoData.url || p.videoData.base64;
-    mediaHTML = `<video src="${vidSrc}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop preload="metadata"
-      onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"></video>
-      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Hover to play</div>`;
+    const poster = p.images && p.images.length ? getImgSrc(p.images[0]) : '';
+    mediaHTML = `<video src="${vidSrc}" ${poster?`poster="${poster}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})" onclick="event.stopPropagation();this.muted=true;this.play().catch(()=>{})"></video>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Video preview</div>`;
   } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
     mediaHTML = `<img src="${getImgSrc(p.images[0])}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
   } else {
@@ -1989,7 +1993,7 @@ function makeCardHTML(p, showActions) {
       <div class="prod-name">${p.name}</div>
       <div class="prod-stars">★★★★★ <span style="color:var(--muted);font-size:11.5px;">4.9 (312)</span></div>
       <div class="prod-price">
-        <span class="price-now">$${p.price.toLocaleString()}</span>
+        <span class="price-now">${formatMoney(p.price, p)}</span>
         ${wasStr?`<span class="price-was">${wasStr}</span>`:''}
       </div>
       ${actions}
@@ -2007,7 +2011,7 @@ function renderGrid(gridId, data, actions=true) {
 
 // ═══ HOME GRID ═══
 function renderHome(cat) {
-  const featured = cat ? products.filter(p => p.category.toLowerCase().includes(cat.toLowerCase())) : products.filter(p => p.featured !== false);
+  const featured = cat ? products.filter(p => (p.category||'').toLowerCase().includes(cat.toLowerCase())) : products;
   renderGrid('home-grid', featured.length ? featured : products);
 }
 
@@ -2058,9 +2062,9 @@ function openSalesPage(id) {
   if (!p) return;
   currentProductId = id;
   qty = 1;
-  const priceStr = '$'+p.price.toLocaleString();
-  const wasStr   = p.wasPrice ? '$'+p.wasPrice.toLocaleString() : '';
-  const saveStr  = p.wasPrice ? 'Save $'+(p.wasPrice-p.price) : '';
+  const priceStr = formatMoney(p.price, p);
+  const wasStr   = p.wasPrice ? formatMoney(p.wasPrice, p) : '';
+  const saveStr  = p.wasPrice ? 'Save '+formatMoney(p.wasPrice-p.price, p) : '';
 
   document.getElementById('sp-title').textContent = p.name;
   document.getElementById('sp-brand').textContent = p.brand||'';
@@ -2077,8 +2081,8 @@ function openSalesPage(id) {
   document.getElementById('ck-prod-name').textContent = p.name;
   document.getElementById('ck-prod-price').textContent = priceStr;
   const tax = Math.round(p.price * 0.08);
-  document.getElementById('ck-tax').textContent  = '$'+tax;
-  document.getElementById('ck-total').textContent = '$'+(p.price+tax).toLocaleString();
+  document.getElementById('ck-tax').textContent  = formatMoney(tax, p);
+  document.getElementById('ck-total').textContent = formatMoney(p.price+tax, p);
 
   const spInfo = document.getElementById('sp-info');
   if (spInfo) spInfo.style.background = p.pageColor||'#fff';
@@ -2157,7 +2161,7 @@ function applyTemplate(p) {
       </div>
       <div class="sp-guarantee-strip">
         <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">Durability guaranteed</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over $${Math.round(p.price*1.5)}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over ${formatMoney(Math.round(p.price*1.5), p)}</div></div>
         <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">Risk-free</div></div>
       </div>
     </div>`;
@@ -2229,8 +2233,8 @@ function applyTemplate(p) {
           ${bonus ? `<div class="sp-vc-bonus">${bonus}</div>` : ''}
           ${imgSrc ? `<img class="sp-vc-img" src="${imgSrc}" alt="${b.label}"/>` : '<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;">${p.icon||"📦"}</div>'}
           <div class="sp-vc-name">${b.label || 'Option '+(i+1)}</div>
-          ${b.qty > 1 ? `<div class="sp-vc-was">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
-          <div class="sp-vc-price">$${b.price.toFixed(2)}</div>
+          ${b.qty > 1 ? `<div class="sp-vc-was">${formatMoney(p.price * b.qty, p)}</div>` : ''}
+          <div class="sp-vc-price">${formatMoney(b.price, p)}</div>
         </div>`;
       }).join('')}</div>`;
     }
@@ -2290,10 +2294,10 @@ function selectVariantCard(idx) {
   });
   const p = products.find(x => x.id === currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
+    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
     const wasEl = document.getElementById('sp-was');
     if (wasEl && p.bundles[idx].qty > 1) {
-      wasEl.textContent = '$' + (p.price * p.bundles[idx].qty).toFixed(2);
+      wasEl.textContent = formatMoney(p.price * p.bundles[idx].qty, p);
     }
   }
 }
@@ -2325,8 +2329,8 @@ function buildBundleCards(p) {
         </div>
       </div>
       <div style="text-align:right;">
-        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">$${b.price.toFixed(2)}</div>
-        ${b.qty > 1 ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">$${(p.price * b.qty).toFixed(2)}</div>` : ''}
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:900;${isDark?'color:#fff;':''}">${formatMoney(b.price, p)}</div>
+        ${b.qty > 1 ? `<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">${formatMoney(p.price * b.qty, p)}</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -2348,7 +2352,7 @@ function selectBundle(idx) {
   });
   const p = products.find(x => x.id === currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = '$' + p.bundles[idx].price.toFixed(2);
+    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
   }
 }
 
@@ -2581,12 +2585,15 @@ function placeOrder() {
 function selPayment(el) { document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('active')); el.classList.add('active'); }
 
 // ═══ ORDER FORM ═══
-function renderExternalFormEmbed(code) {
+function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
   const directUrl = /^https?:\/\//i.test(raw) ? raw : '';
-  const src = iframeSrc || directUrl;
+  let src = iframeSrc || directUrl;
+  if (src && product) {
+    try { const u = new URL(src); u.searchParams.set('product', product.name||''); u.searchParams.set('product_id', product._cloud_id||product.id||''); u.searchParams.set('amount', product.price||0); u.searchParams.set('currency', getCurrency(product)); src = u.toString(); } catch(_) {}
+  }
   if (src) return `<iframe src="${src}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
   const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
   return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"></iframe>`;
@@ -2599,14 +2606,14 @@ function openOrderForm() {
   document.getElementById('of-title').textContent = fc.heading || 'Order Now — Quick & Easy';
   document.getElementById('of-sub').textContent   = fc.subtext || 'Fill your details and we\'ll get it to you fast';
   document.getElementById('of-prod').textContent  = p.name;
-  document.getElementById('of-price').textContent = '$'+p.price.toLocaleString();
-  document.getElementById('of-total').textContent = '$'+p.price.toLocaleString();
+  document.getElementById('of-price').textContent = formatMoney(p.price, p);
+  document.getElementById('of-total').textContent = formatMoney(p.price, p);
   // Thumb
   const t = document.getElementById('of-thumb');
   if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
   else t.textContent = p.icon||'📦';
   if (fc.externalFormEnabled && fc.externalFormCode) {
-    document.getElementById('of-fields').innerHTML = renderExternalFormEmbed(fc.externalFormCode);
+    document.getElementById('of-fields').innerHTML = renderExternalFormEmbed(fc.externalFormCode, p);
     document.getElementById('of-total').closest('.of-total-bar').style.display = 'none';
     document.getElementById('of-buttons').innerHTML = '';
     openModal('order-form-modal');
@@ -2645,7 +2652,7 @@ function openOrderForm() {
   const qEl = document.getElementById('of-qty');
   if (qEl) qEl.addEventListener('input', () => {
     const q = parseInt(qEl.value)||1;
-    document.getElementById('of-total').textContent = '$'+(p.price*q).toLocaleString();
+    document.getElementById('of-total').textContent = formatMoney(p.price*q, p);
   });
 
   // Buttons
@@ -2673,8 +2680,8 @@ function submitOrderForm(route) {
   const total  = p.price * qtyV;
   const oid    = Math.floor(1000+Math.random()*9000);
   activeOrderData = { id:oid, name, email, phone, address, city:g('city'), qty:qtyV,
-    color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:'$'+p.price.toLocaleString(),
-    total:'$'+total.toLocaleString(), route };
+    color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:formatMoney(p.price, p),
+    total:formatMoney(total, p), route };
   const orders = getOrders();
   orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:g('notes'), total, date:'Just now', status:'pending'});
   saveOrders(orders);
@@ -2683,7 +2690,7 @@ function submitOrderForm(route) {
   if (route==='pod') {
     const tc = p.tyConfig || {};
     showThankyou({ id:oid, name, email, product:p.name, qty:qtyV, color:g('color'), size:g('size'),
-      address, city:g('city'), phone, total:'$'+total.toLocaleString(),
+      address, city:g('city'), phone, total:formatMoney(total, p),
       heading: tc.heading||'Order Confirmed! 🎉',
       sub:     tc.sub    ||"We've received your order and will contact you to confirm delivery.",
       body:    tc.body   ||'Our team will call you within 2 hours to confirm your delivery slot.' });
@@ -2709,9 +2716,9 @@ function openPaymentScreen(p, total) {
   document.getElementById('pay-name').textContent    = GW_NAMES[gw]||'Secure Payment';
   document.getElementById('pay-sub').textContent     = `Pay securely via ${GW_NAMES[gw]||'our payment gateway'}`;
   document.getElementById('pay-badge').textContent   = GW_NAMES[gw]||'Gateway';
-  document.getElementById('pay-amount').textContent  = '$'+total.toLocaleString();
+  document.getElementById('pay-amount').textContent  = formatMoney(total, p);
   document.getElementById('pay-currency').textContent = gc.currency||'USD';
-  document.getElementById('pay-submit-btn').textContent = `🔒 Pay $${total.toLocaleString()} ${gc.currency||'USD'}`;
+  document.getElementById('pay-submit-btn').textContent = `🔒 Pay ${formatMoney(total, p)} ${gc.currency||getCurrency(p)}`;
   document.getElementById('pay-submit-btn').disabled = false;
   document.getElementById('pay-submit-btn').style.background = 'var(--accent)';
   openModal('payment-modal');
@@ -2952,11 +2959,12 @@ function renderCloudReviews(productId) {
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
     const date = new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const attachHTML = (r.attachments && r.attachments.length) ?
-      `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${r.attachments.map(a =>
-        a.type?.startsWith('image/') ?
-          `<img src="${a.base64}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
-          `<div style="width:56px;height:56px;border-radius:8px;background:#f5f4f0;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;">🎬</div>`
-      ).join('')}</div>` : '';
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">${r.attachments.map(a => {
+        const src = a.url || a.base64 || '';
+        return a.type?.startsWith('image/') ?
+          `<img src="${src}" style="width:100%;max-height:280px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
+          `<video src="${src}" controls playsinline preload="metadata" style="width:100%;max-height:280px;border-radius:10px;background:#111;border:1px solid var(--border);"></video>`;
+      }).join('')}</div>` : '';
     return `<div class="rev-card">
       <div class="rev-top">
         <div class="rev-av" style="background:linear-gradient(135deg,var(--accent),var(--accent2));">${(r.reviewer_name||'?')[0].toUpperCase()}</div>
@@ -2966,7 +2974,7 @@ function renderCloudReviews(productId) {
         </div>
       </div>
       <div class="rev-stars">${stars}</div>
-      <div class="rev-txt">${r.review_text}</div>
+       ${r.review_text ? `<div class="rev-txt">${r.review_text}</div>` : ''}
       ${attachHTML}
     </div>`;
   }).join('');
