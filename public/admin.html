@@ -1477,6 +1477,9 @@ function clearProductForm(){
   contentSections = [];
   renderContentSections();
   editingProductId = null;
+  const curEl=document.getElementById('fp-currency'); if(curEl) curEl.value='NGN';
+  const activeToggle=document.getElementById('toggle-active'); if(activeToggle) activeToggle.classList.add('on');
+  const featuredToggle=document.getElementById('toggle-featured'); if(featuredToggle) featuredToggle.classList.add('on');
   // Reset template
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
@@ -2754,7 +2757,7 @@ async function saveAdminReview() {
   const name = document.getElementById('rev-admin-name').value.trim();
   const text = document.getElementById('rev-admin-text').value.trim();
   const verified = document.getElementById('rev-admin-verified').checked;
-  if (!name || !text) { showToast('⚠️ Please enter name and review text'); return; }
+  if (!name || (!text && !reviewAttachmentFiles.length)) { showToast('⚠️ Add reviewer name and either text, image, or video'); return; }
 
   const attachments = [];
   for (const file of reviewAttachmentFiles) {
