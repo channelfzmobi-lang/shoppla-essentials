@@ -1826,6 +1826,10 @@ let stars = 5;
 let activeOrderData = {};
 let toastTimer = null;
 
+const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
+function getCurrency(p){ return (p?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
+function formatMoney(amount, p){ const c=CURRENCIES[getCurrency(p)]||CURRENCIES.NGN; return c.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+
 // ═══ STORAGE ═══
 async function loadData() {
   // Try cloud first
@@ -1901,7 +1905,7 @@ function addToCart(id) {
   const c = getCart();
   const ex = c.find(x => x.id === id);
   if (ex) ex.qty = (ex.qty||1) + 1;
-  else c.push({id, name:p.name, price:p.price, icon:p.icon||'📦', qty:1});
+  else c.push({id, name:p.name, price:p.price, currency:getCurrency(p), icon:p.icon||'📦', qty:1});
   saveCart(c);
   refreshBadge();
 }
