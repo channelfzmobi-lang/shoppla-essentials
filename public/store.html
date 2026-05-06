@@ -2959,11 +2959,12 @@ function renderCloudReviews(productId) {
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
     const date = new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const attachHTML = (r.attachments && r.attachments.length) ?
-      `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${r.attachments.map(a =>
-        a.type?.startsWith('image/') ?
-          `<img src="${a.base64}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
-          `<div style="width:56px;height:56px;border-radius:8px;background:#f5f4f0;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;">🎬</div>`
-      ).join('')}</div>` : '';
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">${r.attachments.map(a => {
+        const src = a.url || a.base64 || '';
+        return a.type?.startsWith('image/') ?
+          `<img src="${src}" style="width:100%;max-height:280px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
+          `<video src="${src}" controls playsinline preload="metadata" style="width:100%;max-height:280px;border-radius:10px;background:#111;border:1px solid var(--border);"></video>`;
+      }).join('')}</div>` : '';
     return `<div class="rev-card">
       <div class="rev-top">
         <div class="rev-av" style="background:linear-gradient(135deg,var(--accent),var(--accent2));">${(r.reviewer_name||'?')[0].toUpperCase()}</div>
@@ -2973,7 +2974,7 @@ function renderCloudReviews(productId) {
         </div>
       </div>
       <div class="rev-stars">${stars}</div>
-      <div class="rev-txt">${r.review_text}</div>
+       ${r.review_text ? `<div class="rev-txt">${r.review_text}</div>` : ''}
       ${attachHTML}
     </div>`;
   }).join('');
