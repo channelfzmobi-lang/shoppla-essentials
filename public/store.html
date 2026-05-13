@@ -3096,6 +3096,7 @@ function subscribeToCloudChanges(){
   await loadCloudReviews();
   renderHome();
   refreshBadge();
+  await captureExternalOrderFromRedirect();
   subscribeToCloudChanges();
 })();
 
