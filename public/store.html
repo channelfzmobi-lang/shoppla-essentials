@@ -2585,7 +2585,7 @@ function placeOrder() {
   saveCart([]);
   refreshBadge();
   closeModal('checkout-modal');
-  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:'$'+total.toLocaleString(),
+  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:p?formatMoney(total,p):formatCurrencyAmount(total),
     heading:'Order Confirmed! 🎉', sub:"We've received your order and will be in touch shortly.",
     body:'Check your email for confirmation. Our team will contact you to confirm delivery.' });
 }
@@ -2739,7 +2739,7 @@ function openPaymentScreen(p, total) {
   document.getElementById('pay-sub').textContent     = `Pay securely via ${GW_NAMES[gw]||'our payment gateway'}`;
   document.getElementById('pay-badge').textContent   = GW_NAMES[gw]||'Gateway';
   document.getElementById('pay-amount').textContent  = formatMoney(total, p);
-  document.getElementById('pay-currency').textContent = gc.currency||'USD';
+  document.getElementById('pay-currency').textContent = gc.currency||getCurrency(p);
   document.getElementById('pay-submit-btn').textContent = `🔒 Pay ${formatMoney(total, p)} ${gc.currency||getCurrency(p)}`;
   document.getElementById('pay-submit-btn').disabled = false;
   document.getElementById('pay-submit-btn').style.background = 'var(--accent)';
@@ -2792,6 +2792,24 @@ function showThankyou(d) {
   `;
   document.body.style.overflow = 'hidden';
   document.getElementById('ty-overlay').style.display = 'flex';
+}
+
+async function captureExternalOrderFromRedirect(){
+  const params=new URLSearchParams(location.search);
+  if(!(params.has('product_id')||params.has('thankyou')||params.get('source')==='external_form')) return false;
+  const pid=params.get('product_id')||params.get('productId')||params.get('product')||currentProductId;
+  const p=productById(pid) || products[0];
+  const qtyV=parseInt(params.get('qty')||params.get('quantity')||'1')||1;
+  const total=Number(params.get('total')||params.get('amount')||(p?p.price*qtyV:0))||0;
+  const customer=params.get('name')||params.get('customer')||params.get('full_name')||'External form customer';
+  const email=params.get('email')||'';
+  const phone=params.get('phone')||params.get('whatsapp')||'';
+  const oid=Math.floor(1000+Math.random()*9000);
+  const order={id:oid,customer,email,phone,address:params.get('address')||'',city:params.get('city')||'',products:p?p.name:(params.get('product_name')||'External form order'),productId:p?(p._cloud_id||p.id):null,qty:qtyV,color:params.get('color')||'',size:params.get('size')||'',notes:params.get('notes')||'Captured from external form redirect',total,date:'Just now',status:'pending',paymentMethod:'external_form'};
+  const orders=getOrders(); orders.unshift(order); await saveOrders(orders);
+  const tc=p?.tyConfig||{};
+  showThankyou({id:order.id,name:customer,email,phone:order.phone,address:order.address,city:order.city,product:order.products,qty:qtyV,total:p?formatMoney(total,p):formatCurrencyAmount(total,params.get('currency')),heading:tc.heading||'Order Confirmed! 🎉',sub:tc.sub||'Your external form order has been recorded.',body:tc.body||'Shoppla has saved this order in the admin backend.'});
+  return true;
 }
 
 // ═══ INNER PAGES ═══
