@@ -1908,7 +1908,6 @@ async function saveToStorage(){
   try{
     await saveAgentsCloud();
     for(const p of products){
-      if(!p._cloud_id && typeof p.id === 'string') p._cloud_id = p.id;
       const row = {
         id: typeof p.id==='number'? undefined : p.id,
         name: p.name||'', brand: p.brand||'', category: p.category||'',
