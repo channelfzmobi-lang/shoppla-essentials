@@ -1825,6 +1825,7 @@ let qty = 1;
 let stars = 5;
 let activeOrderData = {};
 let toastTimer = null;
+const DEFAULT_PD_DETAIL_HTML = document.getElementById('pd-detail')?.innerHTML || '';
 
 const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
 function getCurrency(p){ return (p?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
@@ -2057,7 +2058,7 @@ function getMediaFitMode(p){ return p.mediaFit==='contain'?'contain':p.mediaFit=
 function renderProductDetailSections(p){
   const wrap=document.getElementById('pd-detail'); if(!wrap) return;
   const sections=(p.contentSections&&p.contentSections.length)?p.contentSections:[];
-  if(!sections.length) return;
+  if(!sections.length){ wrap.innerHTML = DEFAULT_PD_DETAIL_HTML; return; }
   const imgFallback=(p.images&&p.images.length)?getImgSrc(p.images[0]):'';
   const html=sections.map((s,idx)=>{
     const bg=s.bg==='dark'?'style="background:#100e0b;color:#fff;"':s.bg==='warm'?'class="pd-section light"':'class="pd-section"';
@@ -2073,7 +2074,7 @@ function renderProductDetailSections(p){
     if(s.type==='stats') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;"><div class="pd-stat-row">${String(s.stats||'').split('\n').filter(Boolean).map(r=>{const [n,l]=r.split('|');return `<div><div class="pd-stat-n">${escHTML(n||'')}</div><div class="pd-stat-l">${escHTML(l||'')}</div></div>`}).join('')}</div></div></div>`;
     if(s.type==='callout') return `<div class="pd-callout ${s.color||'orange'}" style="margin:18px 28px;"><span>${emoji}</span><div>${body}</div></div>`;
     if(s.type==='specs') return `<div class="pd-dims"><div class="pd-specs">${String(s.specs||'').split('\n').filter(Boolean).map(r=>{const [a,b]=r.split('|');return `<div class="pd-spec-row"><span>${escHTML(a||'')}</span><span>${escHTML(b||'')}</span></div>`}).join('')}</div></div>`;
-    if(s.type==='faq') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;">${String(s.faqs||'').split('\n').filter(Boolean).map(r=>{const [q,a]=r.split('|');return `<div class="faq-item"><div class="faq-q">${escHTML(q||'Question')} <span class="faq-arr">+</span></div><div class="faq-a">${escHTML(a||'Answer')}</div></div>`}).join('')}</div></div>`;
+    if(s.type==='faq') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;">${String(s.faqs||'').split('\n').filter(Boolean).map(r=>{const [q,a]=r.split('|');return `<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">${escHTML(q||'Question')} <span class="faq-arr">+</span></div><div class="faq-a">${escHTML(a||'Answer')}</div></div>`}).join('')}</div></div>`;
     return '';
   }).join('');
   wrap.innerHTML=html+`<div class="pd-bottom-cta"><div><div class="pd-bcta-title">Ready to order ${escHTML(p.name)}?</div><div class="pd-bcta-sub">Fast checkout · Secure order capture.</div></div><button class="btn-buy-now" onclick="openModal('checkout-modal')" style="white-space:nowrap;padding:15px 30px;">⚡ Buy Now</button></div>`;
