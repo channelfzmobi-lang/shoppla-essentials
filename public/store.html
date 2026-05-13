@@ -2595,6 +2595,9 @@ function selPayment(el) { document.querySelectorAll('.pay-method').forEach(m=>m.
 function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
+  const ty = new URL(location.origin + '/thank-you');
+  if(product){ ty.searchParams.set('product_id', product._cloud_id||product.id||''); ty.searchParams.set('product', product.name||''); ty.searchParams.set('amount', product.price||0); ty.searchParams.set('currency', getCurrency(product)); }
+  ty.searchParams.set('source','external_form');
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
   const directUrl = /^https?:\/\/\S+$/i.test(raw) ? raw : '';
   let src = iframeSrc || directUrl;
@@ -2605,13 +2608,16 @@ function renderExternalFormEmbed(code, product) {
       u.searchParams.set('product_id', product._cloud_id||product.id||'');
       u.searchParams.set('amount', product.price||0);
       u.searchParams.set('currency', getCurrency(product));
+      u.searchParams.set('thank_you_url', ty.toString());
+      u.searchParams.set('success_url', ty.toString());
+      u.searchParams.set('redirect_url', ty.toString());
       u.searchParams.set('_t', Date.now()); // cache-bust to always load latest embed
       src = u.toString();
     } catch(_) {}
   }
   if (src) return `<iframe src="${src}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
   // Full HTML / script embed — render in sandboxed iframe via srcdoc
-  const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  const srcdoc = (`<script>window.ShopplaThankYouURL=${JSON.stringify(ty.toString())};window.ShopplaProduct=${JSON.stringify(product||{})};<\/script>`+raw).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
   return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"></iframe>`;
 }
 
