@@ -1880,16 +1880,19 @@ async function saveOrders(o){
   // Also save to cloud
   if(!sb||!o||!o.length) return;
   try{
-    const last=o[o.length-1];
+    const last=o.find(x=>!x._cloud_saved) || o[o.length-1];
     if(last&&!last._cloud_saved){
-      await sb.from('orders').insert({
+      const {data,error}=await sb.from('orders').insert({
         customer:last.customer||'', email:last.email||'', phone:last.phone||'',
         address:last.address||'', city:last.city||'', products_text:last.products||'',
         qty:last.qty||1, color:last.color||'', size:last.size||'',
         notes:last.notes||'', total:last.total||0, status:last.status||'pending',
         payment_method:last.paymentMethod||'', product_id:last.productId||null,
-      });
+      }).select('id,order_number').single();
+      if(error) throw error;
+      if(data){ last._cloud_id=data.id; last.id=data.order_number||last.id; }
       last._cloud_saved=true;
+      try { localStorage.setItem(ORDERS_KEY, JSON.stringify(o)); } catch(e) {}
     }
   }catch(e){console.warn('Cloud order save error:',e);}
 }
