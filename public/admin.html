@@ -548,8 +548,11 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 <input type="checkbox" id="fp-external-form-enabled" style="accent-color:var(--accent);">
                 <span style="font-size:13.5px;font-weight:700;">Use pasted form code instead of Shoppla collecting customer data</span>
               </label>
-              <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;"></textarea>
+              <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;" oninput="updateThankYouLink()"></textarea>
               <div class="form-hint">When enabled, the storefront opens this embedded form for the product order button.</div>
+              <label class="form-lbl" style="margin-top:10px;">Shoppla Thank You / Order Capture Link</label>
+              <input class="form-input" id="fp-thankyou-url" readonly value="" onclick="this.select();navigator.clipboard?.writeText(this.value);showToast('🔗 Thank-you link copied')"/>
+              <div class="form-hint">Paste this as the redirect/success URL in your external form. Shoppla records the order when customers land there.</div>
             </div>
           </div>
         </div>
