@@ -1468,7 +1468,7 @@ async function saveProduct(draft=false){
     showToast('✅ Product updated!');
   } else {
     const id = (crypto&&crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
-    products.push({id, _cloud_id:id, icon:icons[cat]||'📦', ...payload, formConfig:{...formConfig, thankYouUrl:buildThankYouLink(id)}});
+    products.push({id, icon:icons[cat]||'📦', ...payload, formConfig:{...formConfig, thankYouUrl:buildThankYouLink(id)}});
     showToast(draft?'📝 Saved as draft!':'✅ Product published!');
   }
   updateCounts();
