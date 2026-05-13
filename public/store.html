@@ -2054,6 +2054,31 @@ function doSearch(q) {
 // ═══ SALES PAGE ═══
 function getMediaFitMode(p){ return p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'; }
 
+function renderProductDetailSections(p){
+  const wrap=document.getElementById('pd-detail'); if(!wrap) return;
+  const sections=(p.contentSections&&p.contentSections.length)?p.contentSections:[];
+  if(!sections.length) return;
+  const imgFallback=(p.images&&p.images.length)?getImgSrc(p.images[0]):'';
+  const html=sections.map((s,idx)=>{
+    const bg=s.bg==='dark'?'style="background:#100e0b;color:#fff;"':s.bg==='warm'?'class="pd-section light"':'class="pd-section"';
+    const h=escHTML(s.headline||p.name||'Product Detail'), body=escHTML(s.body||''), eyebrow=escHTML(s.eyebrow||''), emoji=escHTML(s.emoji||p.icon||'🖼️');
+    if(s.type==='headline-text') return `<div class="pd-section ${s.bg==='warm'?'light':''}" ${s.bg==='dark'?'style="background:#100e0b;color:#fff;"':''}><div class="pd-text" style="grid-column:1/-1;${s.bg==='dark'?'color:#fff;':''}">${eyebrow?`<div class="pd-eyebrow">${eyebrow}</div>`:''}<h2 class="pd-h2" ${s.bg==='dark'?'style="color:#fff;"':''}>${h}</h2><p class="pd-body">${body}</p></div></div>`;
+    if(s.type==='text-image-right'||s.type==='image-text-right'){
+      const src=s.imageUrl||s.imageBase64||imgFallback;
+      const media=src?`<img src="${src}" alt="${h}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"/>`:`<span>${emoji}</span>`;
+      const cap=s.caption?`<div style="position:absolute;bottom:18px;left:18px;right:18px;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--ink);">${escHTML(s.caption)}</div>`:'';
+      return `<div class="pd-section light ${s.type==='image-text-right'?'flip':''}"><div class="pd-text"><h2 class="pd-h2">${h}</h2><p class="pd-body">${body}</p></div><div class="pd-img">${media}${cap}</div></div>`;
+    }
+    if(s.type==='bullet-list') return `<div class="pd-pills">${String(s.bullets||'').split('\n').filter(Boolean).map(b=>`<div class="pd-pill">${escHTML(b)}</div>`).join('')}</div>`;
+    if(s.type==='stats') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;"><div class="pd-stat-row">${String(s.stats||'').split('\n').filter(Boolean).map(r=>{const [n,l]=r.split('|');return `<div><div class="pd-stat-n">${escHTML(n||'')}</div><div class="pd-stat-l">${escHTML(l||'')}</div></div>`}).join('')}</div></div></div>`;
+    if(s.type==='callout') return `<div class="pd-callout ${s.color||'orange'}" style="margin:18px 28px;"><span>${emoji}</span><div>${body}</div></div>`;
+    if(s.type==='specs') return `<div class="pd-dims"><div class="pd-specs">${String(s.specs||'').split('\n').filter(Boolean).map(r=>{const [a,b]=r.split('|');return `<div class="pd-spec-row"><span>${escHTML(a||'')}</span><span>${escHTML(b||'')}</span></div>`}).join('')}</div></div>`;
+    if(s.type==='faq') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;">${String(s.faqs||'').split('\n').filter(Boolean).map(r=>{const [q,a]=r.split('|');return `<div class="faq-item"><div class="faq-q">${escHTML(q||'Question')} <span class="faq-arr">+</span></div><div class="faq-a">${escHTML(a||'Answer')}</div></div>`}).join('')}</div></div>`;
+    return '';
+  }).join('');
+  wrap.innerHTML=html+`<div class="pd-bottom-cta"><div><div class="pd-bcta-title">Ready to order ${escHTML(p.name)}?</div><div class="pd-bcta-sub">Fast checkout · Secure order capture.</div></div><button class="btn-buy-now" onclick="openModal('checkout-modal')" style="white-space:nowrap;padding:15px 30px;">⚡ Buy Now</button></div>`;
+}
+
 function applySalesMediaSizing(p){
   const media = document.querySelector('.sp-media');
   if(!media) return;
