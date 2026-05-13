@@ -1906,12 +1906,13 @@ function refreshBadge() {
 }
 
 function addToCart(id) {
-  const p = products.find(x => x.id === id);
+  const p = productById(id);
   if (!p) return;
   const c = getCart();
-  const ex = c.find(x => x.id === id);
+  const cartId = p._cloud_id || p.id;
+  const ex = c.find(x => String(x.id) === String(cartId));
   if (ex) ex.qty = (ex.qty||1) + 1;
-  else c.push({id, name:p.name, price:p.price, currency:getCurrency(p), icon:p.icon||'📦', qty:1});
+  else c.push({id:cartId, productId:cartId, name:p.name, price:p.price, currency:getCurrency(p), icon:p.icon||'📦', qty:1});
   saveCart(c);
   refreshBadge();
 }
