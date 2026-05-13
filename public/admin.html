@@ -1584,17 +1584,17 @@ function buildSectionHTML(s,i){
   const types = {'headline-text':'📝 Headline + Text','text-image-right':'🖼 Text + Image Right','image-text-right':'🖼 Image + Text Right','bullet-list':'✅ Bullet List','stats':'📊 Stats Row','callout':'💬 Callout / Quote','specs':'📐 Specs Table','faq':'❓ FAQ'};
   let inner = '';
   if(s.type==='headline-text') inner=`
-    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Sink Into Pure Comfort Every Day" oninput="contentSections[${i}].headline=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Eyebrow Text (small label above)</label><input class="form-input" value="${s.eyebrow||''}" placeholder="e.g. ✨ Why Everyone's Obsessed" oninput="contentSections[${i}].eyebrow=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Your main paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${escHTML(s.headline||'')}" placeholder="e.g. Sink Into Pure Comfort Every Day" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Eyebrow Text (small label above)</label><input class="form-input" value="${escHTML(s.eyebrow||'')}" placeholder="e.g. ✨ Why Everyone's Obsessed" oninput="contentSections[${i}].eyebrow=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Your main paragraph text…" oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
     <div class="form-group"><label class="form-lbl">Background</label><select class="form-select" onchange="contentSections[${i}].bg=this.value"><option value="white" ${s.bg==='white'?'selected':''}>White</option><option value="dark" ${s.bg==='dark'?'selected':''}>Dark (ink)</option><option value="warm" ${s.bg==='warm'?'selected':''}>Warm</option></select></div>
   `;
   else if(s.type==='text-image-right'||s.type==='image-text-right') inner=`
-    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
-    <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${s.emoji||''}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${escHTML(s.headline||'')}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${escHTML(s.emoji||'')}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
     ${sectionMediaHTML(s,i)}
-    <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${s.caption||''}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${escHTML(s.caption||'')}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
   `;
   else if(s.type==='bullet-list') inner=`
     <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Key Features" oninput="contentSections[${i}].headline=this.value"/></div>
