@@ -1215,7 +1215,8 @@ function renderProductsTable(filter=''){
   const filtered = products.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase())||p.category.toLowerCase().includes(filter.toLowerCase()));
   document.getElementById('prod-table-sub').textContent = `${filtered.length} product${filtered.length!==1?'s':''} in your store`;
   tbody.innerHTML = filtered.map(p=>{
-    const pid = JSON.stringify(p.id);
+    // Escape id for safe inlining inside an HTML double-quoted onclick attribute.
+    const pidJs = "'" + String(p.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'";
     return `
     <tr>
       <td><div class="prod-cell"><div class="prod-thumb">${p.icon}</div><div><div class="prod-name-cell">${p.name}</div><div class="prod-cat">${p.brand}</div></div></div></td>
@@ -1224,8 +1225,8 @@ function renderProductsTable(filter=''){
       <td><span class="badge ${p.stock<=3?'badge-red':p.stock<=10?'badge-orange':'badge-green'}">${p.stock} left</span></td>
       <td><span class="badge ${p.status==='active'?'badge-green':'badge-gray'}">${p.status==='active'?'Active':'Draft'}</span></td>
       <td><div class="table-actions">
-        <button class="tbl-btn" onclick="editProduct(${pid})">✏️ Edit</button>
-        <button class="tbl-btn danger" onclick="promptDelete(${pid})">🗑</button>
+        <button class="tbl-btn" onclick="editProduct(${pidJs})">✏️ Edit</button>
+        <button class="tbl-btn danger" onclick="promptDelete(${pidJs})">🗑</button>
       </div></td>
     </tr>
   `}).join('');

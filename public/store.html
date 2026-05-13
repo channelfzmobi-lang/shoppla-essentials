@@ -1955,17 +1955,17 @@ function makeCardHTML(p, showActions) {
   let mediaHTML;
   // Determine image src - handle both {base64:...} objects and plain URL strings
   const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
+  const firstImg = (p.images && p.images.length) ? getImgSrc(p.images[0]) : '';
   if (p.videoURL) {
     const embedSrc = toEmbedUrl(p.videoURL);
     if (embedSrc) {
       mediaHTML = `<iframe src="${embedSrc}" style="width:100%;height:100%;border:none;display:block;pointer-events:none;" allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe>`;
     } else {
-      mediaHTML = `<video src="${p.videoURL}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop autoplay preload="metadata"></video>`;
+      mediaHTML = `<video src="${p.videoURL}" ${firstImg?`poster="${firstImg}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})"></video>`;
     }
   } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vidSrc = p.videoData.url || p.videoData.base64;
-    const poster = p.images && p.images.length ? getImgSrc(p.images[0]) : '';
-    mediaHTML = `<video src="${vidSrc}" ${poster?`poster="${poster}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})" onclick="event.stopPropagation();this.muted=true;this.play().catch(()=>{})"></video>
+    mediaHTML = `<video src="${vidSrc}" ${firstImg?`poster="${firstImg}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})" onclick="event.stopPropagation();this.muted=true;this.play().catch(()=>{})"></video>
       <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Video preview</div>`;
   } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
     mediaHTML = `<img src="${getImgSrc(p.images[0])}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
@@ -2589,14 +2589,23 @@ function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
-  const directUrl = /^https?:\/\//i.test(raw) ? raw : '';
+  const directUrl = /^https?:\/\/\S+$/i.test(raw) ? raw : '';
   let src = iframeSrc || directUrl;
   if (src && product) {
-    try { const u = new URL(src); u.searchParams.set('product', product.name||''); u.searchParams.set('product_id', product._cloud_id||product.id||''); u.searchParams.set('amount', product.price||0); u.searchParams.set('currency', getCurrency(product)); src = u.toString(); } catch(_) {}
+    try {
+      const u = new URL(src);
+      u.searchParams.set('product', product.name||'');
+      u.searchParams.set('product_id', product._cloud_id||product.id||'');
+      u.searchParams.set('amount', product.price||0);
+      u.searchParams.set('currency', getCurrency(product));
+      u.searchParams.set('_t', Date.now()); // cache-bust to always load latest embed
+      src = u.toString();
+    } catch(_) {}
   }
-  if (src) return `<iframe src="${src}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
+  if (src) return `<iframe src="${src}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
+  // Full HTML / script embed — render in sandboxed iframe via srcdoc
   const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-  return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"></iframe>`;
+  return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"></iframe>`;
 }
 
 function openOrderForm() {
@@ -2959,11 +2968,13 @@ function renderCloudReviews(productId) {
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
     const date = new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const attachHTML = (r.attachments && r.attachments.length) ?
-      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">${r.attachments.map(a => {
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px;">${r.attachments.map(a => {
         const src = a.url || a.base64 || '';
-        return a.type?.startsWith('image/') ?
-          `<img src="${src}" style="width:100%;max-height:280px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
-          `<video src="${src}" controls playsinline preload="metadata" style="width:100%;max-height:280px;border-radius:10px;background:#111;border:1px solid var(--border);"></video>`;
+        const isImg = (a.type||'').startsWith('image/') || /\.(png|jpe?g|gif|webp|avif)$/i.test(src);
+        const isVid = (a.type||'').startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(src);
+        if (isImg) return `<img src="${src}" loading="lazy" style="width:100%;height:auto;max-height:min(70vh,520px);border-radius:12px;object-fit:cover;background:#fff;border:1px solid var(--border);cursor:zoom-in;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>`;
+        if (isVid) return `<video src="${src}" controls playsinline preload="metadata" style="width:100%;height:auto;max-height:min(70vh,520px);border-radius:12px;background:#111;border:1px solid var(--border);"></video>`;
+        return `<a href="${src}" target="_blank" rel="noopener" style="display:block;padding:10px;background:#f4f1ec;border-radius:10px;font-size:13px;color:var(--accent);text-decoration:none;">📎 Attachment</a>`;
       }).join('')}</div>` : '';
     return `<div class="rev-card">
       <div class="rev-top">
