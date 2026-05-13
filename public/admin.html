@@ -1575,6 +1575,11 @@ function renderContentSections(){
   const list = document.getElementById('content-sections-list');
   list.innerHTML = contentSections.map((s,i)=>buildSectionHTML(s,i)).join('');
 }
+function sectionMediaHTML(s,i){
+  const src = s.imageUrl || s.imageBase64 || '';
+  const preview = src ? `<img src="${src}" style="width:120px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border);"/>` : `<div style="width:120px;height:90px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;background:#fff;">${escHTML(s.emoji||'🖼️')}</div>`;
+  return `<div class="form-group"><label class="form-lbl">Section Image</label><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">${preview}<button type="button" class="upload-btn-sm" onclick="document.getElementById('section-img-${i}').click()">📁 Upload Image</button>${src?`<button type="button" class="tbl-btn danger" onclick="removeSectionImage(${i})">Remove</button>`:''}<input type="file" id="section-img-${i}" accept="image/*" style="display:none" onchange="handleSectionImageUpload(this,${i})"/></div><div class="form-hint">Used on the storefront sales page for this section.</div></div>`;
+}
 function buildSectionHTML(s,i){
   const types = {'headline-text':'📝 Headline + Text','text-image-right':'🖼 Text + Image Right','image-text-right':'🖼 Image + Text Right','bullet-list':'✅ Bullet List','stats':'📊 Stats Row','callout':'💬 Callout / Quote','specs':'📐 Specs Table','faq':'❓ FAQ'};
   let inner = '';
@@ -1588,6 +1593,7 @@ function buildSectionHTML(s,i){
     <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
     <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
     <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${s.emoji||''}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
+    ${sectionMediaHTML(s,i)}
     <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${s.caption||''}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
   `;
   else if(s.type==='bullet-list') inner=`
