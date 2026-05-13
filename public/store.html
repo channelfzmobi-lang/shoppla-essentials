@@ -2959,11 +2959,13 @@ function renderCloudReviews(productId) {
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
     const date = new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const attachHTML = (r.attachments && r.attachments.length) ?
-      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px;">${r.attachments.map(a => {
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px;">${r.attachments.map(a => {
         const src = a.url || a.base64 || '';
-        return a.type?.startsWith('image/') ?
-          `<img src="${src}" style="width:100%;max-height:280px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--border);cursor:pointer;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>` :
-          `<video src="${src}" controls playsinline preload="metadata" style="width:100%;max-height:280px;border-radius:10px;background:#111;border:1px solid var(--border);"></video>`;
+        const isImg = (a.type||'').startsWith('image/') || /\.(png|jpe?g|gif|webp|avif)$/i.test(src);
+        const isVid = (a.type||'').startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(src);
+        if (isImg) return `<img src="${src}" loading="lazy" style="width:100%;height:auto;max-height:min(70vh,520px);border-radius:12px;object-fit:cover;background:#fff;border:1px solid var(--border);cursor:zoom-in;" onclick="event.stopPropagation();window.open(this.src,'_blank')"/>`;
+        if (isVid) return `<video src="${src}" controls playsinline preload="metadata" style="width:100%;height:auto;max-height:min(70vh,520px);border-radius:12px;background:#111;border:1px solid var(--border);"></video>`;
+        return `<a href="${src}" target="_blank" rel="noopener" style="display:block;padding:10px;background:#f4f1ec;border-radius:10px;font-size:13px;color:var(--accent);text-decoration:none;">📎 Attachment</a>`;
       }).join('')}</div>` : '';
     return `<div class="rev-card">
       <div class="rev-top">
