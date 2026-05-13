@@ -1602,7 +1602,7 @@ function buildSectionHTML(s,i){
   `;
   else if(s.type==='callout') inner=`
     <div class="form-group"><label class="form-lbl">Emoji Icon</label><input class="form-input" value="${escHTML(s.emoji||'💬')}" style="width:80px;" oninput="contentSections[${i}].emoji=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Quote / Callout Text</label><textarea class="form-textarea" placeholder="e.g. "I've never owned a sofa this comfortable in my life." — Sarah R." oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Quote / Callout Text</label><textarea class="form-textarea" placeholder="e.g. I have never owned a sofa this comfortable — Sarah R." oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
     <div class="form-group"><label class="form-lbl">Color</label><select class="form-select" onchange="contentSections[${i}].color=this.value"><option value="orange">Orange</option><option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option></select></div>
   `;
   else if(s.type==='stats') inner=`
