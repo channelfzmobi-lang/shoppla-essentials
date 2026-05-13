@@ -2589,14 +2589,23 @@ function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
-  const directUrl = /^https?:\/\//i.test(raw) ? raw : '';
+  const directUrl = /^https?:\/\/\S+$/i.test(raw) ? raw : '';
   let src = iframeSrc || directUrl;
   if (src && product) {
-    try { const u = new URL(src); u.searchParams.set('product', product.name||''); u.searchParams.set('product_id', product._cloud_id||product.id||''); u.searchParams.set('amount', product.price||0); u.searchParams.set('currency', getCurrency(product)); src = u.toString(); } catch(_) {}
+    try {
+      const u = new URL(src);
+      u.searchParams.set('product', product.name||'');
+      u.searchParams.set('product_id', product._cloud_id||product.id||'');
+      u.searchParams.set('amount', product.price||0);
+      u.searchParams.set('currency', getCurrency(product));
+      u.searchParams.set('_t', Date.now()); // cache-bust to always load latest embed
+      src = u.toString();
+    } catch(_) {}
   }
-  if (src) return `<iframe src="${src}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
+  if (src) return `<iframe src="${src}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" allow="payment *; camera *; microphone *; clipboard-write" loading="lazy"></iframe>`;
+  // Full HTML / script embed — render in sandboxed iframe via srcdoc
   const srcdoc = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-  return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:640px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation"></iframe>`;
+  return `<iframe srcdoc="${srcdoc}" style="width:100%;min-height:680px;border:1px solid var(--border);border-radius:12px;background:#fff;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"></iframe>`;
 }
 
 function openOrderForm() {
