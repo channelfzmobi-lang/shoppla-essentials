@@ -1182,8 +1182,8 @@ let currentVideoURL  = '';
 let currentImages    = [];     // [{base64, name}] or [{url, name}]
 
 const CURRENCIES={NGN:{symbol:'₦',code:'NGN'},GHS:{symbol:'₵',code:'GHS'},USD:{symbol:'$',code:'USD'}};
-function formatAdminMoney(amount, currency='USD'){
-  const cfg=CURRENCIES[currency]||CURRENCIES.USD;
+function formatAdminMoney(amount, currency='NGN'){
+  const cfg=CURRENCIES[currency]||CURRENCIES.NGN;
   return cfg.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2});
 }
 function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
@@ -1348,7 +1348,7 @@ function editProduct(id){
   if(p.gatewayConfig){
     const gc=p.gatewayConfig;
     if(document.getElementById('fp-gateway')){document.getElementById('fp-gateway').value=gc.gateway||'';if(typeof updateGatewayFields==='function')updateGatewayFields();}
-    if(document.getElementById('fp-currency')) document.getElementById('fp-currency').value=gc.currency||'USD';
+    if(document.getElementById('fp-currency')) document.getElementById('fp-currency').value=gc.currency||'NGN';
     setTimeout(()=>{
       if(document.getElementById('fp-gw-key')&&gc.publicKey)  document.getElementById('fp-gw-key').value=gc.publicKey;
       if(document.getElementById('fp-gw-url')&&gc.customUrl)  document.getElementById('fp-gw-url').value=gc.customUrl;
@@ -1442,7 +1442,7 @@ async function saveProduct(draft=false){
     gateway:   gw,
     publicKey: document.getElementById('fp-gw-key')?.value||'',
     customUrl: document.getElementById('fp-gw-url')?.value||'',
-    currency:  document.getElementById('fp-currency')?.value||'USD',
+    currency:  document.getElementById('fp-currency')?.value||'NGN',
     successUrl:document.getElementById('fp-success-url')?.value||'',
   };
 
