@@ -2599,7 +2599,7 @@ function toggleWish(btn, id) {
 }
 
 // ═══ STANDARD CHECKOUT ═══
-function placeOrder() {
+async function placeOrder() {
   const fname = document.getElementById('ck-fname')?.value.trim();
   const email = document.getElementById('ck-email')?.value.trim();
   if (!fname) { toast('⚠️ Please enter your name'); return; }
@@ -2609,7 +2609,7 @@ function placeOrder() {
   const oid = Math.floor(1000+Math.random()*9000);
   const orders = getOrders();
   orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, currency:p?getCurrency(p):'NGN', date:'Just now', status:'pending'});
-  saveOrders(orders);
+  await saveOrders(orders);
   saveCart([]);
   refreshBadge();
   closeModal('checkout-modal');
@@ -2717,7 +2717,7 @@ function openOrderForm() {
   openModal('order-form-modal');
 }
 
-function submitOrderForm(route) {
+async function submitOrderForm(route) {
   const p = productById(currentProductId);
   if (!p) return;
   const g = (k) => document.getElementById('of-'+k)?.value?.trim()||'';
@@ -2734,7 +2734,7 @@ function submitOrderForm(route) {
     total:formatMoney(total, p), route };
   const orders = getOrders();
   orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:g('notes'), total, currency:getCurrency(p), date:'Just now', status:'pending'});
-  saveOrders(orders);
+  await saveOrders(orders);
   saveCart([]); refreshBadge();
   closeModal('order-form-modal');
   if (route==='pod') {
