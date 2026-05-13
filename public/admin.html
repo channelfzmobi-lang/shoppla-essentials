@@ -548,8 +548,11 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 <input type="checkbox" id="fp-external-form-enabled" style="accent-color:var(--accent);">
                 <span style="font-size:13.5px;font-weight:700;">Use pasted form code instead of Shoppla collecting customer data</span>
               </label>
-              <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;"></textarea>
+              <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;" oninput="updateThankYouLink()"></textarea>
               <div class="form-hint">When enabled, the storefront opens this embedded form for the product order button.</div>
+              <label class="form-lbl" style="margin-top:10px;">Shoppla Thank You / Order Capture Link</label>
+              <input class="form-input" id="fp-thankyou-url" readonly value="" onclick="this.select();navigator.clipboard?.writeText(this.value);showToast('🔗 Thank-you link copied')"/>
+              <div class="form-hint">Paste this as the redirect/success URL in your external form. Shoppla records the order when customers land there.</div>
             </div>
           </div>
         </div>
@@ -1179,9 +1182,22 @@ let currentVideoURL  = '';
 let currentImages    = [];     // [{base64, name}] or [{url, name}]
 
 const CURRENCIES={NGN:{symbol:'₦',code:'NGN'},GHS:{symbol:'₵',code:'GHS'},USD:{symbol:'$',code:'USD'}};
-function formatAdminMoney(amount, currency='USD'){
-  const cfg=CURRENCIES[currency]||CURRENCIES.USD;
+function formatAdminMoney(amount, currency='NGN'){
+  const cfg=CURRENCIES[currency]||CURRENCIES.NGN;
   return cfg.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2});
+}
+function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function buildThankYouLink(productId){
+  const id = productId || editingProductId || '';
+  const base = `${location.origin}/thank-you`;
+  const u = new URL(base);
+  if(id) u.searchParams.set('product_id', id);
+  u.searchParams.set('source','external_form');
+  return u.toString();
+}
+function updateThankYouLink(){
+  const el=document.getElementById('fp-thankyou-url');
+  if(el) el.value=buildThankYouLink(editingProductId);
 }
 
 // ─── SUPABASE STORAGE UPLOAD HELPER ───
@@ -1233,6 +1249,10 @@ function renderProductsTable(filter=''){
 }
 function filterProducts(v){ renderProductsTable(v); }
 
+function findProductById(id){
+  return products.find(x=>String(x.id)===String(id) || String(x._cloud_id||'')===String(id));
+}
+
 function navToPanel(panelId){
   const item = Array.from(document.querySelectorAll('.sb-item')).find(el => (el.getAttribute('onclick')||'').includes("'"+panelId+"'") || (el.getAttribute('onclick')||'').includes('"'+panelId+'"'));
   nav(item || null, panelId);
@@ -1241,9 +1261,9 @@ window.navToPanel = navToPanel;
 
 // ─── EDIT PRODUCT ───
 function editProduct(id){
-  const p = products.find(x=>String(x.id)===String(id) || String(x._cloud_id||'')===String(id));
+  const p = findProductById(id);
   if(!p){ showToast('⚠️ Product not found. Refreshing list…'); renderProductsTable(); return; }
-  editingProductId = id;
+  editingProductId = p._cloud_id || p.id;
 
   // Basic fields
   const setVal = (elId, val) => { const el=document.getElementById(elId); if(el) el.value=val||''; };
@@ -1317,7 +1337,7 @@ function editProduct(id){
   if(p.formConfig){
     const fc=p.formConfig;
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-    setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
+    setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); setV('fp-thankyou-url',fc.thankYouUrl); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
   }
   if(p.tyConfig){
@@ -1328,7 +1348,7 @@ function editProduct(id){
   if(p.gatewayConfig){
     const gc=p.gatewayConfig;
     if(document.getElementById('fp-gateway')){document.getElementById('fp-gateway').value=gc.gateway||'';if(typeof updateGatewayFields==='function')updateGatewayFields();}
-    if(document.getElementById('fp-currency')) document.getElementById('fp-currency').value=gc.currency||'USD';
+    if(document.getElementById('fp-currency')) document.getElementById('fp-currency').value=gc.currency||'NGN';
     setTimeout(()=>{
       if(document.getElementById('fp-gw-key')&&gc.publicKey)  document.getElementById('fp-gw-key').value=gc.publicKey;
       if(document.getElementById('fp-gw-url')&&gc.customUrl)  document.getElementById('fp-gw-url').value=gc.customUrl;
@@ -1347,6 +1367,8 @@ function editProduct(id){
   // Template
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
+
+  updateThankYouLink();
 
   // Benefit badges
   const bbEl = document.getElementById('fp-benefit-badges');
@@ -1406,6 +1428,7 @@ async function saveProduct(draft=false){
     customField: document.getElementById('fp-custom-field')?.value||'',
     externalFormEnabled: externalEnabled,
     externalFormCode: externalCode,
+    thankYouUrl: buildThankYouLink(editingProductId),
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
   };
@@ -1419,7 +1442,7 @@ async function saveProduct(draft=false){
     gateway:   gw,
     publicKey: document.getElementById('fp-gw-key')?.value||'',
     customUrl: document.getElementById('fp-gw-url')?.value||'',
-    currency:  document.getElementById('fp-currency')?.value||'USD',
+    currency:  document.getElementById('fp-currency')?.value||'NGN',
     successUrl:document.getElementById('fp-success-url')?.value||'',
   };
 
@@ -1440,18 +1463,20 @@ async function saveProduct(draft=false){
   };
 
   if(editingProductId){
-    const p = products.find(x=>String(x.id)===String(editingProductId) || String(x._cloud_id||'')===String(editingProductId));
-    if(p) Object.assign(p, payload);
+    const p = findProductById(editingProductId);
+    if(p) Object.assign(p, payload, {id:p.id, _cloud_id:p._cloud_id});
     showToast('✅ Product updated!');
   } else {
-    products.push({id:Date.now(), icon:icons[cat]||'📦', ...payload});
+    const id = (crypto&&crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+    products.push({id, icon:icons[cat]||'📦', ...payload, formConfig:{...formConfig, thankYouUrl:buildThankYouLink(id)}});
     showToast(draft?'📝 Saved as draft!':'✅ Product published!');
   }
   updateCounts();
+  await saveToStorage();
+  renderProductsTable();
+  refreshLivePreview();
   editingProductId = null;
   clearProductForm();
-  await saveToStorage();
-  refreshLivePreview();
   nav(document.querySelector('.sb-item[onclick*=products]'),'products');
 }
 
@@ -1498,14 +1523,14 @@ function updateCounts(){
 // ─── DELETE ───
 function promptDelete(id){
   deleteTargetId = id;
-  const p = products.find(x=>x.id===id);
+  const p = findProductById(id);
   document.getElementById('confirm-msg').textContent = `Delete "${p?.name}"? This cannot be undone.`;
   document.getElementById('confirm-modal').classList.add('open');
 }
 async function confirmDelete(){
-  const removed = products.find(p=>p.id===deleteTargetId);
+  const removed = findProductById(deleteTargetId);
   const cloudId = removed?._cloud_id || (typeof removed?.id === 'string' ? removed.id : null);
-  products = products.filter(p=>p.id!==deleteTargetId);
+  products = products.filter(p=>String(p.id)!==String(deleteTargetId) && String(p._cloud_id||'')!==String(deleteTargetId));
   closeModal();
   updateCounts();
   renderProductsTable();
@@ -1550,43 +1575,67 @@ function renderContentSections(){
   const list = document.getElementById('content-sections-list');
   list.innerHTML = contentSections.map((s,i)=>buildSectionHTML(s,i)).join('');
 }
+function sectionMediaHTML(s,i){
+  const src = s.imageUrl || s.imageBase64 || '';
+  const preview = src ? `<img src="${src}" style="width:120px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border);"/>` : `<div style="width:120px;height:90px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;background:#fff;">${escHTML(s.emoji||'🖼️')}</div>`;
+  return `<div class="form-group"><label class="form-lbl">Section Image</label><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">${preview}<button type="button" class="upload-btn-sm" onclick="document.getElementById('section-img-${i}').click()">📁 Upload Image</button>${src?`<button type="button" class="tbl-btn danger" onclick="removeSectionImage(${i})">Remove</button>`:''}<input type="file" id="section-img-${i}" accept="image/*" style="display:none" onchange="handleSectionImageUpload(this,${i})"/></div><div class="form-hint">Used on the storefront sales page for this section.</div></div>`;
+}
 function buildSectionHTML(s,i){
   const types = {'headline-text':'📝 Headline + Text','text-image-right':'🖼 Text + Image Right','image-text-right':'🖼 Image + Text Right','bullet-list':'✅ Bullet List','stats':'📊 Stats Row','callout':'💬 Callout / Quote','specs':'📐 Specs Table','faq':'❓ FAQ'};
   let inner = '';
   if(s.type==='headline-text') inner=`
-    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Sink Into Pure Comfort Every Day" oninput="contentSections[${i}].headline=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Eyebrow Text (small label above)</label><input class="form-input" value="${s.eyebrow||''}" placeholder="e.g. ✨ Why Everyone's Obsessed" oninput="contentSections[${i}].eyebrow=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Your main paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${escHTML(s.headline||'')}" placeholder="e.g. Sink Into Pure Comfort Every Day" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Eyebrow Text (small label above)</label><input class="form-input" value="${escHTML(s.eyebrow||'')}" placeholder="e.g. ✨ Why Everyone's Obsessed" oninput="contentSections[${i}].eyebrow=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Your main paragraph text…" oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
     <div class="form-group"><label class="form-lbl">Background</label><select class="form-select" onchange="contentSections[${i}].bg=this.value"><option value="white" ${s.bg==='white'?'selected':''}>White</option><option value="dark" ${s.bg==='dark'?'selected':''}>Dark (ink)</option><option value="warm" ${s.bg==='warm'?'selected':''}>Warm</option></select></div>
   `;
   else if(s.type==='text-image-right'||s.type==='image-text-right') inner=`
-    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
-    <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${s.emoji||''}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${s.caption||''}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${escHTML(s.headline||'')}" placeholder="Section headline" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${escHTML(s.emoji||'')}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
+    ${sectionMediaHTML(s,i)}
+    <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${escHTML(s.caption||'')}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
   `;
   else if(s.type==='bullet-list') inner=`
-    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${s.headline||''}" placeholder="e.g. Key Features" oninput="contentSections[${i}].headline=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Bullet Points (one per line, start with emoji)</label><textarea class="form-textarea" placeholder="✅ Feature one&#10;✅ Feature two&#10;✅ Feature three" oninput="contentSections[${i}].bullets=this.value">${s.bullets||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Headline</label><input class="form-input" value="${escHTML(s.headline||'')}" placeholder="e.g. Key Features" oninput="contentSections[${i}].headline=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Bullet Points (one per line, start with emoji)</label><textarea class="form-textarea" placeholder="✅ Feature one&#10;✅ Feature two&#10;✅ Feature three" oninput="contentSections[${i}].bullets=this.value">${escHTML(s.bullets||'')}</textarea></div>
   `;
   else if(s.type==='callout') inner=`
-    <div class="form-group"><label class="form-lbl">Emoji Icon</label><input class="form-input" value="${s.emoji||'💬'}" style="width:80px;" oninput="contentSections[${i}].emoji=this.value"/></div>
-    <div class="form-group"><label class="form-lbl">Quote / Callout Text</label><textarea class="form-textarea" placeholder="e.g. "I've never owned a sofa this comfortable in my life." — Sarah R." oninput="contentSections[${i}].body=this.value">${s.body||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Emoji Icon</label><input class="form-input" value="${escHTML(s.emoji||'💬')}" style="width:80px;" oninput="contentSections[${i}].emoji=this.value"/></div>
+    <div class="form-group"><label class="form-lbl">Quote / Callout Text</label><textarea class="form-textarea" placeholder="e.g. I have never owned a sofa this comfortable — Sarah R." oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
     <div class="form-group"><label class="form-lbl">Color</label><select class="form-select" onchange="contentSections[${i}].color=this.value"><option value="orange">Orange</option><option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option></select></div>
   `;
   else if(s.type==='stats') inner=`
-    <div class="form-group"><label class="form-lbl">Stats (format: Number|Label, one per line)</label><textarea class="form-textarea" placeholder="380|GSM Fabric Weight&#10;5|Colour Options&#10;A+|Fire Safety Rating" oninput="contentSections[${i}].stats=this.value">${s.stats||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Stats (format: Number|Label, one per line)</label><textarea class="form-textarea" placeholder="380|GSM Fabric Weight&#10;5|Colour Options&#10;A+|Fire Safety Rating" oninput="contentSections[${i}].stats=this.value">${escHTML(s.stats||'')}</textarea></div>
   `;
   else if(s.type==='specs') inner=`
-    <div class="form-group"><label class="form-lbl">Specs (format: Label|Value, one per line)</label><textarea class="form-textarea" placeholder="🎨 Color|Dusty Rose, Charcoal&#10;🧵 Material|Premium Velvet&#10;📐 Width|220cm" oninput="contentSections[${i}].specs=this.value">${s.specs||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">Specs (format: Label|Value, one per line)</label><textarea class="form-textarea" placeholder="🎨 Color|Dusty Rose, Charcoal&#10;🧵 Material|Premium Velvet&#10;📐 Width|220cm" oninput="contentSections[${i}].specs=this.value">${escHTML(s.specs||'')}</textarea></div>
   `;
   else if(s.type==='faq') inner=`
-    <div class="form-group"><label class="form-lbl">FAQs (format: Question|Answer, one per line)</label><textarea class="form-textarea" style="min-height:140px;" placeholder="Can I return it?|Yes, within 30 days no questions asked.&#10;How long is delivery?|3-5 business days standard." oninput="contentSections[${i}].faqs=this.value">${s.faqs||''}</textarea></div>
+    <div class="form-group"><label class="form-lbl">FAQs (format: Question|Answer, one per line)</label><textarea class="form-textarea" style="min-height:140px;" placeholder="Can I return it?|Yes, within 30 days no questions asked.&#10;How long is delivery?|3-5 business days standard." oninput="contentSections[${i}].faqs=this.value">${escHTML(s.faqs||'')}</textarea></div>
   `;
   return `<div class="content-section"><div class="cs-header"><span class="cs-type-badge">${types[s.type]||s.type}</span></div><button class="cs-del" onclick="removeSection(${i})">✕</button>${inner}</div>`;
 }
 function addSection(type){ contentSections.push({type}); renderContentSections(); showToast('✅ Section added'); }
 function removeSection(i){ contentSections.splice(i,1); renderContentSections(); }
+async function handleSectionImageUpload(input,i){
+  const f=input.files&&input.files[0];
+  if(!f || !contentSections[i]) return;
+  showToast('⏳ Uploading section image…');
+  const publicUrl=await uploadToStorage(f,'section-images');
+  const src=publicUrl || await readFileAsBase64(f);
+  if(!src){showToast('❌ Section image upload failed');return;}
+  contentSections[i].imageUrl = publicUrl || '';
+  contentSections[i].imageBase64 = publicUrl ? '' : src;
+  contentSections[i].imageName = f.name;
+  renderContentSections();
+  showToast('✅ Section image uploaded');
+}
+function removeSectionImage(i){
+  if(!contentSections[i]) return;
+  delete contentSections[i].imageUrl; delete contentSections[i].imageBase64; delete contentSections[i].imageName;
+  renderContentSections();
+}
 
 // ─── PAGE COLOR ───
 function setProductPageColor(hex){
@@ -1859,7 +1908,6 @@ async function saveToStorage(){
   try{
     await saveAgentsCloud();
     for(const p of products){
-      if(!p._cloud_id && typeof p.id === 'string') p._cloud_id = p.id;
       const row = {
         id: typeof p.id==='number'? undefined : p.id,
         name: p.name||'', brand: p.brand||'', category: p.category||'',
