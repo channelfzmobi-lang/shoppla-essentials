@@ -28,7 +28,7 @@ export default function Store() {
   return (
     <iframe
       ref={iframeRef}
-      src="/store.html"
+      src={`/store.html${window.location.pathname === '/thank-you' ? window.location.search || '?thankyou=1' : ''}`}
       title="Shoppla Store"
       style={{
         display: 'block',
