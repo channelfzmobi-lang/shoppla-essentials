@@ -2299,7 +2299,7 @@ function selectVariantCard(idx) {
   document.querySelectorAll('.sp-variant-card').forEach((c, i) => {
     c.classList.toggle('active', i === idx);
   });
-  const p = products.find(x => x.id === currentProductId);
+  const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
     document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
     const wasEl = document.getElementById('sp-was');
@@ -2357,7 +2357,7 @@ function selectBundle(idx) {
       if (radio) radio.innerHTML = '';
     }
   });
-  const p = products.find(x => x.id === currentProductId);
+  const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
     document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
   }
@@ -2576,7 +2576,7 @@ function placeOrder() {
   const email = document.getElementById('ck-email')?.value.trim();
   if (!fname) { toast('⚠️ Please enter your name'); return; }
   if (!email||!email.includes('@')) { toast('⚠️ Please enter a valid email'); return; }
-  const p = products.find(x => x.id===currentProductId);
+  const p = productById(currentProductId);
   const total = p ? p.price + Math.round(p.price*0.08) : 0;
   const oid = Math.floor(1000+Math.random()*9000);
   const orders = getOrders();
@@ -2616,7 +2616,7 @@ function renderExternalFormEmbed(code, product) {
 }
 
 function openOrderForm() {
-  const p = products.find(x => x.id===currentProductId);
+  const p = productById(currentProductId);
   if (!p) return;
   const fc = p.formConfig || {};
   document.getElementById('of-title').textContent = fc.heading || 'Order Now — Quick & Easy';
@@ -2684,7 +2684,7 @@ function openOrderForm() {
 }
 
 function submitOrderForm(route) {
-  const p = products.find(x => x.id===currentProductId);
+  const p = productById(currentProductId);
   if (!p) return;
   const g = (k) => document.getElementById('of-'+k)?.value?.trim()||'';
   const name = g('name'), email = g('email'), phone = g('phone'), address = g('address');
@@ -2755,7 +2755,7 @@ function processPayment() {
     btn.textContent='✓ Payment Successful!'; btn.style.background='var(--green)';
     setTimeout(() => {
       closeModal('payment-modal');
-      const p = products.find(x=>x.id===currentProductId);
+      const p = productById(currentProductId);
       const tc = p?.tyConfig||{};
       showThankyou({
         id: activeOrderData.id||Math.floor(1000+Math.random()*9000),
@@ -2910,7 +2910,7 @@ async function loadAgents() {
 function normalizeTelHref(v='') { const cleaned=String(v||'').replace(/[^+0-9]/g,''); return cleaned ? 'tel:'+cleaned : ''; }
 function normalizeWaHref(v='') { v=String(v||'').trim(); if(!v) return ''; if(/^https?:\/\//i.test(v)) return v; const d=v.replace(/\D/g,''); return d?'https://wa.me/'+d:''; }
 function getActiveAgent() {
-  const p = products.find(x => x.id === currentProductId);
+  const p = productById(currentProductId);
   if (p?.agentId) {
     const a = storeAgents.find(x => String(x.id) === String(p.agentId));
     if (a) return a;
@@ -3032,8 +3032,8 @@ function subscribeToCloudChanges(){
   if(!sb) return;
   if(_cloudChannel){ try{ sb.removeChannel(_cloudChannel); }catch(e){} _cloudChannel=null; }
   _cloudChannel = sb.channel('shoppla-storefront-live-'+Date.now())
-    .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) openSalesPage(p.id);}})
-    .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=products.find(x=>x.id===currentProductId); if(p) showAgentOnCallBar(p);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=productById(currentProductId); if(p) openSalesPage(p.id);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=productById(currentProductId); if(p) showAgentOnCallBar(p);}})
     .on('postgres_changes',{event:'*',schema:'public',table:'reviews'},async()=>{if(currentProductId){await loadCloudReviews(currentProductId); renderCloudReviews(currentProductId);}})
     .subscribe();
 }
@@ -3050,7 +3050,7 @@ function subscribeToCloudChanges(){
 
 window.addEventListener('resize', () => {
   if (!currentProductId) return;
-  const p = products.find(x => x.id === currentProductId);
+  const p = productById(currentProductId);
   if (p) applySalesMediaSizing(p);
 });
 
@@ -3062,7 +3062,7 @@ window.addEventListener('storage', async (event) => {
   refreshBadge();
   subscribeToCloudChanges();
   if (salesOpen && currentProductId) {
-    const latest = products.find(x => x.id === currentProductId);
+    const latest = productById(currentProductId);
     if (latest) openSalesPage(latest.id);
   }
 });
