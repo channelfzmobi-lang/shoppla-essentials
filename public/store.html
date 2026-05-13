@@ -1955,17 +1955,17 @@ function makeCardHTML(p, showActions) {
   let mediaHTML;
   // Determine image src - handle both {base64:...} objects and plain URL strings
   const getImgSrc = (img) => typeof img === 'string' ? img : (img && (img.url || img.base64)) || '';
+  const firstImg = (p.images && p.images.length) ? getImgSrc(p.images[0]) : '';
   if (p.videoURL) {
     const embedSrc = toEmbedUrl(p.videoURL);
     if (embedSrc) {
       mediaHTML = `<iframe src="${embedSrc}" style="width:100%;height:100%;border:none;display:block;pointer-events:none;" allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe>`;
     } else {
-      mediaHTML = `<video src="${p.videoURL}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;" muted playsinline loop autoplay preload="metadata"></video>`;
+      mediaHTML = `<video src="${p.videoURL}" ${firstImg?`poster="${firstImg}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})"></video>`;
     }
   } else if (p.videoData && (p.videoData.url || p.videoData.base64)) {
     const vidSrc = p.videoData.url || p.videoData.base64;
-    const poster = p.images && p.images.length ? getImgSrc(p.images[0]) : '';
-    mediaHTML = `<video src="${vidSrc}" ${poster?`poster="${poster}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})" onclick="event.stopPropagation();this.muted=true;this.play().catch(()=>{})"></video>
+    mediaHTML = `<video src="${vidSrc}" ${firstImg?`poster="${firstImg}"`:''} style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':p.mediaFit==='fill'?'fill':'cover'};display:block;background:#0d0b09;" muted playsinline loop autoplay preload="auto" oncanplay="this.play().catch(()=>{})" onclick="event.stopPropagation();this.muted=true;this.play().catch(()=>{})"></video>
       <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(5px);color:#fff;font-size:11px;font-weight:700;padding:4px 11px;border-radius:16px;pointer-events:none;white-space:nowrap;">▶ Video preview</div>`;
   } else if (p.images && p.images.length && getImgSrc(p.images[0])) {
     mediaHTML = `<img src="${getImgSrc(p.images[0])}" style="width:100%;height:100%;object-fit:${p.mediaFit==='contain'?'contain':'cover'};display:block;" alt="${p.name}" loading="lazy"/>`;
