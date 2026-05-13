@@ -1415,6 +1415,7 @@ async function saveProduct(draft=false){
     customField: document.getElementById('fp-custom-field')?.value||'',
     externalFormEnabled: externalEnabled,
     externalFormCode: externalCode,
+    thankYouUrl: buildThankYouLink(editingProductId),
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
   };
@@ -1449,18 +1450,20 @@ async function saveProduct(draft=false){
   };
 
   if(editingProductId){
-    const p = products.find(x=>String(x.id)===String(editingProductId) || String(x._cloud_id||'')===String(editingProductId));
-    if(p) Object.assign(p, payload);
+    const p = findProductById(editingProductId);
+    if(p) Object.assign(p, payload, {id:p.id, _cloud_id:p._cloud_id});
     showToast('✅ Product updated!');
   } else {
-    products.push({id:Date.now(), icon:icons[cat]||'📦', ...payload});
+    const id = (crypto&&crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+    products.push({id, _cloud_id:id, icon:icons[cat]||'📦', ...payload, formConfig:{...formConfig, thankYouUrl:buildThankYouLink(id)}});
     showToast(draft?'📝 Saved as draft!':'✅ Product published!');
   }
   updateCounts();
+  await saveToStorage();
+  renderProductsTable();
+  refreshLivePreview();
   editingProductId = null;
   clearProductForm();
-  await saveToStorage();
-  refreshLivePreview();
   nav(document.querySelector('.sb-item[onclick*=products]'),'products');
 }
 
