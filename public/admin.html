@@ -1510,14 +1510,14 @@ function updateCounts(){
 // ─── DELETE ───
 function promptDelete(id){
   deleteTargetId = id;
-  const p = products.find(x=>x.id===id);
+  const p = findProductById(id);
   document.getElementById('confirm-msg').textContent = `Delete "${p?.name}"? This cannot be undone.`;
   document.getElementById('confirm-modal').classList.add('open');
 }
 async function confirmDelete(){
-  const removed = products.find(p=>p.id===deleteTargetId);
+  const removed = findProductById(deleteTargetId);
   const cloudId = removed?._cloud_id || (typeof removed?.id === 'string' ? removed.id : null);
-  products = products.filter(p=>p.id!==deleteTargetId);
+  products = products.filter(p=>String(p.id)!==String(deleteTargetId) && String(p._cloud_id||'')!==String(deleteTargetId));
   closeModal();
   updateCounts();
   renderProductsTable();
