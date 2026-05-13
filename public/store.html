@@ -1829,6 +1829,9 @@ let toastTimer = null;
 const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
 function getCurrency(p){ return (p?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
 function formatMoney(amount, p){ const c=CURRENCIES[getCurrency(p)]||CURRENCIES.NGN; return c.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+function formatCurrencyAmount(amount, currency='NGN'){ const c=CURRENCIES[String(currency||'NGN').toUpperCase()]||CURRENCIES.NGN; return c.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function productById(id){return products.find(x=>String(x.id)===String(id)||String(x._cloud_id||'')===String(id));}
 
 // ═══ STORAGE ═══
 async function loadData() {
