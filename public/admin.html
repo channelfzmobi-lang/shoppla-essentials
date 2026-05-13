@@ -1186,6 +1186,19 @@ function formatAdminMoney(amount, currency='USD'){
   const cfg=CURRENCIES[currency]||CURRENCIES.USD;
   return cfg.symbol + Number(amount||0).toLocaleString(undefined,{maximumFractionDigits:2});
 }
+function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function buildThankYouLink(productId){
+  const id = productId || editingProductId || '';
+  const base = `${location.origin}/thank-you`;
+  const u = new URL(base);
+  if(id) u.searchParams.set('product_id', id);
+  u.searchParams.set('source','external_form');
+  return u.toString();
+}
+function updateThankYouLink(){
+  const el=document.getElementById('fp-thankyou-url');
+  if(el) el.value=buildThankYouLink(editingProductId);
+}
 
 // ─── SUPABASE STORAGE UPLOAD HELPER ───
 async function uploadToStorage(file, folder='images') {
