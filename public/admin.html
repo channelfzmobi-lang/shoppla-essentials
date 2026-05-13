@@ -1618,6 +1618,24 @@ function buildSectionHTML(s,i){
 }
 function addSection(type){ contentSections.push({type}); renderContentSections(); showToast('✅ Section added'); }
 function removeSection(i){ contentSections.splice(i,1); renderContentSections(); }
+async function handleSectionImageUpload(input,i){
+  const f=input.files&&input.files[0];
+  if(!f || !contentSections[i]) return;
+  showToast('⏳ Uploading section image…');
+  const publicUrl=await uploadToStorage(f,'section-images');
+  const src=publicUrl || await readFileAsBase64(f);
+  if(!src){showToast('❌ Section image upload failed');return;}
+  contentSections[i].imageUrl = publicUrl || '';
+  contentSections[i].imageBase64 = publicUrl ? '' : src;
+  contentSections[i].imageName = f.name;
+  renderContentSections();
+  showToast('✅ Section image uploaded');
+}
+function removeSectionImage(i){
+  if(!contentSections[i]) return;
+  delete contentSections[i].imageUrl; delete contentSections[i].imageBase64; delete contentSections[i].imageName;
+  renderContentSections();
+}
 
 // ─── PAGE COLOR ───
 function setProductPageColor(hex){
