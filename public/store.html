@@ -2093,6 +2093,34 @@ function applySalesMediaSizing(p){
   media.style.minHeight = isMobile ? '220px' : '380px';
 }
 
+function applyProductShippingReturns(p){
+  // Inject product-specific shipping/returns/warranty content into the sales page tabs
+  const ship = document.getElementById('pd-shipping');
+  const ret  = document.getElementById('pd-returns');
+  const notes = (p.shippingNotes||'').trim();
+  const delivery = (p.deliveryInfo||'').trim();
+  const returnDays = (p.returnDays||'30 days').trim();
+  const returnPolicy = (p.returnPolicy||'').trim();
+  const warranty = (p.warranty||'').trim();
+  if(ship && (notes||delivery)){
+    ship.innerHTML = `
+      <div class="pd-ship-header"><h2>🚚 Shipping &amp; Delivery</h2><p>${escHTML(delivery||'Fast, tracked, insured delivery on every order.')}</p></div>
+      <div class="pd-ship-wrap">
+        ${notes?`<div class="pd-info-card" style="margin:0 28px 16px;"><div class="ico">📦</div><h4>Shipping Notes</h4><p>${escHTML(notes).replace(/\n/g,'<br/>')}</p></div>`:''}
+        <div class="pd-callout green" style="margin:0 28px;"><span>⚡</span><div><strong>Order today</strong> and we'll prepare your shipment within 24 hours.</div></div>
+      </div>`;
+  }
+  if(ret && (returnPolicy||warranty||returnDays)){
+    ret.innerHTML = `
+      <div class="pd-ship-header" style="background:linear-gradient(135deg,#0d4f28,#1a8a4a);"><h2>↩️ ${escHTML(returnDays)} Returns</h2><p>Shop with confidence — easy returns &amp; warranty cover.</p></div>
+      <div class="pd-ship-wrap">
+        ${returnPolicy?`<div class="pd-info-card" style="margin:0 28px 16px;"><div class="ico">↩️</div><h4>Return Policy</h4><p>${escHTML(returnPolicy).replace(/\n/g,'<br/>')}</p></div>`:''}
+        ${warranty?`<div class="pd-warranty"><h3>🏆 Warranty</h3><div class="pw-grid"><div class="pw-item"><div class="pw-years">Covered</div><div class="pw-what">${escHTML(warranty)}</div><div class="pw-desc">Full warranty support — contact us anytime.</div></div></div></div>`:''}
+        <div class="pd-callout orange" style="margin:18px 28px 0;"><span>📞</span><div><strong>Need help?</strong> Call our live support line — we respond in minutes.</div></div>
+      </div>`;
+  }
+}
+
 function openSalesPage(id) {
   const p = productById(id);
   if (!p) return;
