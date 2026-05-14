@@ -727,8 +727,47 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               </div>
             </div>
             <div class="form-group">
-              <label class="form-lbl">Installment Info (optional)</label>
+              <label class="form-lbl">Installment Info (free text — optional)</label>
               <input class="form-input" id="fp-installment" placeholder="e.g. 4 × $162.25 with Shoppla Pay — 0% interest"/>
+              <div class="form-hint">Used only when the structured installment plan below is OFF.</div>
+            </div>
+
+            <!-- ═══ STRUCTURED INSTALLMENT PLAN ═══ -->
+            <div class="section-card" style="margin-top:18px;border:1px dashed var(--border);">
+              <div class="sc-head">
+                <div class="sc-title">💳 Installment Plan Builder</div>
+                <div class="sc-sub">First payment covers your product cost + profit. Remaining balance is split across the rest.</div>
+              </div>
+              <div class="sc-body">
+                <div class="form-group">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="toggle" id="toggle-installment-plan" onclick="this.classList.toggle('on');updateInstallmentPreview()"></div>
+                    <div><div class="form-lbl" style="text-transform:none;letter-spacing:0;">Enable installment plan for this product</div></div>
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-lbl">Your Cost Price</label>
+                    <input class="form-input" id="fp-ip-cost" type="number" placeholder="0.00" oninput="updateInstallmentPreview()"/>
+                    <div class="form-hint">What this product costs you (wholesale / landed cost).</div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-lbl">Target Profit on First Payment</label>
+                    <input class="form-input" id="fp-ip-profit" type="number" placeholder="0.00" oninput="updateInstallmentPreview()"/>
+                    <div class="form-hint">Reasonable profit you want secured up front.</div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-lbl">Number of Installments</label>
+                    <input class="form-input" id="fp-ip-count" type="number" min="2" max="12" value="3" oninput="updateInstallmentPreview()"/>
+                    <div class="form-hint">Total payments including the first one (2–12).</div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-lbl">Plan Label (optional)</label>
+                    <input class="form-input" id="fp-ip-label" placeholder="e.g. Pay-Small-Small Plan" oninput="updateInstallmentPreview()"/>
+                  </div>
+                </div>
+                <div id="fp-ip-preview" style="margin-top:10px;padding:14px;border-radius:10px;background:#fff8ee;border:1px solid #f0d8a8;font-size:13px;color:#5a3d10;display:none;"></div>
+              </div>
             </div>
             <div class="form-group">
               <div style="display:flex;align-items:center;gap:12px;">
@@ -1339,6 +1378,15 @@ function editProduct(id){
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
     setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); setV('fp-thankyou-url',fc.thankYouUrl); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
+    // Installment plan
+    const ip = fc.installmentPlan || {};
+    const ipTog = document.getElementById('toggle-installment-plan');
+    if(ipTog){ ipTog.classList.toggle('on', !!ip.enabled); }
+    setV('fp-ip-cost', ip.cost!=null?ip.cost:'');
+    setV('fp-ip-profit', ip.profit!=null?ip.profit:'');
+    setV('fp-ip-count', ip.count||3);
+    setV('fp-ip-label', ip.label||'');
+    setTimeout(updateInstallmentPreview,50);
   }
   if(p.tyConfig){
     const tc=p.tyConfig;
@@ -1431,6 +1479,7 @@ async function saveProduct(draft=false){
     thankYouUrl: buildThankYouLink(editingProductId),
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
+    installmentPlan: getInstallmentPlanFromForm(),
   };
   const tyConfig = {
     heading: document.getElementById('fp-ty-heading')?.value||'Order Confirmed! 🎉',
@@ -1481,11 +1530,14 @@ async function saveProduct(draft=false){
 }
 
 function clearProductForm(){
-  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code'].forEach(id=>{
+  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code','fp-ip-cost','fp-ip-profit','fp-ip-label'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
   document.getElementById('fp-stock').value = 10;
+  const ipCount = document.getElementById('fp-ip-count'); if(ipCount) ipCount.value = 3;
+  const ipTog = document.getElementById('toggle-installment-plan'); if(ipTog) ipTog.classList.remove('on');
+  const ipPrev = document.getElementById('fp-ip-preview'); if(ipPrev) ipPrev.style.display='none';
   setProductPageColor('#ffffff');
   syncMediaHeight('desktop', 640);
   syncMediaHeight('mobile', 320);
@@ -2697,6 +2749,42 @@ function refreshLivePreview(){
 // Alias used by inline oninput handlers in the product form
 function updateProductPreview(){ try{ refreshLivePreview(); }catch(e){} }
 window.updateProductPreview = updateProductPreview;
+
+// ═══ INSTALLMENT PLAN HELPERS ═══
+function getInstallmentPlanFromForm(){
+  const enabled = !!document.getElementById('toggle-installment-plan')?.classList.contains('on');
+  const cost    = parseFloat(document.getElementById('fp-ip-cost')?.value)||0;
+  const profit  = parseFloat(document.getElementById('fp-ip-profit')?.value)||0;
+  const count   = Math.max(2, Math.min(12, parseInt(document.getElementById('fp-ip-count')?.value)||3));
+  const label   = document.getElementById('fp-ip-label')?.value.trim()||'';
+  return { enabled, cost, profit, count, label };
+}
+function computeInstallmentBreakdown(price, plan){
+  if(!plan || !plan.enabled) return null;
+  const total = parseFloat(price)||0;
+  const first = (parseFloat(plan.cost)||0) + (parseFloat(plan.profit)||0);
+  const remaining = Math.max(0, total - first);
+  const rest = plan.count > 1 ? remaining / (plan.count - 1) : 0;
+  return { total, first, rest, count: plan.count, label: plan.label||'Installment Plan', valid: first>0 && first<=total };
+}
+function fmtNum(n){ return (Math.round((n+Number.EPSILON)*100)/100).toLocaleString(undefined,{maximumFractionDigits:2}); }
+function updateInstallmentPreview(){
+  const previewEl = document.getElementById('fp-ip-preview');
+  if(!previewEl) return;
+  const plan = getInstallmentPlanFromForm();
+  if(!plan.enabled){ previewEl.style.display='none'; return; }
+  const price = parseFloat(document.getElementById('fp-price')?.value)||0;
+  const sym = ({NGN:'₦',GHS:'₵',USD:'$'})[document.getElementById('fp-currency')?.value||'NGN']||'';
+  const b = computeInstallmentBreakdown(price, plan);
+  if(!b){ previewEl.style.display='none'; return; }
+  previewEl.style.display='block';
+  if(price<=0){ previewEl.innerHTML='⚠️ Set the product price first.'; return; }
+  if(!b.valid){ previewEl.innerHTML=`⚠️ First payment (${sym}${fmtNum(b.first)}) must be greater than 0 and not exceed total price (${sym}${fmtNum(price)}).`; return; }
+  previewEl.innerHTML = `<b>${b.label}:</b> Customer pays <b>${sym}${fmtNum(b.first)}</b> first (covers your cost ${sym}${fmtNum(plan.cost)} + profit ${sym}${fmtNum(plan.profit)}), then <b>${b.count-1} × ${sym}${fmtNum(b.rest)}</b> to complete <b>${sym}${fmtNum(price)}</b>.`;
+}
+window.updateInstallmentPreview = updateInstallmentPreview;
+window.computeInstallmentBreakdown = computeInstallmentBreakdown;
+
 
 // Global "Save Changes" — context-aware: saves the active panel
 async function globalSaveChanges(){
