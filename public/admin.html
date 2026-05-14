@@ -1378,6 +1378,15 @@ function editProduct(id){
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
     setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); setV('fp-thankyou-url',fc.thankYouUrl); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
+    // Installment plan
+    const ip = fc.installmentPlan || {};
+    const ipTog = document.getElementById('toggle-installment-plan');
+    if(ipTog){ ipTog.classList.toggle('on', !!ip.enabled); }
+    setV('fp-ip-cost', ip.cost!=null?ip.cost:'');
+    setV('fp-ip-profit', ip.profit!=null?ip.profit:'');
+    setV('fp-ip-count', ip.count||3);
+    setV('fp-ip-label', ip.label||'');
+    setTimeout(updateInstallmentPreview,50);
   }
   if(p.tyConfig){
     const tc=p.tyConfig;
