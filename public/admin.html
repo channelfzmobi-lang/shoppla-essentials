@@ -1479,6 +1479,7 @@ async function saveProduct(draft=false){
     thankYouUrl: buildThankYouLink(editingProductId),
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
+    installmentPlan: getInstallmentPlanFromForm(),
   };
   const tyConfig = {
     heading: document.getElementById('fp-ty-heading')?.value||'Order Confirmed! 🎉',
