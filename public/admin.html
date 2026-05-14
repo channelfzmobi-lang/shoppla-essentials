@@ -1530,7 +1530,7 @@ async function saveProduct(draft=false){
 }
 
 function clearProductForm(){
-  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code'].forEach(id=>{
+  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code','fp-ip-cost','fp-ip-profit','fp-ip-label'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
