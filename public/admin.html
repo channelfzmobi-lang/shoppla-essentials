@@ -1535,6 +1535,9 @@ function clearProductForm(){
     if(el) el.value = '';
   });
   document.getElementById('fp-stock').value = 10;
+  const ipCount = document.getElementById('fp-ip-count'); if(ipCount) ipCount.value = 3;
+  const ipTog = document.getElementById('toggle-installment-plan'); if(ipTog) ipTog.classList.remove('on');
+  const ipPrev = document.getElementById('fp-ip-preview'); if(ipPrev) ipPrev.style.display='none';
   setProductPageColor('#ffffff');
   syncMediaHeight('desktop', 640);
   syncMediaHeight('mobile', 320);
