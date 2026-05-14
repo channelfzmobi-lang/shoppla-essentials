@@ -1594,6 +1594,10 @@ function buildSectionHTML(s,i){
     <div class="form-group"><label class="form-lbl">Body Text</label><textarea class="form-textarea" placeholder="Paragraph text…" oninput="contentSections[${i}].body=this.value">${escHTML(s.body||'')}</textarea></div>
     <div class="form-group"><label class="form-lbl">Image / Emoji placeholder</label><input class="form-input" value="${escHTML(s.emoji||'')}" placeholder="Emoji e.g. 🛋️ (will show until real image uploaded)" oninput="contentSections[${i}].emoji=this.value"/></div>
     ${sectionMediaHTML(s,i)}
+    <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div><label class="form-lbl">Image Height (px) — ${s.imageHeight||420}</label><input type="range" min="220" max="720" step="10" value="${s.imageHeight||420}" oninput="contentSections[${i}].imageHeight=parseInt(this.value);this.previousElementSibling.textContent='Image Height (px) — '+this.value"/></div>
+      <div><label class="form-lbl">Image Fit</label><select class="form-select" onchange="contentSections[${i}].imageFit=this.value"><option value="cover" ${(!s.imageFit||s.imageFit==='cover')?'selected':''}>Cover (fill & crop)</option><option value="contain" ${s.imageFit==='contain'?'selected':''}>Contain (no crop)</option><option value="fill" ${s.imageFit==='fill'?'selected':''}>Stretch</option></select></div>
+    </div>
     <div class="form-group"><label class="form-lbl">Image Caption</label><input class="form-input" value="${escHTML(s.caption||'')}" placeholder="e.g. Upload lifestyle photo here" oninput="contentSections[${i}].caption=this.value"/></div>
   `;
   else if(s.type==='bullet-list') inner=`
