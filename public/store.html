@@ -2139,7 +2139,24 @@ function openSalesPage(id) {
   document.getElementById('sp-name-bc').textContent = p.name;
   document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
   const instEl = document.getElementById('sp-install');
-  if (instEl) instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
+  if (instEl) {
+    const ip = (p.formConfig && p.formConfig.installmentPlan) || null;
+    if (ip && ip.enabled) {
+      const total = parseFloat(p.price)||0;
+      const first = (parseFloat(ip.cost)||0) + (parseFloat(ip.profit)||0);
+      const count = Math.max(2, Math.min(12, parseInt(ip.count)||3));
+      const rest  = count > 1 ? Math.max(0, total - first) / (count - 1) : 0;
+      if (first > 0 && first <= total) {
+        const fmt = (n)=>formatMoney(n, p);
+        const label = (ip.label||'Installment Plan');
+        instEl.innerHTML = `<b>${label}:</b> Pay <b>${fmt(first)}</b> first, then <b>${count-1} × ${fmt(rest)}</b> &nbsp;<span style="color:#888;">(Total ${fmt(total)})</span>`;
+      } else {
+        instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
+      }
+    } else {
+      instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
+    }
+  }
   document.getElementById('qty-val').value = 1;
 
   document.getElementById('ck-prod-name').textContent = p.name;
