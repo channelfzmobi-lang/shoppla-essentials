@@ -2066,9 +2066,11 @@ function renderProductDetailSections(p){
     if(s.type==='headline-text') return `<div class="pd-section ${s.bg==='warm'?'light':''}" ${s.bg==='dark'?'style="background:#100e0b;color:#fff;"':''}><div class="pd-text" style="grid-column:1/-1;${s.bg==='dark'?'color:#fff;':''}">${eyebrow?`<div class="pd-eyebrow">${eyebrow}</div>`:''}<h2 class="pd-h2" ${s.bg==='dark'?'style="color:#fff;"':''}>${h}</h2><p class="pd-body">${body}</p></div></div>`;
     if(s.type==='text-image-right'||s.type==='image-text-right'){
       const src=s.imageUrl||s.imageBase64||imgFallback;
-      const media=src?`<img src="${src}" alt="${h}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"/>`:`<span>${emoji}</span>`;
+      const fit=s.imageFit==='contain'?'contain':s.imageFit==='fill'?'fill':'cover';
+      const h_px=Math.max(220,Math.min(720,parseInt(s.imageHeight)||420));
+      const media=src?`<img src="${src}" alt="${h}" style="width:100%;height:100%;object-fit:${fit};position:absolute;inset:0;background:#f5f4f0;"/>`:`<span>${emoji}</span>`;
       const cap=s.caption?`<div style="position:absolute;bottom:18px;left:18px;right:18px;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--ink);">${escHTML(s.caption)}</div>`:'';
-      return `<div class="pd-section light ${s.type==='image-text-right'?'flip':''}"><div class="pd-text"><h2 class="pd-h2">${h}</h2><p class="pd-body">${body}</p></div><div class="pd-img">${media}${cap}</div></div>`;
+      return `<div class="pd-section light ${s.type==='image-text-right'?'flip':''}"><div class="pd-text"><h2 class="pd-h2">${h}</h2><p class="pd-body">${body}</p></div><div class="pd-img" style="height:${h_px}px;min-height:${h_px}px;position:relative;overflow:hidden;border-radius:14px;">${media}${cap}</div></div>`;
     }
     if(s.type==='bullet-list') return `<div class="pd-pills">${String(s.bullets||'').split('\n').filter(Boolean).map(b=>`<div class="pd-pill">${escHTML(b)}</div>`).join('')}</div>`;
     if(s.type==='stats') return `<div class="pd-section"><div class="pd-text" style="grid-column:1/-1;"><div class="pd-stat-row">${String(s.stats||'').split('\n').filter(Boolean).map(r=>{const [n,l]=r.split('|');return `<div><div class="pd-stat-n">${escHTML(n||'')}</div><div class="pd-stat-l">${escHTML(l||'')}</div></div>`}).join('')}</div></div></div>`;
@@ -2089,6 +2091,34 @@ function applySalesMediaSizing(p){
   media.style.height = `${isMobile ? mobile : desktop}px`;
   media.style.maxHeight = isMobile ? '560px' : 'calc(100vh - var(--nav-h))';
   media.style.minHeight = isMobile ? '220px' : '380px';
+}
+
+function applyProductShippingReturns(p){
+  // Inject product-specific shipping/returns/warranty content into the sales page tabs
+  const ship = document.getElementById('pd-shipping');
+  const ret  = document.getElementById('pd-returns');
+  const notes = (p.shippingNotes||'').trim();
+  const delivery = (p.deliveryInfo||'').trim();
+  const returnDays = (p.returnDays||'30 days').trim();
+  const returnPolicy = (p.returnPolicy||'').trim();
+  const warranty = (p.warranty||'').trim();
+  if(ship && (notes||delivery)){
+    ship.innerHTML = `
+      <div class="pd-ship-header"><h2>🚚 Shipping &amp; Delivery</h2><p>${escHTML(delivery||'Fast, tracked, insured delivery on every order.')}</p></div>
+      <div class="pd-ship-wrap">
+        ${notes?`<div class="pd-info-card" style="margin:0 28px 16px;"><div class="ico">📦</div><h4>Shipping Notes</h4><p>${escHTML(notes).replace(/\n/g,'<br/>')}</p></div>`:''}
+        <div class="pd-callout green" style="margin:0 28px;"><span>⚡</span><div><strong>Order today</strong> and we'll prepare your shipment within 24 hours.</div></div>
+      </div>`;
+  }
+  if(ret && (returnPolicy||warranty||returnDays)){
+    ret.innerHTML = `
+      <div class="pd-ship-header" style="background:linear-gradient(135deg,#0d4f28,#1a8a4a);"><h2>↩️ ${escHTML(returnDays)} Returns</h2><p>Shop with confidence — easy returns &amp; warranty cover.</p></div>
+      <div class="pd-ship-wrap">
+        ${returnPolicy?`<div class="pd-info-card" style="margin:0 28px 16px;"><div class="ico">↩️</div><h4>Return Policy</h4><p>${escHTML(returnPolicy).replace(/\n/g,'<br/>')}</p></div>`:''}
+        ${warranty?`<div class="pd-warranty"><h3>🏆 Warranty</h3><div class="pw-grid"><div class="pw-item"><div class="pw-years">Covered</div><div class="pw-what">${escHTML(warranty)}</div><div class="pw-desc">Full warranty support — contact us anytime.</div></div></div></div>`:''}
+        <div class="pd-callout orange" style="margin:18px 28px 0;"><span>📞</span><div><strong>Need help?</strong> Call our live support line — we respond in minutes.</div></div>
+      </div>`;
+  }
 }
 
 function openSalesPage(id) {
@@ -2129,6 +2159,7 @@ function openSalesPage(id) {
   buildCTAs(p);
   applyTemplate(p);
   renderProductDetailSections(p);
+  applyProductShippingReturns(p);
 
   gotoPage('sales-page');
   showAgentOnCallBar(p);
