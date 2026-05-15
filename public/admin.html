@@ -2784,8 +2784,10 @@ function validateInstallmentPlan(plan, productPrice){
   if(price <= 0) errors.push({field:'enabled', msg:'Set a product price above 0 before enabling installments.'});
   if(plan.cost <= 0) errors.push({field:'cost', msg:'Cost price must be greater than 0.'});
   if(Number.isNaN(plan.profit) || plan.profit < 0) errors.push({field:'profit', msg:'Profit cannot be negative.'});
-  if(Number.isNaN(plan.count) || plan.count < 2) errors.push({field:'count', msg:'Installments must be at least 2.'});
-  if(plan.count > 12) errors.push({field:'count', msg:'Installments cannot exceed 12.'});
+
+  const countRaw = parseInt(document.getElementById('fp-ip-count')?.value);
+  if(Number.isNaN(countRaw) || countRaw < 2) errors.push({field:'count', msg:'Installments must be at least 2.'});
+  if(!Number.isNaN(countRaw) && countRaw > 12) errors.push({field:'count', msg:'Installments cannot exceed 12.'});
 
   const first = plan.cost + plan.profit;
   if(first <= 0 && plan.cost > 0 && plan.profit >= 0) errors.push({field:'cost', msg:'First payment (cost + profit) must be greater than 0.'});
