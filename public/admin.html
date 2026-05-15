@@ -2770,7 +2770,8 @@ function getInstallmentPlanFromForm(){
   const enabled = !!document.getElementById('toggle-installment-plan')?.classList.contains('on');
   const cost    = parseFloat(document.getElementById('fp-ip-cost')?.value)||0;
   const profit  = parseFloat(document.getElementById('fp-ip-profit')?.value)||0;
-  const count   = parseInt(document.getElementById('fp-ip-count')?.value)||3;
+  const countRaw= parseInt(document.getElementById('fp-ip-count')?.value)||3;
+  const count   = Math.max(2, Math.min(12, countRaw));
   const label   = document.getElementById('fp-ip-label')?.value.trim()||'';
   return { enabled, cost, profit, count, label };
 }
