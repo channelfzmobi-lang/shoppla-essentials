@@ -744,26 +744,32 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                     <div class="toggle" id="toggle-installment-plan" onclick="this.classList.toggle('on');updateInstallmentPreview()"></div>
                     <div><div class="form-lbl" style="text-transform:none;letter-spacing:0;">Enable installment plan for this product</div></div>
                   </div>
+                  <div id="fp-ip-error-enabled" class="ip-error" style="display:none;margin-top:6px;font-size:12px;font-weight:600;color:var(--red);"></div>
                 </div>
                 <div class="form-grid-2">
                   <div class="form-group">
-                    <label class="form-lbl">Your Cost Price</label>
+                    <label class="form-lbl">Your Cost Price <span>*</span></label>
                     <input class="form-input" id="fp-ip-cost" type="number" placeholder="0.00" oninput="updateInstallmentPreview()"/>
                     <div class="form-hint">What this product costs you (wholesale / landed cost).</div>
+                    <div id="fp-ip-error-cost" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
                   </div>
                   <div class="form-group">
-                    <label class="form-lbl">Target Profit on First Payment</label>
+                    <label class="form-lbl">Target Profit on First Payment <span>*</span></label>
                     <input class="form-input" id="fp-ip-profit" type="number" placeholder="0.00" oninput="updateInstallmentPreview()"/>
                     <div class="form-hint">Reasonable profit you want secured up front.</div>
+                    <div id="fp-ip-error-profit" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
                   </div>
                   <div class="form-group">
-                    <label class="form-lbl">Number of Installments</label>
+                    <label class="form-lbl">Number of Installments <span>*</span></label>
                     <input class="form-input" id="fp-ip-count" type="number" min="2" max="12" value="3" oninput="updateInstallmentPreview()"/>
                     <div class="form-hint">Total payments including the first one (2–12).</div>
+                    <div id="fp-ip-error-count" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
                   </div>
                   <div class="form-group">
                     <label class="form-lbl">Plan Label (optional)</label>
                     <input class="form-input" id="fp-ip-label" placeholder="e.g. Pay-Small-Small Plan" oninput="updateInstallmentPreview()"/>
+                    <div class="form-hint">Name shown to customers on the sales page.</div>
+                    <div id="fp-ip-error-label" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
                   </div>
                 </div>
                 <div id="fp-ip-preview" style="margin-top:10px;padding:14px;border-radius:10px;background:#fff8ee;border:1px solid #f0d8a8;font-size:13px;color:#5a3d10;display:none;"></div>
