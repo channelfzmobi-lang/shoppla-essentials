@@ -2761,10 +2761,29 @@ function getInstallmentPlanFromForm(){
   const enabled = !!document.getElementById('toggle-installment-plan')?.classList.contains('on');
   const cost    = parseFloat(document.getElementById('fp-ip-cost')?.value)||0;
   const profit  = parseFloat(document.getElementById('fp-ip-profit')?.value)||0;
-  const count   = Math.max(2, Math.min(12, parseInt(document.getElementById('fp-ip-count')?.value)||3));
+  const count   = parseInt(document.getElementById('fp-ip-count')?.value)||3;
   const label   = document.getElementById('fp-ip-label')?.value.trim()||'';
   return { enabled, cost, profit, count, label };
 }
+
+function validateInstallmentPlan(plan, productPrice){
+  const errors = [];
+  if(!plan.enabled) return errors;
+  const price = parseFloat(productPrice)||0;
+
+  if(price <= 0) errors.push({field:'enabled', msg:'Set a product price above 0 before enabling installments.'});
+  if(plan.cost <= 0) errors.push({field:'cost', msg:'Cost price must be greater than 0.'});
+  if(Number.isNaN(plan.profit) || plan.profit < 0) errors.push({field:'profit', msg:'Profit cannot be negative.'});
+  if(Number.isNaN(plan.count) || plan.count < 2) errors.push({field:'count', msg:'Installments must be at least 2.'});
+  if(plan.count > 12) errors.push({field:'count', msg:'Installments cannot exceed 12.'});
+
+  const first = plan.cost + plan.profit;
+  if(first <= 0 && plan.cost > 0 && plan.profit >= 0) errors.push({field:'cost', msg:'First payment (cost + profit) must be greater than 0.'});
+  if(price > 0 && first > price) errors.push({field:'cost', msg:`First payment (${first}) exceeds product price (${price}). Reduce cost or profit.`});
+
+  return errors;
+}
+
 function computeInstallmentBreakdown(price, plan){
   if(!plan || !plan.enabled) return null;
   const total = parseFloat(price)||0;
@@ -2773,23 +2792,62 @@ function computeInstallmentBreakdown(price, plan){
   const rest = plan.count > 1 ? remaining / (plan.count - 1) : 0;
   return { total, first, rest, count: plan.count, label: plan.label||'Installment Plan', valid: first>0 && first<=total };
 }
+
 function fmtNum(n){ return (Math.round((n+Number.EPSILON)*100)/100).toLocaleString(undefined,{maximumFractionDigits:2}); }
+
 function updateInstallmentPreview(){
   const previewEl = document.getElementById('fp-ip-preview');
   if(!previewEl) return;
+
+  // Clear all inline errors first
+  ['enabled','cost','profit','count','label'].forEach(k=>{
+    const el = document.getElementById('fp-ip-error-'+k);
+    if(el){ el.style.display='none'; el.textContent=''; }
+  });
+
   const plan = getInstallmentPlanFromForm();
   if(!plan.enabled){ previewEl.style.display='none'; return; }
+
   const price = parseFloat(document.getElementById('fp-price')?.value)||0;
   const sym = ({NGN:'₦',GHS:'₵',USD:'$'})[document.getElementById('fp-currency')?.value||'NGN']||'';
+
+  const errors = validateInstallmentPlan(plan, price);
+  if(errors.length){
+    previewEl.style.display='block';
+    previewEl.style.background='#fef2f2';
+    previewEl.style.borderColor='#fecaca';
+    previewEl.style.color='#7f1d1d';
+    errors.forEach(err=>{
+      const el = document.getElementById('fp-ip-error-'+err.field);
+      if(el){ el.textContent='❌ '+err.msg; el.style.display='block'; }
+    });
+    const msgs = errors.map(e=>e.msg).join(' · ');
+    previewEl.innerHTML = `<b>Cannot save — fix these issues:</b><br/>${msgs}`;
+    return;
+  }
+
   const b = computeInstallmentBreakdown(price, plan);
   if(!b){ previewEl.style.display='none'; return; }
+
   previewEl.style.display='block';
-  if(price<=0){ previewEl.innerHTML='⚠️ Set the product price first.'; return; }
-  if(!b.valid){ previewEl.innerHTML=`⚠️ First payment (${sym}${fmtNum(b.first)}) must be greater than 0 and not exceed total price (${sym}${fmtNum(price)}).`; return; }
+  previewEl.style.background='#fff8ee';
+  previewEl.style.borderColor='#f0d8a8';
+  previewEl.style.color='#5a3d10';
   previewEl.innerHTML = `<b>${b.label}:</b> Customer pays <b>${sym}${fmtNum(b.first)}</b> first (covers your cost ${sym}${fmtNum(plan.cost)} + profit ${sym}${fmtNum(plan.profit)}), then <b>${b.count-1} × ${sym}${fmtNum(b.rest)}</b> to complete <b>${sym}${fmtNum(price)}</b>.`;
 }
+
+function isInstallmentValid(){
+  const plan = getInstallmentPlanFromForm();
+  if(!plan.enabled) return true;
+  const price = parseFloat(document.getElementById('fp-price')?.value)||0;
+  return validateInstallmentPlan(plan, price).length === 0;
+}
+
+window.getInstallmentPlanFromForm = getInstallmentPlanFromForm;
 window.updateInstallmentPreview = updateInstallmentPreview;
 window.computeInstallmentBreakdown = computeInstallmentBreakdown;
+window.validateInstallmentPlan = validateInstallmentPlan;
+window.isInstallmentValid = isInstallmentValid;
 
 
 // Global "Save Changes" — context-aware: saves the active panel
