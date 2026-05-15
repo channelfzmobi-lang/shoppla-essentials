@@ -1470,6 +1470,15 @@ async function saveProduct(draft=false){
 
   if(!name||!price){ showToast('⚠️ Please fill in Name and Price'); return; }
 
+  // Validate installment plan if enabled
+  if(!isInstallmentValid()){
+    showToast('⚠️ Fix installment plan errors in the Pricing tab before saving');
+    // Switch to Pricing tab so user sees the errors
+    const pricingTab = document.querySelector('.tab[onclick*="tab-pricing"]');
+    if(pricingTab) switchFormTab(pricingTab, 'tab-pricing');
+    return;
+  }
+
   // Collect checkout / form / gateway settings
   const externalCode = document.getElementById('fp-external-form-code')?.value||'';
   const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked || !!externalCode.trim();
