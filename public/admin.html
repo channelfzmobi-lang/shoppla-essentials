@@ -1593,6 +1593,8 @@ function clearProductForm(){
   // Reset bundles & badges
   currentBundles = []; renderBundles();
   const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
+  const efc=document.getElementById('fp-external-form-code'); if(efc) efc.value='';
+  updateThankYouLink();
 }
 
 function updateCounts(){
