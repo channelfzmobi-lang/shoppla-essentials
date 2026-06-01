@@ -530,6 +530,13 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                   🛋️
                 </div>
               </div>
+              <div style="margin-top:12px;background:#fff8ed;border:1.5px solid #f4d39a;border-radius:10px;padding:12px 14px;font-size:12.5px;line-height:1.55;color:#6b4a13;">
+                <div style="font-weight:800;margin-bottom:6px;">✏️ How to edit each template's content</div>
+                <div><strong>Aero</strong> — Edit the <em>Benefit Badges</em> (checklist), <em>Bundle Pricing</em> (kit cards), <em>Warranty / Return Days</em> (guarantee strip).</div>
+                <div><strong>LUVEA</strong> — Edit the <em>Benefit Badges</em> (4-icon grid) and <em>Content Sections</em> below (each one becomes an FAQ accordion item).</div>
+                <div><strong>Radiance</strong> — Edit the <em>Benefit Badges</em> (2×2 grid), <em>Bundle Pricing</em> (variant cards), <em>Return Days</em> (money-back banner).</div>
+                <div><strong>Dark / Classic</strong> — Edit the <em>Benefit Badges</em> (floating image badges) and standard fields.</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-lbl">📦 Bundle Pricing (Optional)</label>
@@ -539,7 +546,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-group">
               <label class="form-lbl">🏷️ Benefit Badges (Optional)</label>
-              <div class="form-hint" style="margin-bottom:8px;">Custom badges that appear on the product image (Dark/Bold templates only). One per line: emoji|text</div>
+              <div class="form-hint" style="margin-bottom:8px;">Used by every template — checklist (Aero), 4-icon grid (LUVEA/Radiance), floating image badges (Dark). One per line: emoji|text</div>
               <textarea class="form-textarea" id="fp-benefit-badges" placeholder="💪|Premium Quality&#10;🧠|Expert Tested&#10;✅|Third-Party Verified&#10;🔬|13.6x Absorption" style="min-height:80px;"></textarea>
             </div>
             <div class="form-group">
@@ -550,9 +557,16 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               </label>
               <textarea class="form-textarea" id="fp-external-form-code" placeholder="Paste a form URL, iframe, script, or full embed code from another platform…" style="min-height:110px;" oninput="updateThankYouLink()"></textarea>
               <div class="form-hint">When enabled, the storefront opens this embedded form for the product order button.</div>
-              <label class="form-lbl" style="margin-top:10px;">Shoppla Thank You / Order Capture Link</label>
-              <input class="form-input" id="fp-thankyou-url" readonly value="" onclick="this.select();navigator.clipboard?.writeText(this.value);showToast('🔗 Thank-you link copied')"/>
-              <div class="form-hint">Paste this as the redirect/success URL in your external form. Shoppla records the order when customers land there.</div>
+
+              <div style="margin-top:14px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:12px;padding:14px 16px;">
+                <div style="font-weight:800;font-size:13.5px;color:#78350f;margin-bottom:6px;">🔗 Thank-You / Order Capture Link <span style="background:#f59e0b;color:#fff;font-size:10px;padding:2px 7px;border-radius:6px;margin-left:6px;">REQUIRED</span></div>
+                <div style="font-size:12.5px;color:#92400e;line-height:1.5;margin-bottom:10px;">Paste this URL as the <strong>redirect / success / thank-you</strong> URL inside your external form (Typeform, Tally, Google Form, Stripe, Paystack, etc.). When a customer lands here after submitting, Shoppla automatically records the order on your admin dashboard so it counts toward analytics &amp; sales.</div>
+                <div style="display:flex;gap:8px;align-items:stretch;">
+                  <input class="form-input" id="fp-thankyou-url" readonly value="" style="flex:1;background:#fff;font-family:monospace;font-size:12px;" onclick="this.select()"/>
+                  <button type="button" onclick="const i=document.getElementById('fp-thankyou-url');i.select();navigator.clipboard?.writeText(i.value);showToast('🔗 Thank-you link copied — paste into your external form');" style="background:#78350f;color:#fff;border:none;border-radius:8px;padding:0 16px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;">📋 Copy</button>
+                </div>
+                <div style="font-size:11.5px;color:#78350f;margin-top:8px;line-height:1.5;">✓ Works with any form provider · ✓ Order shows up instantly in Admin → Orders · ✓ Counts in revenue analytics</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1579,6 +1593,8 @@ function clearProductForm(){
   // Reset bundles & badges
   currentBundles = []; renderBundles();
   const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
+  const efc=document.getElementById('fp-external-form-code'); if(efc) efc.value='';
+  updateThankYouLink();
 }
 
 function updateCounts(){
