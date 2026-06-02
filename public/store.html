@@ -2173,6 +2173,23 @@ function openSalesPage(id) {
       instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
     }
     instEl.classList.toggle('is-plan', isPlan);
+    // Apply admin-chosen colors
+    if (isPlan && ip && ip.colors) {
+      const c = ip.colors;
+      const bg = c.bg||'#fff3c4', bd = c.border||'#f5b400', gl = c.glow||'#f5b400';
+      const hexToRgba=(hex,a)=>{const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return m?`rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a})`:hex;};
+      instEl.style.background = `linear-gradient(135deg, ${bg}, ${hexToRgba(bg,.85)})`;
+      instEl.style.borderColor = bd;
+      instEl.style.setProperty('--ip-glow-1', hexToRgba(gl,.55));
+      instEl.style.setProperty('--ip-glow-2', hexToRgba(gl,0));
+      instEl.style.setProperty('--ip-glow-3', hexToRgba(gl,.22));
+      instEl.style.setProperty('--ip-glow-4', hexToRgba(gl,.55));
+      instEl.style.animation = 'installGlowDyn 2.2s ease-in-out infinite';
+    } else {
+      instEl.style.background = '';
+      instEl.style.borderColor = '';
+      instEl.style.animation = '';
+    }
   }
   document.getElementById('qty-val').value = 1;
 
