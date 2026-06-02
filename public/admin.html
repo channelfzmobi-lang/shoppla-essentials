@@ -480,14 +480,24 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-lbl">Colour Options</label>
+                <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <span>Colour Options</span>
+                  <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;">
+                    <input type="checkbox" id="fp-show-colors" checked style="accent-color:var(--accent);"> Show on sales page
+                  </label>
+                </label>
                 <input class="form-input" id="fp-colors" placeholder="e.g. Dusty Rose, Charcoal, Camel"/>
-                <div class="form-hint">Comma-separated colour names</div>
+                <div class="form-hint">Comma-separated. Uncheck "Show on sales page" to hide the colour picker for this product/template.</div>
               </div>
               <div class="form-group">
-                <label class="form-lbl">Size Options</label>
+                <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <span>Size Options</span>
+                  <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;">
+                    <input type="checkbox" id="fp-show-sizes" checked style="accent-color:var(--accent);"> Show on sales page
+                  </label>
+                </label>
                 <input class="form-input" id="fp-sizes" placeholder="e.g. S, M, L, XL  or  2-Seater, 3-Seater"/>
-                <div class="form-hint">Comma-separated size options</div>
+                <div class="form-hint">Comma-separated. Uncheck to hide the size picker for this product/template.</div>
               </div>
             </div>
             <div class="form-group">
