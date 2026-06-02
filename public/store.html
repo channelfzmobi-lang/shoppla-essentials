@@ -284,6 +284,10 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
   0%,100%{box-shadow:0 0 0 0 rgba(245,180,0,.55), 0 0 22px 2px rgba(245,180,0,.22); border-color:#f5b400;}
   50%   {box-shadow:0 0 0 6px rgba(245,180,0,0),   0 0 32px 8px rgba(245,180,0,.55); border-color:#ffcd3a;}
 }
+@keyframes installGlowDyn{
+  0%,100%{box-shadow:0 0 0 0 var(--ip-glow-1), 0 0 22px 2px var(--ip-glow-3);}
+  50%   {box-shadow:0 0 0 6px var(--ip-glow-2),  0 0 32px 8px var(--ip-glow-4);}
+}
 .sp-stock{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--green);margin-bottom:4px;}
 .sp-stock-dot{width:7px;height:7px;background:var(--green);border-radius:50%;}
 .sp-delivery{font-size:12.5px;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;}
@@ -1870,6 +1874,7 @@ async function loadData() {
           pageTemplate:p.page_template||'classic',
           bundles:(p.form_config&&p.form_config.bundles)||[],
           benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
+          templateContent:(p.form_config&&p.form_config.templateContent)||{},
         }));
         return;
       }
@@ -2173,6 +2178,23 @@ function openSalesPage(id) {
       instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
     }
     instEl.classList.toggle('is-plan', isPlan);
+    // Apply admin-chosen colors
+    if (isPlan && ip && ip.colors) {
+      const c = ip.colors;
+      const bg = c.bg||'#fff3c4', bd = c.border||'#f5b400', gl = c.glow||'#f5b400';
+      const hexToRgba=(hex,a)=>{const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return m?`rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a})`:hex;};
+      instEl.style.background = `linear-gradient(135deg, ${bg}, ${hexToRgba(bg,.85)})`;
+      instEl.style.borderColor = bd;
+      instEl.style.setProperty('--ip-glow-1', hexToRgba(gl,.55));
+      instEl.style.setProperty('--ip-glow-2', hexToRgba(gl,0));
+      instEl.style.setProperty('--ip-glow-3', hexToRgba(gl,.22));
+      instEl.style.setProperty('--ip-glow-4', hexToRgba(gl,.55));
+      instEl.style.animation = 'installGlowDyn 2.2s ease-in-out infinite';
+    } else {
+      instEl.style.background = '';
+      instEl.style.borderColor = '';
+      instEl.style.animation = '';
+    }
   }
   document.getElementById('qty-val').value = 1;
 
@@ -2232,15 +2254,19 @@ function applyTemplate(p) {
   const spCtas = document.getElementById('sp-ctas');
   const trustRow = spInfo?.querySelector('.trust-row');
   
+  const TC = p.templateContent || {};
+
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
     const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✓',text:'Powerful multi-surface suction'},{icon:'✓',text:'Lightweight, easy-to-use design'},{icon:'✓',text:'Works on carpet, rugs, stairs & upholstery'}];
+    const aeroTitle = TC.aeroTitle || (p.desc ? p.desc.split('.')[0] : 'Key Benefits');
+    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}` : '');
     const checklistHTML = `<div class="tpl-injected">
-      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${p.desc ? p.desc.split('.')[0] : 'Key Benefits'}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${aeroTitle}</div>
       <ul class="sp-checklist">${bb.map(b => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${b.text}</li>`).join('')}</ul>
-      ${p.wasPrice ? `<div class="sp-free-gift">🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}</div>` : ''}
+      ${aeroGift ? `<div class="sp-free-gift">${aeroGift}</div>` : ''}
     </div>`;
     
     // Inject after call bar or guest notice
@@ -2251,7 +2277,7 @@ function applyTemplate(p) {
     // Inject stock urgency bar + hassle-free + payment icons after CTAs
     const afterCta = `<div class="tpl-injected">
       <div class="sp-stock-bar">
-        <div class="sp-stock-text">🔴 Only a few left in stock</div>
+        <div class="sp-stock-text">🔴 ${TC.aeroStock || 'Only a few left in stock'}</div>
         <div class="sp-stock-bar-inner"><div class="sp-stock-bar-fill" style="width:${Math.min(92, Math.max(60, 100 - (p.stock||10)*3))}%;"></div></div>
       </div>
       <div class="sp-hassle">↩️ ${p.returnDays || '100 Day'} hassle free returns</div>
@@ -2278,9 +2304,9 @@ function applyTemplate(p) {
     const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'🌊',text:'Reduced Wrinkles'},{icon:'☀️',text:'Radiant Skin'},{icon:'⊞',text:'Less Dark Spots'},{icon:'🔬',text:'Reduced Acne'}];
     const gridHTML = `<div class="tpl-injected">
-      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">After 6 weeks, visibly see:</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">${TC.luveaTitle || 'After 6 weeks, visibly see:'}</div>
       <div class="sp-benefit-grid">${bb.slice(0,4).map(b => `<div class="sp-bg-item"><div class="sp-bg-icon">${b.icon}</div><span>${b.text}</span></div>`).join('')}</div>
-      <div class="sp-delivery-date"><div class="dd-dot"></div>Order Today And Receive By <strong id="luvea-date" style="margin-left:4px;">${getDeliveryDate()}</strong></div>
+      <div class="sp-delivery-date"><div class="dd-dot"></div>${TC.luveaDeliv || 'Order Today And Receive By'} <strong id="luvea-date" style="margin-left:4px;">${getDeliveryDate()}</strong></div>
     </div>`;
     
     const priceRow = spInfo?.querySelector('.sp-price-row');
@@ -2296,7 +2322,7 @@ function applyTemplate(p) {
     const afterCtaHTML = `<div class="tpl-injected">
       <div class="sp-guarantee-banner">
         <div class="gb-icon">🏅</div>
-        <div class="gb-text"><strong>Less than 1%</strong> of customers claim our Money Back Guarantee</div>
+        <div class="gb-text">${TC.luveaGuar || '<strong>Less than 1%</strong> of customers claim our Money Back Guarantee'}</div>
       </div>
       <div class="sp-faq-section">
         ${faqItems.map(f => `<div class="sp-faq-item" onclick="this.classList.toggle('open')"><div class="sp-faq-q"><span>${f.q}</span><span class="faq-plus">+</span></div><div class="sp-faq-a">${f.a}</div></div>`).join('')}
@@ -2308,7 +2334,7 @@ function applyTemplate(p) {
   // ═══ RADIANCE TEMPLATE: Variant Cards + Free Gift + Selling-Out Bar ═══
   if (tpl === 'radiance') {
     // Free gift banner
-    const freeGiftHTML = `<div class="tpl-injected sp-free-gift-banner">🔴 <strong>Free</strong> Gift reserved for the next ${Math.floor(Math.random()*40+20)} orders!</div>`;
+    const freeGiftHTML = `<div class="tpl-injected sp-free-gift-banner">${TC.radBanner || `🔴 <strong>Free</strong> Gift reserved for the next ${Math.floor(Math.random()*40+20)} orders!`}</div>`;
     const installEl = spInfo?.querySelector('.sp-install');
     if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
     
@@ -2353,14 +2379,14 @@ function applyTemplate(p) {
     const soldPct = Math.floor(Math.random()*15 + 80);
     const afterTrustHTML = `<div class="tpl-injected">
       <div class="sp-selling-out">
-        <div class="so-header">🔥 SELLING OUT FAST</div>
-        <div class="so-sub">Due to high demand, limited quantities available</div>
+        <div class="so-header">${TC.radSoTitle || '🔥 SELLING OUT FAST'}</div>
+        <div class="so-sub">${TC.radSoSub || 'Due to high demand, limited quantities available'}</div>
         <div class="so-bar"><div class="so-fill" style="width:${soldPct}%;"></div></div>
         <div class="so-pct">${soldPct}% SOLD</div>
       </div>
       <div class="sp-money-back">
-        <div class="mb-title">📦 ${p.returnDays||'90-Days'} Money-Back Guarantee</div>
-        <div class="mb-text">We're confident in the results you'll achieve. If you're not completely satisfied, simply return it, and we'll issue a full refund.</div>
+        <div class="mb-title">${TC.radMbTitle || `📦 ${p.returnDays||'90-Days'} Money-Back Guarantee`}</div>
+        <div class="mb-text">${TC.radMbText || "We're confident in the results you'll achieve. If you're not completely satisfied, simply return it, and we'll issue a full refund."}</div>
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterTrustHTML);
@@ -2737,7 +2763,7 @@ function openOrderForm() {
   document.getElementById('of-sub').textContent   = fc.subtext || 'Fill your details and we\'ll get it to you fast';
   document.getElementById('of-prod').textContent  = p.name;
   document.getElementById('of-price').textContent = formatMoney(p.price, p);
-  document.getElementById('of-total').textContent = formatMoney(p.price, p);
+  document.getElementById('of-total').textContent = formatMoney(p.price*(qty||1), p);
   // Thumb
   const t = document.getElementById('of-thumb');
   if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
@@ -2773,7 +2799,7 @@ function openOrderForm() {
     } else if (f.type==='textarea') {
       input = `<textarea class="f-ta" id="of-${f.k}" placeholder="${f.ph}" style="min-height:70px;width:100%;"></textarea>`;
     } else {
-      input = `<input class="f-in" type="${f.type}" id="of-${f.k}" placeholder="${f.ph}" ${f.k==='qty'?'value="1" min="1"':''} style="width:100%;"/>`;
+      input = `<input class="f-in" type="${f.type}" id="of-${f.k}" placeholder="${f.ph}" ${f.k==='qty'?`value="${qty||1}" min="1"`:''} style="width:100%;"/>`;
     }
     return `<div class="f-group" style="${f.full?'':''}"><label class="f-lbl">${f.lbl}</label>${input}</div>`;
   }).join('');
