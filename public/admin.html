@@ -1627,12 +1627,21 @@ async function saveProduct(draft=false){
 
   const icons = {'Furniture':'🛋️','Electronics':'💻','Fashion':'👗','Kitchen':'🍳','Lighting':'💡','Outdoor':'🌿','Bedding':'🛏️','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
 
+  const tcGet = (id) => document.getElementById(id)?.value.trim()||'';
+  const templateContent = {
+    aeroTitle: tcGet('tc-aero-title'), aeroStock: tcGet('tc-aero-stock'), aeroGift: tcGet('tc-aero-gift'),
+    luveaTitle: tcGet('tc-luvea-title'), luveaDeliv: tcGet('tc-luvea-deliv'), luveaGuar: tcGet('tc-luvea-guar'),
+    radBanner: tcGet('tc-rad-banner'), radSoTitle: tcGet('tc-rad-soTitle'), radSoSub: tcGet('tc-rad-soSub'),
+    radMbTitle: tcGet('tc-rad-mbTitle'), radMbText: tcGet('tc-rad-mbText'),
+    darkTag: tcGet('tc-dark-tag'), classicTag: tcGet('tc-classic-tag'),
+  };
+
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
     pageColor:productPageColor, status:(draft||!isActive)?'draft':'active', featured:isFeatured, mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
     videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
-    contentSections:[...contentSections],
+    contentSections:[...contentSections], templateContent,
     checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
   };
 
