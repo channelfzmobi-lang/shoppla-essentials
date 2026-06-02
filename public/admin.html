@@ -2125,7 +2125,7 @@ async function saveToStorage(){
         content_sections: p.contentSections||[],
         checkout_method: p.checkoutMethod||'standard',
         payment_route: p.paymentRoute||'pod',
-        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[]},
+        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[], templateContent:p.templateContent||{}},
         ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: (p.agentId && String(p.agentId).includes('-')) ? p.agentId : null,
         page_template: p.pageTemplate||'classic',
