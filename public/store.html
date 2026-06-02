@@ -2253,6 +2253,8 @@ function applyTemplate(p) {
   const spCtas = document.getElementById('sp-ctas');
   const trustRow = spInfo?.querySelector('.trust-row');
   
+  const TC = p.templateContent || {};
+
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
