@@ -2773,7 +2773,7 @@ function openOrderForm() {
     } else if (f.type==='textarea') {
       input = `<textarea class="f-ta" id="of-${f.k}" placeholder="${f.ph}" style="min-height:70px;width:100%;"></textarea>`;
     } else {
-      input = `<input class="f-in" type="${f.type}" id="of-${f.k}" placeholder="${f.ph}" ${f.k==='qty'?'value="1" min="1"':''} style="width:100%;"/>`;
+      input = `<input class="f-in" type="${f.type}" id="of-${f.k}" placeholder="${f.ph}" ${f.k==='qty'?`value="${qty||1}" min="1"`:''} style="width:100%;"/>`;
     }
     return `<div class="f-group" style="${f.full?'':''}"><label class="f-lbl">${f.lbl}</label>${input}</div>`;
   }).join('');
