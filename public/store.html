@@ -274,6 +274,16 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .sp-was{font-size:17px;color:var(--muted);text-decoration:line-through;}
 .sp-save{background:rgba(232,84,26,.1);color:var(--accent);font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:16px;}
 .sp-install{font-size:12.5px;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;}
+.sp-install.is-plan{font-size:14px;color:#3b2a06;background:linear-gradient(135deg,#fff8e1,#ffeec2);border:2px solid #f5b400;border-radius:14px;padding:14px 16px 14px 48px;position:relative;line-height:1.55;box-shadow:0 0 0 0 rgba(245,180,0,.6);animation:installGlow 2.2s ease-in-out infinite;}
+.sp-install.is-plan::before{content:'💳';position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:22px;filter:drop-shadow(0 0 6px rgba(245,180,0,.7));}
+.sp-install.is-plan .ip-headline{display:block;font-weight:800;font-size:13px;letter-spacing:.3px;text-transform:uppercase;color:#8a5a00;margin-bottom:4px;}
+.sp-install.is-plan .ip-first{color:#8a3a00;font-weight:800;}
+.sp-install.is-plan .ip-rest{color:#3b2a06;font-weight:700;}
+.sp-install.is-plan .ip-total{display:inline-block;margin-left:6px;font-size:12px;color:#7a6020;}
+@keyframes installGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(245,180,0,.55), 0 0 22px 2px rgba(245,180,0,.22); border-color:#f5b400;}
+  50%   {box-shadow:0 0 0 6px rgba(245,180,0,0),   0 0 32px 8px rgba(245,180,0,.55); border-color:#ffcd3a;}
+}
 .sp-stock{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--green);margin-bottom:4px;}
 .sp-stock-dot{width:7px;height:7px;background:var(--green);border-radius:50%;}
 .sp-delivery{font-size:12.5px;color:var(--muted);margin-bottom:18px;overflow-wrap:anywhere;}
@@ -1158,7 +1168,7 @@ img,video,iframe{max-width:100%;}
       </button>
     </div>
 
-    <div class="sp-lbl">Color — <span id="color-txt" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);">Dusty Rose</span></div>
+    <div class="sp-lbl" id="sp-color-lbl">Color — <span id="color-txt" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);">Dusty Rose</span></div>
     <div class="sp-colors" id="sp-colors">
       <div class="sp-color active" style="background:#d4a0a0;" onclick="selColor(this,'Dusty Rose')"></div>
       <div class="sp-color" style="background:#b0a8c0;" onclick="selColor(this,'Lavender')"></div>
@@ -1167,7 +1177,7 @@ img,video,iframe{max-width:100%;}
       <div class="sp-color" style="background:#2a2a2a;" onclick="selColor(this,'Charcoal')"></div>
     </div>
 
-    <div class="sp-lbl">Size</div>
+    <div class="sp-lbl" id="sp-size-lbl">Size</div>
     <div class="sp-sizes" id="sp-sizes">
       <div class="sp-size out">2-Seater</div>
       <div class="sp-size active" onclick="selSize(this)">3-Seater</div>
@@ -2141,6 +2151,7 @@ function openSalesPage(id) {
   const instEl = document.getElementById('sp-install');
   if (instEl) {
     const ip = (p.formConfig && p.formConfig.installmentPlan) || null;
+    let isPlan = false;
     if (ip && ip.enabled) {
       const total = parseFloat(p.price)||0;
       const first = (parseFloat(ip.cost)||0) + (parseFloat(ip.profit)||0);
@@ -2148,14 +2159,20 @@ function openSalesPage(id) {
       const rest  = count > 1 ? Math.max(0, total - first) / (count - 1) : 0;
       if (first > 0 && first <= total) {
         const fmt = (n)=>formatMoney(n, p);
-        const label = (ip.label||'Installment Plan');
-        instEl.innerHTML = `<b>${label}:</b> Pay <b>${fmt(first)}</b> first, then <b>${count-1} × ${fmt(rest)}</b> &nbsp;<span style="color:#888;">(Total ${fmt(total)})</span>`;
+        const label = (ip.label||'Installment Plan Available');
+        instEl.innerHTML = `
+          <span class="ip-headline">✨ ${label} ✨</span>
+          Pay <span class="ip-first">${fmt(first)}</span> today, then
+          <span class="ip-rest">${count-1} × ${fmt(rest)}</span>
+          <span class="ip-total">(Total ${fmt(total)})</span>`;
+        isPlan = true;
       } else {
         instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
       }
     } else {
       instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
     }
+    instEl.classList.toggle('is-plan', isPlan);
   }
   document.getElementById('qty-val').value = 1;
 
@@ -2561,17 +2578,32 @@ function buildMediaPanel(p) {
 
 // ── Variants ──
 function buildVariants(p) {
-  if (p.colors) {
+  const fc = p.formConfig || {};
+  const showColors = fc.showColors !== false && !!(p.colors && p.colors.trim());
+  const showSizes  = fc.showSizes  !== false && !!(p.sizes  && p.sizes.trim());
+  const cLbl = document.getElementById('sp-color-lbl');
+  const cWrap = document.getElementById('sp-colors');
+  const sLbl = document.getElementById('sp-size-lbl');
+  const sWrap = document.getElementById('sp-sizes');
+  if (showColors) {
     const names = p.colors.split(',').map(s=>s.trim()).filter(Boolean);
     const palette = ['#d4a0a0','#b0a8c0','#8a9aa0','#c8b890','#2a2a2a','#c8e0c8','#f0d8b0','#a8c0d8'];
-    const wrap = document.getElementById('sp-colors');
-    wrap.innerHTML = names.map((c,i) => `<div class="sp-color${i===0?' active':''}" style="background:${palette[i%palette.length]}" title="${c}" onclick="selColor(this,'${c}')"></div>`).join('');
+    cWrap.innerHTML = names.map((c,i) => `<div class="sp-color${i===0?' active':''}" style="background:${palette[i%palette.length]}" title="${c}" onclick="selColor(this,'${c}')"></div>`).join('');
     document.getElementById('color-txt').textContent = names[0]||'';
+    if (cLbl) cLbl.style.display = '';
+    cWrap.style.display = '';
+  } else {
+    if (cLbl) cLbl.style.display = 'none';
+    if (cWrap) { cWrap.style.display = 'none'; cWrap.innerHTML = ''; }
   }
-  if (p.sizes) {
+  if (showSizes) {
     const names = p.sizes.split(',').map(s=>s.trim()).filter(Boolean);
-    const wrap = document.getElementById('sp-sizes');
-    wrap.innerHTML = names.map((s,i) => `<div class="sp-size${i===0?' active':''}" onclick="selSize(this)">${s}</div>`).join('');
+    sWrap.innerHTML = names.map((s,i) => `<div class="sp-size${i===0?' active':''}" onclick="selSize(this)">${s}</div>`).join('');
+    if (sLbl) sLbl.style.display = '';
+    sWrap.style.display = '';
+  } else {
+    if (sLbl) sLbl.style.display = 'none';
+    if (sWrap) { sWrap.style.display = 'none'; sWrap.innerHTML = ''; }
   }
 }
 

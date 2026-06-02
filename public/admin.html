@@ -480,14 +480,24 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-lbl">Colour Options</label>
+                <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <span>Colour Options</span>
+                  <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;">
+                    <input type="checkbox" id="fp-show-colors" checked style="accent-color:var(--accent);"> Show on sales page
+                  </label>
+                </label>
                 <input class="form-input" id="fp-colors" placeholder="e.g. Dusty Rose, Charcoal, Camel"/>
-                <div class="form-hint">Comma-separated colour names</div>
+                <div class="form-hint">Comma-separated. Uncheck "Show on sales page" to hide the colour picker for this product/template.</div>
               </div>
               <div class="form-group">
-                <label class="form-lbl">Size Options</label>
+                <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <span>Size Options</span>
+                  <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;">
+                    <input type="checkbox" id="fp-show-sizes" checked style="accent-color:var(--accent);"> Show on sales page
+                  </label>
+                </label>
                 <input class="form-input" id="fp-sizes" placeholder="e.g. S, M, L, XL  or  2-Seater, 3-Seater"/>
-                <div class="form-hint">Comma-separated size options</div>
+                <div class="form-hint">Comma-separated. Uncheck to hide the size picker for this product/template.</div>
               </div>
             </div>
             <div class="form-group">
@@ -1397,6 +1407,8 @@ function editProduct(id){
     const fc=p.formConfig;
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
     setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); setV('fp-thankyou-url',fc.thankYouUrl); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
+    const scEl=document.getElementById('fp-show-colors'); if(scEl) scEl.checked = fc.showColors!==false;
+    const ssEl=document.getElementById('fp-show-sizes');  if(ssEl) ssEl.checked = fc.showSizes!==false;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
     // Installment plan
     const ip = fc.installmentPlan || {};
@@ -1495,9 +1507,13 @@ async function saveProduct(draft=false){
 
   // Collect checkout / form / gateway settings
   const externalCode = document.getElementById('fp-external-form-code')?.value||'';
-  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked || !!externalCode.trim();
+  // Respect the checkbox strictly — if user unchecks, external form is OFF
+  // even if code is still pasted in the textarea (so they can keep a draft).
+  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked;
   const cm = externalEnabled ? 'form' : (checkoutMethod||'standard');
   const pr = paymentRoute||'pod';
+  const showColors = document.getElementById('fp-show-colors')?.checked !== false;
+  const showSizes  = document.getElementById('fp-show-sizes')?.checked !== false;
   const formConfig = {
     btnLabel:    document.getElementById('fp-form-btn-label')?.value||'Place My Order →',
     heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
@@ -1506,6 +1522,7 @@ async function saveProduct(draft=false){
     externalFormEnabled: externalEnabled,
     externalFormCode: externalCode,
     thankYouUrl: buildThankYouLink(editingProductId),
+    showColors, showSizes,
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
     installmentPlan: getInstallmentPlanFromForm(),
@@ -1593,6 +1610,8 @@ function clearProductForm(){
   // Reset bundles & badges
   currentBundles = []; renderBundles();
   const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
+  const scEl=document.getElementById('fp-show-colors'); if(scEl) scEl.checked=true;
+  const ssEl=document.getElementById('fp-show-sizes');  if(ssEl) ssEl.checked=true;
   const efc=document.getElementById('fp-external-form-code'); if(efc) efc.value='';
   updateThankYouLink();
 }
