@@ -2260,10 +2260,12 @@ function applyTemplate(p) {
     // Inject checklist benefits after description/install area
     const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✓',text:'Powerful multi-surface suction'},{icon:'✓',text:'Lightweight, easy-to-use design'},{icon:'✓',text:'Works on carpet, rugs, stairs & upholstery'}];
+    const aeroTitle = TC.aeroTitle || (p.desc ? p.desc.split('.')[0] : 'Key Benefits');
+    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}` : '');
     const checklistHTML = `<div class="tpl-injected">
-      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${p.desc ? p.desc.split('.')[0] : 'Key Benefits'}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${aeroTitle}</div>
       <ul class="sp-checklist">${bb.map(b => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${b.text}</li>`).join('')}</ul>
-      ${p.wasPrice ? `<div class="sp-free-gift">🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}</div>` : ''}
+      ${aeroGift ? `<div class="sp-free-gift">${aeroGift}</div>` : ''}
     </div>`;
     
     // Inject after call bar or guest notice
