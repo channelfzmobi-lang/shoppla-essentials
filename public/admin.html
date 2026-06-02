@@ -1407,6 +1407,8 @@ function editProduct(id){
     const fc=p.formConfig;
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
     setV('fp-form-btn-label',fc.btnLabel); setV('fp-form-heading',fc.heading); setV('fp-form-subtext',fc.subtext); setV('fp-custom-field',fc.customField); setV('fp-external-form-code',fc.externalFormCode); setV('fp-thankyou-url',fc.thankYouUrl); const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=!!fc.externalFormEnabled;
+    const scEl=document.getElementById('fp-show-colors'); if(scEl) scEl.checked = fc.showColors!==false;
+    const ssEl=document.getElementById('fp-show-sizes');  if(ssEl) ssEl.checked = fc.showSizes!==false;
     ['name','email','phone','address','city','qty','color','size','notes'].forEach(k=>{const el=document.getElementById('ff-'+k);if(el)el.checked=fc['ff-'+k]!==false;});
     // Installment plan
     const ip = fc.installmentPlan || {};
