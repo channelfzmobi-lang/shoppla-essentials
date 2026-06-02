@@ -2303,9 +2303,9 @@ function applyTemplate(p) {
     const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'🌊',text:'Reduced Wrinkles'},{icon:'☀️',text:'Radiant Skin'},{icon:'⊞',text:'Less Dark Spots'},{icon:'🔬',text:'Reduced Acne'}];
     const gridHTML = `<div class="tpl-injected">
-      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">After 6 weeks, visibly see:</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">${TC.luveaTitle || 'After 6 weeks, visibly see:'}</div>
       <div class="sp-benefit-grid">${bb.slice(0,4).map(b => `<div class="sp-bg-item"><div class="sp-bg-icon">${b.icon}</div><span>${b.text}</span></div>`).join('')}</div>
-      <div class="sp-delivery-date"><div class="dd-dot"></div>Order Today And Receive By <strong id="luvea-date" style="margin-left:4px;">${getDeliveryDate()}</strong></div>
+      <div class="sp-delivery-date"><div class="dd-dot"></div>${TC.luveaDeliv || 'Order Today And Receive By'} <strong id="luvea-date" style="margin-left:4px;">${getDeliveryDate()}</strong></div>
     </div>`;
     
     const priceRow = spInfo?.querySelector('.sp-price-row');
