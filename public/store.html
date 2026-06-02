@@ -2333,7 +2333,7 @@ function applyTemplate(p) {
   // ═══ RADIANCE TEMPLATE: Variant Cards + Free Gift + Selling-Out Bar ═══
   if (tpl === 'radiance') {
     // Free gift banner
-    const freeGiftHTML = `<div class="tpl-injected sp-free-gift-banner">🔴 <strong>Free</strong> Gift reserved for the next ${Math.floor(Math.random()*40+20)} orders!</div>`;
+    const freeGiftHTML = `<div class="tpl-injected sp-free-gift-banner">${TC.radBanner || `🔴 <strong>Free</strong> Gift reserved for the next ${Math.floor(Math.random()*40+20)} orders!`}</div>`;
     const installEl = spInfo?.querySelector('.sp-install');
     if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
     
