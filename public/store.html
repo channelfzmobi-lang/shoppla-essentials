@@ -2321,7 +2321,7 @@ function applyTemplate(p) {
     const afterCtaHTML = `<div class="tpl-injected">
       <div class="sp-guarantee-banner">
         <div class="gb-icon">🏅</div>
-        <div class="gb-text"><strong>Less than 1%</strong> of customers claim our Money Back Guarantee</div>
+        <div class="gb-text">${TC.luveaGuar || '<strong>Less than 1%</strong> of customers claim our Money Back Guarantee'}</div>
       </div>
       <div class="sp-faq-section">
         ${faqItems.map(f => `<div class="sp-faq-item" onclick="this.classList.toggle('open')"><div class="sp-faq-q"><span>${f.q}</span><span class="faq-plus">+</span></div><div class="sp-faq-a">${f.a}</div></div>`).join('')}
