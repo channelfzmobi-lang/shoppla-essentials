@@ -2378,14 +2378,14 @@ function applyTemplate(p) {
     const soldPct = Math.floor(Math.random()*15 + 80);
     const afterTrustHTML = `<div class="tpl-injected">
       <div class="sp-selling-out">
-        <div class="so-header">🔥 SELLING OUT FAST</div>
-        <div class="so-sub">Due to high demand, limited quantities available</div>
+        <div class="so-header">${TC.radSoTitle || '🔥 SELLING OUT FAST'}</div>
+        <div class="so-sub">${TC.radSoSub || 'Due to high demand, limited quantities available'}</div>
         <div class="so-bar"><div class="so-fill" style="width:${soldPct}%;"></div></div>
         <div class="so-pct">${soldPct}% SOLD</div>
       </div>
       <div class="sp-money-back">
-        <div class="mb-title">📦 ${p.returnDays||'90-Days'} Money-Back Guarantee</div>
-        <div class="mb-text">We're confident in the results you'll achieve. If you're not completely satisfied, simply return it, and we'll issue a full refund.</div>
+        <div class="mb-title">${TC.radMbTitle || `📦 ${p.returnDays||'90-Days'} Money-Back Guarantee`}</div>
+        <div class="mb-text">${TC.radMbText || "We're confident in the results you'll achieve. If you're not completely satisfied, simply return it, and we'll issue a full refund."}</div>
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterTrustHTML);
