@@ -1509,7 +1509,23 @@ function editProduct(id){
 
   // Template
   const tplSel = document.getElementById('fp-template');
-  if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); }
+  if(tplSel) { tplSel.value = p.pageTemplate||'classic'; updateTemplatePreview(p.pageTemplate||'classic'); showTemplateContentGroup(p.pageTemplate||'classic'); }
+
+  // Template content overrides
+  const tc = p.templateContent || {};
+  const setTC=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  setTC('tc-aero-title',tc.aeroTitle); setTC('tc-aero-stock',tc.aeroStock); setTC('tc-aero-gift',tc.aeroGift);
+  setTC('tc-luvea-title',tc.luveaTitle); setTC('tc-luvea-deliv',tc.luveaDeliv); setTC('tc-luvea-guar',tc.luveaGuar);
+  setTC('tc-rad-banner',tc.radBanner); setTC('tc-rad-soTitle',tc.radSoTitle); setTC('tc-rad-soSub',tc.radSoSub);
+  setTC('tc-rad-mbTitle',tc.radMbTitle); setTC('tc-rad-mbText',tc.radMbText);
+  setTC('tc-dark-tag',tc.darkTag); setTC('tc-classic-tag',tc.classicTag);
+
+  // Installment colors
+  const ic = (p.formConfig && p.formConfig.installmentPlan && p.formConfig.installmentPlan.colors) || {};
+  const setColor=(id,v,def)=>{const el=document.getElementById(id);if(el)el.value=v||def;};
+  setColor('fp-ip-color-bg', ic.bg, '#fff3c4');
+  setColor('fp-ip-color-border', ic.border, '#f5b400');
+  setColor('fp-ip-color-glow', ic.glow, '#f5b400');
 
   updateThankYouLink();
 
