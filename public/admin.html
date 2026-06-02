@@ -548,6 +548,49 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                 <div><strong>Dark / Classic</strong> — Edit the <em>Benefit Badges</em> (floating image badges) and standard fields.</div>
               </div>
             </div>
+            <div class="form-group" id="tpl-content-editor">
+              <label class="form-lbl">📝 Template Section Texts <span style="font-weight:500;color:var(--muted);font-size:11px;">(applies only to the selected template)</span></label>
+              <div class="form-hint" style="margin-bottom:10px;">Override the default headlines and banners injected by each template. Leave blank to use the built-in defaults.</div>
+
+              <div class="tpl-grp" data-tpl="aero" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Aero — Texts</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Benefits headline</label><input class="form-input" id="tc-aero-title" placeholder="Key Benefits"/></div>
+                  <div><label class="form-hint">Stock urgency text</label><input class="form-input" id="tc-aero-stock" placeholder="Only a few left in stock"/></div>
+                  <div style="grid-column:span 2;"><label class="form-hint">Free gift line</label><input class="form-input" id="tc-aero-gift" placeholder="🟢 Free attachment on all orders over …"/></div>
+                </div>
+              </div>
+
+              <div class="tpl-grp" data-tpl="luvea" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;">LUVEA — Texts</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Benefits headline</label><input class="form-input" id="tc-luvea-title" placeholder="After 6 weeks, visibly see:"/></div>
+                  <div><label class="form-hint">Delivery prefix</label><input class="form-input" id="tc-luvea-deliv" placeholder="Order Today And Receive By"/></div>
+                  <div style="grid-column:span 2;"><label class="form-hint">Guarantee strip text</label><input class="form-input" id="tc-luvea-guar" placeholder="Less than 1% of customers claim our Money Back Guarantee"/></div>
+                </div>
+              </div>
+
+              <div class="tpl-grp" data-tpl="radiance" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Radiance — Texts</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div style="grid-column:span 2;"><label class="form-hint">Free-gift banner</label><input class="form-input" id="tc-rad-banner" placeholder="🔴 Free Gift reserved for the next 30 orders!"/></div>
+                  <div><label class="form-hint">Selling-out title</label><input class="form-input" id="tc-rad-soTitle" placeholder="🔥 SELLING OUT FAST"/></div>
+                  <div><label class="form-hint">Selling-out subtitle</label><input class="form-input" id="tc-rad-soSub" placeholder="Due to high demand, limited quantities available"/></div>
+                  <div><label class="form-hint">Money-back title</label><input class="form-input" id="tc-rad-mbTitle" placeholder="📦 90-Days Money-Back Guarantee"/></div>
+                  <div><label class="form-hint">Money-back text</label><input class="form-input" id="tc-rad-mbText" placeholder="We're confident in the results…"/></div>
+                </div>
+              </div>
+
+              <div class="tpl-grp" data-tpl="dark" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Dark Premium — Texts</div>
+                <div><label class="form-hint">Hero tagline (above title)</label><input class="form-input" id="tc-dark-tag" placeholder="Premium · Expert tested"/></div>
+              </div>
+
+              <div class="tpl-grp" data-tpl="classic" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Classic — Texts</div>
+                <div><label class="form-hint">Optional small tagline under price</label><input class="form-input" id="tc-classic-tag" placeholder=""/></div>
+              </div>
+            </div>
             <div class="form-group">
               <label class="form-lbl">📦 Bundle Pricing (Optional)</label>
               <div class="form-hint" style="margin-bottom:8px;">Add quantity-based bundle pricing like "Buy 2 Get 1 Free". Leave empty to hide bundles.</div>
