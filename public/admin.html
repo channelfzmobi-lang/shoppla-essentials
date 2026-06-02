@@ -2304,7 +2304,13 @@ function previewSelectedAgent(agentId){
 }
 
 // ─── TEMPLATE PREVIEW ───
-document.addEventListener('change',e=>{if(e.target?.id==='fp-template')updateTemplatePreview(e.target.value);});
+document.addEventListener('change',e=>{if(e.target?.id==='fp-template'){updateTemplatePreview(e.target.value);showTemplateContentGroup(e.target.value);}});
+function showTemplateContentGroup(tpl){
+  document.querySelectorAll('#tpl-content-editor .tpl-grp').forEach(el=>{
+    el.style.display = (el.dataset.tpl===tpl) ? 'block' : 'none';
+  });
+}
+window.showTemplateContentGroup = showTemplateContentGroup;
 function updateTemplatePreview(tpl){
   const media=document.getElementById('tpl-preview-media');
   const label=document.getElementById('tpl-preview-label');
