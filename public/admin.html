@@ -1505,9 +1505,13 @@ async function saveProduct(draft=false){
 
   // Collect checkout / form / gateway settings
   const externalCode = document.getElementById('fp-external-form-code')?.value||'';
-  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked || !!externalCode.trim();
+  // Respect the checkbox strictly — if user unchecks, external form is OFF
+  // even if code is still pasted in the textarea (so they can keep a draft).
+  const externalEnabled = !!document.getElementById('fp-external-form-enabled')?.checked;
   const cm = externalEnabled ? 'form' : (checkoutMethod||'standard');
   const pr = paymentRoute||'pod';
+  const showColors = document.getElementById('fp-show-colors')?.checked !== false;
+  const showSizes  = document.getElementById('fp-show-sizes')?.checked !== false;
   const formConfig = {
     btnLabel:    document.getElementById('fp-form-btn-label')?.value||'Place My Order →',
     heading:     document.getElementById('fp-form-heading')?.value||'Order Now',
@@ -1516,6 +1520,7 @@ async function saveProduct(draft=false){
     externalFormEnabled: externalEnabled,
     externalFormCode: externalCode,
     thankYouUrl: buildThankYouLink(editingProductId),
+    showColors, showSizes,
     ...['name','email','phone','address','city','qty','color','size','notes']
       .reduce((a,k)=>({...a,['ff-'+k]:document.getElementById('ff-'+k)?.checked!==false}),{}),
     installmentPlan: getInstallmentPlanFromForm(),
