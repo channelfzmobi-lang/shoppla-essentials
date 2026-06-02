@@ -2177,6 +2177,7 @@ async function loadFromStorage(){
           pageTemplate:p.page_template||'classic',
           bundles:(p.form_config&&p.form_config.bundles)||[],
           benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
+          templateContent:(p.form_config&&p.form_config.templateContent)||{},
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
