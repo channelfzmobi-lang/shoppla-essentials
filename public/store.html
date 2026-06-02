@@ -2276,7 +2276,7 @@ function applyTemplate(p) {
     // Inject stock urgency bar + hassle-free + payment icons after CTAs
     const afterCta = `<div class="tpl-injected">
       <div class="sp-stock-bar">
-        <div class="sp-stock-text">🔴 Only a few left in stock</div>
+        <div class="sp-stock-text">🔴 ${TC.aeroStock || 'Only a few left in stock'}</div>
         <div class="sp-stock-bar-inner"><div class="sp-stock-bar-fill" style="width:${Math.min(92, Math.max(60, 100 - (p.stock||10)*3))}%;"></div></div>
       </div>
       <div class="sp-hassle">↩️ ${p.returnDays || '100 Day'} hassle free returns</div>
