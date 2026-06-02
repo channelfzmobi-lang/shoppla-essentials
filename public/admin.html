@@ -797,6 +797,26 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                   </div>
                 </div>
                 <div id="fp-ip-preview" style="margin-top:10px;padding:14px;border-radius:10px;background:#fff8ee;border:1px solid #f0d8a8;font-size:13px;color:#5a3d10;display:none;"></div>
+
+                <!-- Installment notice colors -->
+                <div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);">
+                  <div class="form-lbl" style="margin-bottom:8px;">🎨 Installment notice colors</div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                    <div>
+                      <label class="form-hint" style="display:block;margin-bottom:4px;">Background</label>
+                      <input type="color" id="fp-ip-color-bg" value="#fff3c4" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;" oninput="updateInstallmentPreview()"/>
+                    </div>
+                    <div>
+                      <label class="form-hint" style="display:block;margin-bottom:4px;">Border</label>
+                      <input type="color" id="fp-ip-color-border" value="#f5b400" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;" oninput="updateInstallmentPreview()"/>
+                    </div>
+                    <div>
+                      <label class="form-hint" style="display:block;margin-bottom:4px;">Glow / Pulse</label>
+                      <input type="color" id="fp-ip-color-glow" value="#f5b400" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;" oninput="updateInstallmentPreview()"/>
+                    </div>
+                  </div>
+                  <div class="form-hint" style="margin-top:6px;">Pick the background, border and animated glow color shown around the installment plan notice on the sales page.</div>
+                </div>
               </div>
             </div>
             <div class="form-group">
