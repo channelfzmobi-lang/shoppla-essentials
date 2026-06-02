@@ -1694,7 +1694,13 @@ function clearProductForm(){
   const featuredToggle=document.getElementById('toggle-featured'); if(featuredToggle) featuredToggle.classList.add('on');
   // Reset template
   const tplSel = document.getElementById('fp-template');
-  if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); }
+  if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); showTemplateContentGroup('classic'); }
+  // Reset template content fields
+  ['tc-aero-title','tc-aero-stock','tc-aero-gift','tc-luvea-title','tc-luvea-deliv','tc-luvea-guar','tc-rad-banner','tc-rad-soTitle','tc-rad-soSub','tc-rad-mbTitle','tc-rad-mbText','tc-dark-tag','tc-classic-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // Reset installment colors
+  const cBg=document.getElementById('fp-ip-color-bg'); if(cBg) cBg.value='#fff3c4';
+  const cBd=document.getElementById('fp-ip-color-border'); if(cBd) cBd.value='#f5b400';
+  const cGl=document.getElementById('fp-ip-color-glow'); if(cGl) cGl.value='#f5b400';
   // Reset bundles & badges
   currentBundles = []; renderBundles();
   const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
