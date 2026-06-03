@@ -1711,7 +1711,7 @@ function clearProductForm(){
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); showTemplateContentGroup('classic'); }
   // Reset template content fields
-  ['tc-aero-title','tc-aero-stock','tc-aero-gift','tc-luvea-title','tc-luvea-deliv','tc-luvea-guar','tc-rad-banner','tc-rad-soTitle','tc-rad-soSub','tc-rad-mbTitle','tc-rad-mbText','tc-dark-tag','tc-classic-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['tc-aero-sub','tc-aero-title','tc-aero-stock','tc-aero-gift','tc-aero-hassle','tc-aero-g1','tc-aero-g2','tc-aero-g3','tc-luvea-sub','tc-luvea-title','tc-luvea-deliv','tc-luvea-cta','tc-luvea-guar','tc-rad-sub','tc-rad-banner','tc-rad-fgInc','tc-rad-soTitle','tc-rad-soSub','tc-rad-mbTitle','tc-rad-mbText','tc-dark-tag','tc-dark-sub','tc-classic-tag','tc-classic-sub'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   // Reset installment colors
   const cBg=document.getElementById('fp-ip-color-bg'); if(cBg) cBg.value='#fff3c4';
   const cBd=document.getElementById('fp-ip-color-border'); if(cBd) cBd.value='#f5b400';
