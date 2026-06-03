@@ -2650,14 +2650,16 @@ function buildCTAs(p) {
   const m  = p.checkoutMethod || 'standard';
   const fc = p.formConfig || {};
   const lbl = fc.btnLabel || 'Fill Order Form →';
+  const TC = p.templateContent || {};
+  const buyLbl = (p.pageTemplate==='luvea' && TC.luveaCta) ? TC.luveaCta : '⚡ Buy Now — Guest Checkout';
   let html2 = '';
   if (m === 'standard') {
-    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">⚡ Buy Now — Guest Checkout</button>
+    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">${buyLbl}</button>
              <button class="btn-add-sp" id="add-cart-sp">🛒 Add to Cart</button>`;
   } else if (m === 'form') {
     html2 = `<button class="btn-order-form" onclick="openOrderForm()">📋 ${lbl}</button>`;
   } else {
-    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">⚡ Buy Now — Guest Checkout</button>
+    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">${buyLbl}</button>
              <button class="btn-add-sp" id="add-cart-sp">🛒 Add to Cart</button>
              <div class="or-divider">— OR —</div>
              <button class="btn-order-form" onclick="openOrderForm()">📋 ${lbl}</button>`;
