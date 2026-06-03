@@ -2480,39 +2480,91 @@ async function deleteAgent(id){
   showToast('🗑 Agent removed');
 }
 
-// ─── VIEW ORDER MODAL ───
+// ─── VIEW ORDER MODAL (structured + copiable fields) ───
+function copyVal(v){
+  try { navigator.clipboard.writeText(String(v||'')); showToast('📋 Copied'); }
+  catch(e){ showToast('⚠️ Copy failed'); }
+}
+function copyAllOrder(id){
+  const o = orders.find(x=>String(x.id)===String(id)); if(!o) return;
+  const txt = [
+    `Order #${o.id}`,
+    `Date: ${o.date||''}`,
+    `Status: ${o.status||''}`,
+    `─ Customer ─`,
+    `Name: ${o.customer||''}`,
+    `Email: ${o.email||''}`,
+    `Phone: ${o.phone||''}`,
+    `Address: ${o.address||''}${o.city?', '+o.city:''}`,
+    `─ Order ─`,
+    `Product: ${o.products||''}`,
+    `Qty: ${o.qty||1}`,
+    o.color?`Color: ${o.color}`:null,
+    o.size?`Size: ${o.size}`:null,
+    `Total: $${typeof o.total==='number'?o.total.toLocaleString():o.total}`,
+    o.paymentMethod?`Payment: ${o.paymentMethod}`:null,
+    o.notes?`Notes: ${o.notes}`:null,
+  ].filter(Boolean).join('\n');
+  copyVal(txt);
+}
 function viewOrder(id){
   const o=orders.find(x=>String(x.id)===String(id));if(!o)return;
   document.getElementById('order-detail-modal')?.remove();
   const el=document.createElement('div');
   el.id='order-detail-modal';
   el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
-  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-      <div style="font-family:'Fraunces',serif;font-size:19px;font-weight:900;">Order #${o.id}</div>
+  const oid = JSON.stringify(o.id);
+  const row = (lbl, val, raw) => {
+    if(!val) return '';
+    const safe = String(val).replace(/"/g,'&quot;');
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed #ece7df;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;">${lbl}</div>
+        <div style="font-size:14px;margin-top:2px;word-break:break-word;">${val}</div>
+      </div>
+      <button class="tbl-btn" onclick='copyVal(${JSON.stringify(raw||String(val))})' style="flex-shrink:0;">📋 Copy</button>
+    </div>`;
+  };
+  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;">Order #${o.id}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${o.date||''}</div>
+      </div>
       <button onclick="document.getElementById('order-detail-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">✕</button>
     </div>
-    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Customer</div>
-      <div style="font-weight:700;font-size:15px;">${o.customer}</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:3px;">${o.email||''}</div>
-      ${o.phone?`<div style="font-size:13px;color:var(--muted);">📞 ${o.phone}</div>`:''}
-      ${o.address?`<div style="font-size:13px;color:var(--muted);">📍 ${o.address}${o.city?', '+o.city:''}</div>`:''}
+
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="hdr-btn hdr-btn-outline" onclick="copyAllOrder(${oid})" style="flex:1;">📋 Copy all order details</button>
     </div>
-    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Items</div>
-      <div style="font-weight:600;">${o.products}</div>
-      ${o.qty?`<div style="font-size:13px;color:var(--muted);">Qty: ${o.qty}</div>`:''}
-      ${o.color?`<div style="font-size:13px;color:var(--muted);">Colour: ${o.color}</div>`:''}
-      ${o.notes?`<div style="font-size:13px;color:var(--muted);">Notes: ${o.notes}</div>`:''}
+
+    <div style="background:#f9f8f6;border:1px solid var(--border);border-radius:11px;padding:6px 14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);padding-top:10px;">Customer</div>
+      ${row('Full Name', o.customer, o.customer)}
+      ${row('Email', o.email, o.email)}
+      ${row('Phone / WhatsApp', o.phone, o.phone)}
+      ${row('Delivery Address', o.address, o.address)}
+      ${row('City / State', o.city, o.city)}
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;background:#f5f4f0;border-radius:11px;padding:14px;margin-bottom:18px;">
-      <span style="color:var(--muted);">Total</span>
+
+    <div style="background:#f9f8f6;border:1px solid var(--border);border-radius:11px;padding:6px 14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);padding-top:10px;">Order</div>
+      ${row('Product', o.products, o.products)}
+      ${row('Quantity', o.qty, o.qty)}
+      ${row('Colour', o.color, o.color)}
+      ${row('Size', o.size, o.size)}
+      ${row('Payment Method', o.paymentMethod, o.paymentMethod)}
+      ${row('Special Notes', o.notes, o.notes)}
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;border-radius:11px;padding:14px 16px;margin-bottom:14px;">
+      <span style="opacity:.7;">Order Total</span>
       <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">$${typeof o.total==='number'?o.total.toLocaleString():o.total}</span>
     </div>
-    <div style="margin-bottom:18px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Update Status</div>
-      <select onchange="updateOrderStatus(${JSON.stringify(o.id)},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Update Status</div>
+      <select onchange="updateOrderStatus(${oid},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
         <option value="">— Choose status —</option>
         <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
         <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
@@ -2522,7 +2574,7 @@ function viewOrder(id){
     </div>
     <div style="display:flex;gap:10px;">
       <button onclick="document.getElementById('order-detail-modal').remove()" style="flex:1;background:#f5f4f0;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;cursor:pointer;">Close</button>
-      <button onclick="showToast('📧 Email sent to ${o.email||'customer'}');document.getElementById('order-detail-modal').remove();" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📧 Email</button>
+      ${o.email?`<button onclick="window.location.href='mailto:${o.email}?subject=Order%20%23${o.id}'" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📧 Email Customer</button>`:''}
     </div>
   </div>`;
   el.onclick=e=>{if(e.target===el)el.remove();};
