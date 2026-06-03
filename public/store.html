@@ -2688,7 +2688,31 @@ function buildCTAs(p) {
 }
 function selColor(el, name) { document.querySelectorAll('.sp-color').forEach(c=>c.classList.remove('active')); el.classList.add('active'); document.getElementById('color-txt').textContent=name; }
 function selSize(el)  { if(el.classList.contains('out'))return; document.querySelectorAll('.sp-size').forEach(s=>s.classList.remove('active')); el.classList.add('active'); }
-function chgQty(d)    { qty=Math.max(1,Math.min(10,qty+d)); document.getElementById('qty-val').value=qty; }
+function chgQty(d)    {
+  qty=Math.max(1,Math.min(10,qty+d));
+  document.getElementById('qty-val').value=qty;
+  const p = productById(currentProductId);
+  if (!p) return;
+  // If bundles or radiance variants drive price, don't override
+  const usingBundle = Array.isArray(p.bundles) && p.bundles.length > 0;
+  if (usingBundle) return;
+  const unit = Number(p.price)||0;
+  const wasUnit = Number(p.wasPrice)||0;
+  document.getElementById('sp-price').textContent = formatMoney(unit*qty, p);
+  const wasEl = document.getElementById('sp-was');
+  if (wasEl) wasEl.textContent = wasUnit ? formatMoney(wasUnit*qty, p) : '';
+  const saveEl = document.getElementById('sp-save');
+  if (saveEl) {
+    const save = wasUnit ? (wasUnit - unit)*qty : 0;
+    saveEl.textContent = save>0 ? 'Save '+formatMoney(save, p) : '';
+    saveEl.style.display = save>0?'inline-flex':'none';
+  }
+  // Update checkout modal totals
+  const tax = Math.round(unit*qty*0.08);
+  const ckP = document.getElementById('ck-prod-price'); if(ckP) ckP.textContent = formatMoney(unit*qty,p);
+  const ckT = document.getElementById('ck-tax'); if(ckT) ckT.textContent = formatMoney(tax,p);
+  const ckTot = document.getElementById('ck-total'); if(ckTot) ckTot.textContent = formatMoney(unit*qty+tax,p);
+}
 function switchPdTab(btn, id) {
   document.querySelectorAll('.pd-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.pd-content').forEach(c=>c.classList.remove('active'));
