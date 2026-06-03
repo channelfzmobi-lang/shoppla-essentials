@@ -2560,64 +2560,142 @@ function renderOrders(){
   const rstat=document.getElementById('total-revenue-stat');if(rstat)rstat.textContent='$'+rev.toLocaleString();
 }
 
-// ─── CUSTOMERS ───
+// ─── CUSTOMERS (derived from real orders) ───
 function renderCustomers(){
   const tbody=document.getElementById('customers-table-body');if(!tbody)return;
-  let customers_all=[...customers];
-  orders.forEach(o=>{if(o.email&&o.customer&&!customers_all.find(c=>c.email===o.email))customers_all.push({name:o.customer,email:o.email,orders:1,spent:typeof o.total==='number'?o.total:parseFloat(o.total)||0,type:'guest',joined:'Recent'});});
-  tbody.innerHTML=customers_all.map(c=>`
-    <tr>
-      <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${c.name[0]}</div><b>${c.name}</b></div></td>
-      <td>${c.email}</td><td>${c.orders}</td><td>$${(c.spent||0).toLocaleString()}</td>
-      <td><span class="badge ${c.type==='registered'?'badge-green':'badge-gray'}">${c.type}</span></td>
-      <td>${c.joined}</td>
-      <td><div class="table-actions"><button class="tbl-btn" onclick="showToast('📧 Email sent to ${c.email}')">Email</button></div></td>
-    </tr>`).join('');
-  const cstat=document.getElementById('total-customers-stat');if(cstat)cstat.textContent=customers_all.length;
+  // Aggregate by email (or name if no email)
+  const map = new Map();
+  orders.forEach(o=>{
+    const key = (o.email||o.phone||o.customer||'').toLowerCase().trim();
+    if(!key) return;
+    const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
+    if(map.has(key)){
+      const c = map.get(key);
+      c.orders += 1; c.spent += total;
+      if(new Date(o.date||0) < new Date(c.joined||0)) c.joined = o.date;
+    } else {
+      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, type:'guest', joined:o.date||''});
+    }
+  });
+  const list = Array.from(map.values()).sort((a,b)=>b.spent-a.spent);
+  customers = list;
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:38px;color:var(--muted);">No customers yet — orders will populate this list automatically.</td></tr>`;
+  } else {
+    tbody.innerHTML = list.map(c=>{
+      const initial = (c.name||'?')[0].toUpperCase();
+      const joined = c.joined ? new Date(c.joined).toLocaleDateString() : '—';
+      return `
+      <tr>
+        <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${initial}</div><b>${c.name}</b></div></td>
+        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>$${c.spent.toLocaleString()}</td>
+        <td><span class="badge badge-gray">${c.type}</span></td>
+        <td>${joined}</td>
+        <td><div class="table-actions">${c.email?`<button class="tbl-btn" onclick="navigator.clipboard.writeText('${c.email}');showToast('📋 Email copied')">Copy Email</button>`:''}</div></td>
+      </tr>`;
+    }).join('');
+  }
+  const cstat=document.getElementById('total-customers-stat');if(cstat)cstat.textContent=list.length;
 }
 
-// ─── CATEGORIES ───
+// ─── CATEGORIES (cloud + product counts) ───
+async function loadCategoriesCloud(){
+  if(!sb) return;
+  try{
+    const {data} = await sb.from('categories').select('*').order('sort_order',{ascending:true});
+    if(data) categories = data.map(c=>({_cloud_id:c.id, name:c.name, icon:c.icon||'📦'}));
+  }catch(e){console.warn('Categories load error:',e);}
+}
+function recomputeCategoryCounts(){
+  const counts = {};
+  products.forEach(p=>{ if(p.category){ counts[p.category]=(counts[p.category]||0)+1; } });
+  categories.forEach(c=>{ c.count = counts[c.name]||0; });
+  // Add categories present in products but missing from list
+  Object.keys(counts).forEach(n=>{
+    if(!categories.find(c=>c.name===n)) categories.push({name:n, icon:'📦', count:counts[n]});
+  });
+}
 function renderCategories(){
-  document.getElementById('cat-admin-grid').innerHTML=categories.map((c,i)=>`
+  const grid = document.getElementById('cat-admin-grid');
+  if(!grid) return;
+  recomputeCategoryCounts();
+  if(!categories.length){
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:38px;color:var(--muted);">No categories yet. Add one below or assign a category to a product.</div>`;
+    return;
+  }
+  grid.innerHTML = categories.map((c,i)=>`
     <div style="background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:20px;text-align:center;position:relative;">
       <div style="font-size:32px;margin-bottom:8px;">${c.icon}</div>
       <div style="font-weight:800;font-size:14px;">${c.name}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:3px;">${c.count} products</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px;">${c.count||0} products</div>
       <button class="tbl-btn danger" style="position:absolute;top:8px;right:8px;padding:4px 8px;" onclick="removeCategory(${i})">✕</button>
     </div>`).join('');
 }
-function addCategory(){
+async function addCategory(){
   const name=document.getElementById('new-cat-name').value.trim();
   const icon=document.getElementById('new-cat-icon').value.trim()||'📦';
   if(!name){showToast('⚠️ Enter a category name');return;}
-  categories.push({name,icon,count:0});renderCategories();
+  if(categories.find(c=>c.name.toLowerCase()===name.toLowerCase())){showToast('⚠️ Category already exists');return;}
+  let cloudId = null;
+  if(sb){
+    try{ const {data,error} = await sb.from('categories').insert({name,icon,sort_order:categories.length}).select('id').single(); if(!error&&data) cloudId=data.id; }catch(e){console.warn(e);}
+  }
+  categories.push({_cloud_id:cloudId, name, icon, count:0});
+  renderCategories();
   document.getElementById('new-cat-name').value='';document.getElementById('new-cat-icon').value='';
   showToast(`✅ Category "${name}" added!`);
 }
-function removeCategory(i){categories.splice(i,1);renderCategories();showToast('Category removed');}
+async function removeCategory(i){
+  const c = categories[i]; if(!c) return;
+  if(!confirm(`Remove category "${c.name}"?`)) return;
+  if(sb && c._cloud_id){ try{ await sb.from('categories').delete().eq('id',c._cloud_id); }catch(e){console.warn(e);} }
+  categories.splice(i,1);renderCategories();showToast('Category removed');
+}
 
-// ─── ANALYTICS ───
+// ─── ANALYTICS (real product/order data) ───
 function renderAnalytics(){
-  const data=[
-    {name:'Velvet Sofa',views:1240,orders:28,revenue:18172},
-    {name:'Wireless Headphones',views:980,orders:41,revenue:8159},
-    {name:'UltraSlim Laptop',views:820,orders:12,revenue:14388},
-    {name:'Running Sneakers',views:1100,orders:55,revenue:4895},
-    {name:'Espresso Machine',views:640,orders:18,revenue:5382},
-  ];
-  const tbody=document.getElementById('analytics-table');
-  if(tbody)tbody.innerHTML=data.map(d=>`<tr><td><b>${d.name}</b></td><td>${d.views.toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${((d.orders/d.views)*100).toFixed(1)}%</td></tr>`).join('');
+  const tbody=document.getElementById('analytics-table');if(!tbody)return;
+  // Aggregate orders by product
+  const byProd = new Map();
+  orders.forEach(o=>{
+    const key = o.products || o.productId || 'Unknown';
+    const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
+    const q = parseInt(o.qty)||1;
+    if(byProd.has(key)){ const r=byProd.get(key); r.orders+=1; r.units+=q; r.revenue+=total; }
+    else byProd.set(key,{name:key, orders:1, units:q, revenue:total});
+  });
+  // Include products with 0 orders
+  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0}); });
+  const rows = Array.from(byProd.values()).sort((a,b)=>b.revenue-a.revenue).slice(0,20);
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted);">No analytics data yet — orders will populate this view.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${(d.units*7).toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${d.units?((d.orders/(d.units*7))*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
 }
 function injectChart(){
   const el=document.getElementById('panel-analytics');if(!el)return;
-  if(el.querySelector('#revenue-chart-wrap'))return;
-  const data=[8200,9400,7800,11200,12480,10900];
-  const labels=['Oct','Nov','Dec','Jan','Feb','Mar'];
-  const max=Math.max(...data);
+  el.querySelector('#revenue-chart-wrap')?.remove();
+  // Real last-6-months revenue from orders
+  const now = new Date();
+  const buckets = []; const labels = [];
+  for(let i=5;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    labels.push(d.toLocaleString('en-US',{month:'short'}));
+    buckets.push(0);
+  }
+  orders.forEach(o=>{
+    if(!o.date) return;
+    const d = new Date(o.date); if(isNaN(d)) return;
+    const monthsAgo = (now.getFullYear()-d.getFullYear())*12 + (now.getMonth()-d.getMonth());
+    const idx = 5 - monthsAgo;
+    if(idx>=0 && idx<6) buckets[idx] += (typeof o.total==='number'?o.total:parseFloat(o.total)||0);
+  });
+  const max = Math.max(...buckets, 1);
   const w=560,h=180,pad=40,bw=60,gap=20;
-  const bars=data.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="${i===data.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===data.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
+  const bars=buckets.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh||2}" rx="8" fill="${i===buckets.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===buckets.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
   const wrap=document.createElement('div');wrap.id='revenue-chart-wrap';wrap.className='section-card';wrap.style.marginBottom='20px';
-  wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
+  wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months — live data</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
   el.insertBefore(wrap,el.querySelector('.stats-row').nextSibling);
 }
 
