@@ -555,17 +555,24 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               <div class="tpl-grp" data-tpl="aero" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;">
                 <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Aero — Texts</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Hero sub-headline (under title)</label><input class="form-input" id="tc-aero-sub" placeholder="Short tagline under product name"/></div>
                   <div><label class="form-hint">Benefits headline</label><input class="form-input" id="tc-aero-title" placeholder="Key Benefits"/></div>
                   <div><label class="form-hint">Stock urgency text</label><input class="form-input" id="tc-aero-stock" placeholder="Only a few left in stock"/></div>
+                  <div><label class="form-hint">Hassle-free returns text</label><input class="form-input" id="tc-aero-hassle" placeholder="100 Day hassle free returns"/></div>
                   <div style="grid-column:span 2;"><label class="form-hint">Free gift line</label><input class="form-input" id="tc-aero-gift" placeholder="🟢 Free attachment on all orders over …"/></div>
+                  <div><label class="form-hint">Guarantee 1 sub</label><input class="form-input" id="tc-aero-g1" placeholder="Durability guaranteed"/></div>
+                  <div><label class="form-hint">Guarantee 2 sub (shipping)</label><input class="form-input" id="tc-aero-g2" placeholder="Orders over $X"/></div>
+                  <div style="grid-column:span 2;"><label class="form-hint">Guarantee 3 sub (try it)</label><input class="form-input" id="tc-aero-g3" placeholder="Risk-free"/></div>
                 </div>
               </div>
 
               <div class="tpl-grp" data-tpl="luvea" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
                 <div style="font-weight:800;font-size:13px;margin-bottom:8px;">LUVEA — Texts</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Hero sub-headline (under title)</label><input class="form-input" id="tc-luvea-sub" placeholder="Short tagline under product name"/></div>
                   <div><label class="form-hint">Benefits headline</label><input class="form-input" id="tc-luvea-title" placeholder="After 6 weeks, visibly see:"/></div>
                   <div><label class="form-hint">Delivery prefix</label><input class="form-input" id="tc-luvea-deliv" placeholder="Order Today And Receive By"/></div>
+                  <div><label class="form-hint">CTA button label</label><input class="form-input" id="tc-luvea-cta" placeholder="⚡ Buy Now"/></div>
                   <div style="grid-column:span 2;"><label class="form-hint">Guarantee strip text</label><input class="form-input" id="tc-luvea-guar" placeholder="Less than 1% of customers claim our Money Back Guarantee"/></div>
                 </div>
               </div>
@@ -573,7 +580,9 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               <div class="tpl-grp" data-tpl="radiance" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
                 <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Radiance — Texts</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div style="grid-column:span 2;"><label class="form-hint">Hero sub-headline (under title)</label><input class="form-input" id="tc-rad-sub" placeholder="Short tagline under product name"/></div>
                   <div style="grid-column:span 2;"><label class="form-hint">Free-gift banner</label><input class="form-input" id="tc-rad-banner" placeholder="🔴 Free Gift reserved for the next 30 orders!"/></div>
+                  <div><label class="form-hint">Free-gift included tag</label><input class="form-input" id="tc-rad-fgInc" placeholder='FREE "YOUR GIFT" INCLUDED'/></div>
                   <div><label class="form-hint">Selling-out title</label><input class="form-input" id="tc-rad-soTitle" placeholder="🔥 SELLING OUT FAST"/></div>
                   <div><label class="form-hint">Selling-out subtitle</label><input class="form-input" id="tc-rad-soSub" placeholder="Due to high demand, limited quantities available"/></div>
                   <div><label class="form-hint">Money-back title</label><input class="form-input" id="tc-rad-mbTitle" placeholder="📦 90-Days Money-Back Guarantee"/></div>
@@ -583,12 +592,18 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
 
               <div class="tpl-grp" data-tpl="dark" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
                 <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Dark Premium — Texts</div>
-                <div><label class="form-hint">Hero tagline (above title)</label><input class="form-input" id="tc-dark-tag" placeholder="Premium · Expert tested"/></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Hero tagline (above title)</label><input class="form-input" id="tc-dark-tag" placeholder="Premium · Expert tested"/></div>
+                  <div><label class="form-hint">Hero sub-headline (under title)</label><input class="form-input" id="tc-dark-sub" placeholder="Short tagline under product name"/></div>
+                </div>
               </div>
 
               <div class="tpl-grp" data-tpl="classic" style="display:none;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
                 <div style="font-weight:800;font-size:13px;margin-bottom:8px;">Classic — Texts</div>
-                <div><label class="form-hint">Optional small tagline under price</label><input class="form-input" id="tc-classic-tag" placeholder=""/></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div><label class="form-hint">Tagline under price</label><input class="form-input" id="tc-classic-tag" placeholder=""/></div>
+                  <div><label class="form-hint">Hero sub-headline (under title)</label><input class="form-input" id="tc-classic-sub" placeholder="Short tagline under product name"/></div>
+                </div>
               </div>
             </div>
             <div class="form-group">
@@ -1294,17 +1309,8 @@ let orders = [
   {id:1044,customer:'David L.',email:'david@email.com',products:'Sneakers (White, L)',total:89,date:'Mar 18',status:'delivered'},
   {id:1043,customer:'Maria S.',email:'maria@email.com',products:'LED Pendant Light',total:129,date:'Mar 17',status:'delivered'},
 ];
-let categories = [
-  {name:'Furniture',icon:'🛋️',count:1},{name:'Electronics',icon:'📱',count:2},{name:'Fashion',icon:'👗',count:2},
-  {name:'Kitchen',icon:'🍳',count:1},{name:'Lighting',icon:'💡',count:1},{name:'Outdoor',icon:'🌿',count:1},
-];
-let customers = [
-  {name:'Sarah M.',email:'sarah@email.com',orders:3,spent:1890,type:'registered',joined:'Jan 12, 2026'},
-  {name:'James T.',email:'james@email.com',orders:2,spent:1398,type:'registered',joined:'Feb 5, 2026'},
-  {name:'Amina K.',email:'amina@email.com',orders:5,spent:2340,type:'registered',joined:'Dec 2, 2025'},
-  {name:'David L.',email:'david@email.com',orders:1,spent:89,type:'guest',joined:'Mar 18, 2026'},
-  {name:'Maria S.',email:'maria@email.com',orders:4,spent:650,type:'registered',joined:'Nov 20, 2025'},
-];
+let categories = [];
+let customers  = [];
 let contentSections = [];
 let editingProductId = null;
 let deleteTargetId = null;
@@ -1514,11 +1520,11 @@ function editProduct(id){
   // Template content overrides
   const tc = p.templateContent || {};
   const setTC=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  setTC('tc-aero-title',tc.aeroTitle); setTC('tc-aero-stock',tc.aeroStock); setTC('tc-aero-gift',tc.aeroGift);
-  setTC('tc-luvea-title',tc.luveaTitle); setTC('tc-luvea-deliv',tc.luveaDeliv); setTC('tc-luvea-guar',tc.luveaGuar);
-  setTC('tc-rad-banner',tc.radBanner); setTC('tc-rad-soTitle',tc.radSoTitle); setTC('tc-rad-soSub',tc.radSoSub);
+  setTC('tc-aero-sub',tc.aeroSub); setTC('tc-aero-title',tc.aeroTitle); setTC('tc-aero-stock',tc.aeroStock); setTC('tc-aero-gift',tc.aeroGift); setTC('tc-aero-hassle',tc.aeroHassle); setTC('tc-aero-g1',tc.aeroG1); setTC('tc-aero-g2',tc.aeroG2); setTC('tc-aero-g3',tc.aeroG3);
+  setTC('tc-luvea-sub',tc.luveaSub); setTC('tc-luvea-title',tc.luveaTitle); setTC('tc-luvea-deliv',tc.luveaDeliv); setTC('tc-luvea-cta',tc.luveaCta); setTC('tc-luvea-guar',tc.luveaGuar);
+  setTC('tc-rad-sub',tc.radSub); setTC('tc-rad-banner',tc.radBanner); setTC('tc-rad-fgInc',tc.radFgInc); setTC('tc-rad-soTitle',tc.radSoTitle); setTC('tc-rad-soSub',tc.radSoSub);
   setTC('tc-rad-mbTitle',tc.radMbTitle); setTC('tc-rad-mbText',tc.radMbText);
-  setTC('tc-dark-tag',tc.darkTag); setTC('tc-classic-tag',tc.classicTag);
+  setTC('tc-dark-tag',tc.darkTag); setTC('tc-dark-sub',tc.darkSub); setTC('tc-classic-tag',tc.classicTag); setTC('tc-classic-sub',tc.classicSub);
 
   // Installment colors
   const ic = (p.formConfig && p.formConfig.installmentPlan && p.formConfig.installmentPlan.colors) || {};
@@ -1629,11 +1635,11 @@ async function saveProduct(draft=false){
 
   const tcGet = (id) => document.getElementById(id)?.value.trim()||'';
   const templateContent = {
-    aeroTitle: tcGet('tc-aero-title'), aeroStock: tcGet('tc-aero-stock'), aeroGift: tcGet('tc-aero-gift'),
-    luveaTitle: tcGet('tc-luvea-title'), luveaDeliv: tcGet('tc-luvea-deliv'), luveaGuar: tcGet('tc-luvea-guar'),
-    radBanner: tcGet('tc-rad-banner'), radSoTitle: tcGet('tc-rad-soTitle'), radSoSub: tcGet('tc-rad-soSub'),
+    aeroSub: tcGet('tc-aero-sub'), aeroTitle: tcGet('tc-aero-title'), aeroStock: tcGet('tc-aero-stock'), aeroGift: tcGet('tc-aero-gift'), aeroHassle: tcGet('tc-aero-hassle'), aeroG1: tcGet('tc-aero-g1'), aeroG2: tcGet('tc-aero-g2'), aeroG3: tcGet('tc-aero-g3'),
+    luveaSub: tcGet('tc-luvea-sub'), luveaTitle: tcGet('tc-luvea-title'), luveaDeliv: tcGet('tc-luvea-deliv'), luveaCta: tcGet('tc-luvea-cta'), luveaGuar: tcGet('tc-luvea-guar'),
+    radSub: tcGet('tc-rad-sub'), radBanner: tcGet('tc-rad-banner'), radFgInc: tcGet('tc-rad-fgInc'), radSoTitle: tcGet('tc-rad-soTitle'), radSoSub: tcGet('tc-rad-soSub'),
     radMbTitle: tcGet('tc-rad-mbTitle'), radMbText: tcGet('tc-rad-mbText'),
-    darkTag: tcGet('tc-dark-tag'), classicTag: tcGet('tc-classic-tag'),
+    darkTag: tcGet('tc-dark-tag'), darkSub: tcGet('tc-dark-sub'), classicTag: tcGet('tc-classic-tag'), classicSub: tcGet('tc-classic-sub'),
   };
 
   const payload = {
@@ -1696,7 +1702,7 @@ function clearProductForm(){
   const tplSel = document.getElementById('fp-template');
   if(tplSel) { tplSel.value = 'classic'; updateTemplatePreview('classic'); showTemplateContentGroup('classic'); }
   // Reset template content fields
-  ['tc-aero-title','tc-aero-stock','tc-aero-gift','tc-luvea-title','tc-luvea-deliv','tc-luvea-guar','tc-rad-banner','tc-rad-soTitle','tc-rad-soSub','tc-rad-mbTitle','tc-rad-mbText','tc-dark-tag','tc-classic-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['tc-aero-sub','tc-aero-title','tc-aero-stock','tc-aero-gift','tc-aero-hassle','tc-aero-g1','tc-aero-g2','tc-aero-g3','tc-luvea-sub','tc-luvea-title','tc-luvea-deliv','tc-luvea-cta','tc-luvea-guar','tc-rad-sub','tc-rad-banner','tc-rad-fgInc','tc-rad-soTitle','tc-rad-soSub','tc-rad-mbTitle','tc-rad-mbText','tc-dark-tag','tc-dark-sub','tc-classic-tag','tc-classic-sub'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   // Reset installment colors
   const cBg=document.getElementById('fp-ip-color-bg'); if(cBg) cBg.value='#fff3c4';
   const cBd=document.getElementById('fp-ip-color-border'); if(cBd) cBd.value='#f5b400';
@@ -2474,39 +2480,91 @@ async function deleteAgent(id){
   showToast('🗑 Agent removed');
 }
 
-// ─── VIEW ORDER MODAL ───
+// ─── VIEW ORDER MODAL (structured + copiable fields) ───
+function copyVal(v){
+  try { navigator.clipboard.writeText(String(v||'')); showToast('📋 Copied'); }
+  catch(e){ showToast('⚠️ Copy failed'); }
+}
+function copyAllOrder(id){
+  const o = orders.find(x=>String(x.id)===String(id)); if(!o) return;
+  const txt = [
+    `Order #${o.id}`,
+    `Date: ${o.date||''}`,
+    `Status: ${o.status||''}`,
+    `─ Customer ─`,
+    `Name: ${o.customer||''}`,
+    `Email: ${o.email||''}`,
+    `Phone: ${o.phone||''}`,
+    `Address: ${o.address||''}${o.city?', '+o.city:''}`,
+    `─ Order ─`,
+    `Product: ${o.products||''}`,
+    `Qty: ${o.qty||1}`,
+    o.color?`Color: ${o.color}`:null,
+    o.size?`Size: ${o.size}`:null,
+    `Total: $${typeof o.total==='number'?o.total.toLocaleString():o.total}`,
+    o.paymentMethod?`Payment: ${o.paymentMethod}`:null,
+    o.notes?`Notes: ${o.notes}`:null,
+  ].filter(Boolean).join('\n');
+  copyVal(txt);
+}
 function viewOrder(id){
   const o=orders.find(x=>String(x.id)===String(id));if(!o)return;
   document.getElementById('order-detail-modal')?.remove();
   const el=document.createElement('div');
   el.id='order-detail-modal';
   el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
-  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-      <div style="font-family:'Fraunces',serif;font-size:19px;font-weight:900;">Order #${o.id}</div>
+  const oid = JSON.stringify(o.id);
+  const row = (lbl, val, raw) => {
+    if(!val) return '';
+    const safe = String(val).replace(/"/g,'&quot;');
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed #ece7df;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;">${lbl}</div>
+        <div style="font-size:14px;margin-top:2px;word-break:break-word;">${val}</div>
+      </div>
+      <button class="tbl-btn" onclick='copyVal(${JSON.stringify(raw||String(val))})' style="flex-shrink:0;">📋 Copy</button>
+    </div>`;
+  };
+  el.innerHTML=`<div style="background:#fff;border-radius:18px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;">Order #${o.id}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${o.date||''}</div>
+      </div>
       <button onclick="document.getElementById('order-detail-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">✕</button>
     </div>
-    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Customer</div>
-      <div style="font-weight:700;font-size:15px;">${o.customer}</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:3px;">${o.email||''}</div>
-      ${o.phone?`<div style="font-size:13px;color:var(--muted);">📞 ${o.phone}</div>`:''}
-      ${o.address?`<div style="font-size:13px;color:var(--muted);">📍 ${o.address}${o.city?', '+o.city:''}</div>`:''}
+
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="hdr-btn hdr-btn-outline" onclick="copyAllOrder(${oid})" style="flex:1;">📋 Copy all order details</button>
     </div>
-    <div style="background:#f5f4f0;border-radius:11px;padding:15px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Items</div>
-      <div style="font-weight:600;">${o.products}</div>
-      ${o.qty?`<div style="font-size:13px;color:var(--muted);">Qty: ${o.qty}</div>`:''}
-      ${o.color?`<div style="font-size:13px;color:var(--muted);">Colour: ${o.color}</div>`:''}
-      ${o.notes?`<div style="font-size:13px;color:var(--muted);">Notes: ${o.notes}</div>`:''}
+
+    <div style="background:#f9f8f6;border:1px solid var(--border);border-radius:11px;padding:6px 14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);padding-top:10px;">Customer</div>
+      ${row('Full Name', o.customer, o.customer)}
+      ${row('Email', o.email, o.email)}
+      ${row('Phone / WhatsApp', o.phone, o.phone)}
+      ${row('Delivery Address', o.address, o.address)}
+      ${row('City / State', o.city, o.city)}
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;background:#f5f4f0;border-radius:11px;padding:14px;margin-bottom:18px;">
-      <span style="color:var(--muted);">Total</span>
+
+    <div style="background:#f9f8f6;border:1px solid var(--border);border-radius:11px;padding:6px 14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);padding-top:10px;">Order</div>
+      ${row('Product', o.products, o.products)}
+      ${row('Quantity', o.qty, o.qty)}
+      ${row('Colour', o.color, o.color)}
+      ${row('Size', o.size, o.size)}
+      ${row('Payment Method', o.paymentMethod, o.paymentMethod)}
+      ${row('Special Notes', o.notes, o.notes)}
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;border-radius:11px;padding:14px 16px;margin-bottom:14px;">
+      <span style="opacity:.7;">Order Total</span>
       <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">$${typeof o.total==='number'?o.total.toLocaleString():o.total}</span>
     </div>
-    <div style="margin-bottom:18px;">
-      <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Update Status</div>
-      <select onchange="updateOrderStatus(${JSON.stringify(o.id)},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Update Status</div>
+      <select onchange="updateOrderStatus(${oid},this.value);document.getElementById('order-detail-modal').remove();" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Satoshi',sans-serif;font-size:14px;outline:none;">
         <option value="">— Choose status —</option>
         <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
         <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
@@ -2516,7 +2574,7 @@ function viewOrder(id){
     </div>
     <div style="display:flex;gap:10px;">
       <button onclick="document.getElementById('order-detail-modal').remove()" style="flex:1;background:#f5f4f0;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;cursor:pointer;">Close</button>
-      <button onclick="showToast('📧 Email sent to ${o.email||'customer'}');document.getElementById('order-detail-modal').remove();" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📧 Email</button>
+      ${o.email?`<button onclick="window.location.href='mailto:${o.email}?subject=Order%20%23${o.id}'" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📧 Email Customer</button>`:''}
     </div>
   </div>`;
   el.onclick=e=>{if(e.target===el)el.remove();};
@@ -2554,64 +2612,142 @@ function renderOrders(){
   const rstat=document.getElementById('total-revenue-stat');if(rstat)rstat.textContent='$'+rev.toLocaleString();
 }
 
-// ─── CUSTOMERS ───
+// ─── CUSTOMERS (derived from real orders) ───
 function renderCustomers(){
   const tbody=document.getElementById('customers-table-body');if(!tbody)return;
-  let customers_all=[...customers];
-  orders.forEach(o=>{if(o.email&&o.customer&&!customers_all.find(c=>c.email===o.email))customers_all.push({name:o.customer,email:o.email,orders:1,spent:typeof o.total==='number'?o.total:parseFloat(o.total)||0,type:'guest',joined:'Recent'});});
-  tbody.innerHTML=customers_all.map(c=>`
-    <tr>
-      <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${c.name[0]}</div><b>${c.name}</b></div></td>
-      <td>${c.email}</td><td>${c.orders}</td><td>$${(c.spent||0).toLocaleString()}</td>
-      <td><span class="badge ${c.type==='registered'?'badge-green':'badge-gray'}">${c.type}</span></td>
-      <td>${c.joined}</td>
-      <td><div class="table-actions"><button class="tbl-btn" onclick="showToast('📧 Email sent to ${c.email}')">Email</button></div></td>
-    </tr>`).join('');
-  const cstat=document.getElementById('total-customers-stat');if(cstat)cstat.textContent=customers_all.length;
+  // Aggregate by email (or name if no email)
+  const map = new Map();
+  orders.forEach(o=>{
+    const key = (o.email||o.phone||o.customer||'').toLowerCase().trim();
+    if(!key) return;
+    const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
+    if(map.has(key)){
+      const c = map.get(key);
+      c.orders += 1; c.spent += total;
+      if(new Date(o.date||0) < new Date(c.joined||0)) c.joined = o.date;
+    } else {
+      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, type:'guest', joined:o.date||''});
+    }
+  });
+  const list = Array.from(map.values()).sort((a,b)=>b.spent-a.spent);
+  customers = list;
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:38px;color:var(--muted);">No customers yet — orders will populate this list automatically.</td></tr>`;
+  } else {
+    tbody.innerHTML = list.map(c=>{
+      const initial = (c.name||'?')[0].toUpperCase();
+      const joined = c.joined ? new Date(c.joined).toLocaleDateString() : '—';
+      return `
+      <tr>
+        <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${initial}</div><b>${c.name}</b></div></td>
+        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>$${c.spent.toLocaleString()}</td>
+        <td><span class="badge badge-gray">${c.type}</span></td>
+        <td>${joined}</td>
+        <td><div class="table-actions">${c.email?`<button class="tbl-btn" onclick="navigator.clipboard.writeText('${c.email}');showToast('📋 Email copied')">Copy Email</button>`:''}</div></td>
+      </tr>`;
+    }).join('');
+  }
+  const cstat=document.getElementById('total-customers-stat');if(cstat)cstat.textContent=list.length;
 }
 
-// ─── CATEGORIES ───
+// ─── CATEGORIES (cloud + product counts) ───
+async function loadCategoriesCloud(){
+  if(!sb) return;
+  try{
+    const {data} = await sb.from('categories').select('*').order('sort_order',{ascending:true});
+    if(data) categories = data.map(c=>({_cloud_id:c.id, name:c.name, icon:c.icon||'📦'}));
+  }catch(e){console.warn('Categories load error:',e);}
+}
+function recomputeCategoryCounts(){
+  const counts = {};
+  products.forEach(p=>{ if(p.category){ counts[p.category]=(counts[p.category]||0)+1; } });
+  categories.forEach(c=>{ c.count = counts[c.name]||0; });
+  // Add categories present in products but missing from list
+  Object.keys(counts).forEach(n=>{
+    if(!categories.find(c=>c.name===n)) categories.push({name:n, icon:'📦', count:counts[n]});
+  });
+}
 function renderCategories(){
-  document.getElementById('cat-admin-grid').innerHTML=categories.map((c,i)=>`
+  const grid = document.getElementById('cat-admin-grid');
+  if(!grid) return;
+  recomputeCategoryCounts();
+  if(!categories.length){
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:38px;color:var(--muted);">No categories yet. Add one below or assign a category to a product.</div>`;
+    return;
+  }
+  grid.innerHTML = categories.map((c,i)=>`
     <div style="background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:20px;text-align:center;position:relative;">
       <div style="font-size:32px;margin-bottom:8px;">${c.icon}</div>
       <div style="font-weight:800;font-size:14px;">${c.name}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:3px;">${c.count} products</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px;">${c.count||0} products</div>
       <button class="tbl-btn danger" style="position:absolute;top:8px;right:8px;padding:4px 8px;" onclick="removeCategory(${i})">✕</button>
     </div>`).join('');
 }
-function addCategory(){
+async function addCategory(){
   const name=document.getElementById('new-cat-name').value.trim();
   const icon=document.getElementById('new-cat-icon').value.trim()||'📦';
   if(!name){showToast('⚠️ Enter a category name');return;}
-  categories.push({name,icon,count:0});renderCategories();
+  if(categories.find(c=>c.name.toLowerCase()===name.toLowerCase())){showToast('⚠️ Category already exists');return;}
+  let cloudId = null;
+  if(sb){
+    try{ const {data,error} = await sb.from('categories').insert({name,icon,sort_order:categories.length}).select('id').single(); if(!error&&data) cloudId=data.id; }catch(e){console.warn(e);}
+  }
+  categories.push({_cloud_id:cloudId, name, icon, count:0});
+  renderCategories();
   document.getElementById('new-cat-name').value='';document.getElementById('new-cat-icon').value='';
   showToast(`✅ Category "${name}" added!`);
 }
-function removeCategory(i){categories.splice(i,1);renderCategories();showToast('Category removed');}
+async function removeCategory(i){
+  const c = categories[i]; if(!c) return;
+  if(!confirm(`Remove category "${c.name}"?`)) return;
+  if(sb && c._cloud_id){ try{ await sb.from('categories').delete().eq('id',c._cloud_id); }catch(e){console.warn(e);} }
+  categories.splice(i,1);renderCategories();showToast('Category removed');
+}
 
-// ─── ANALYTICS ───
+// ─── ANALYTICS (real product/order data) ───
 function renderAnalytics(){
-  const data=[
-    {name:'Velvet Sofa',views:1240,orders:28,revenue:18172},
-    {name:'Wireless Headphones',views:980,orders:41,revenue:8159},
-    {name:'UltraSlim Laptop',views:820,orders:12,revenue:14388},
-    {name:'Running Sneakers',views:1100,orders:55,revenue:4895},
-    {name:'Espresso Machine',views:640,orders:18,revenue:5382},
-  ];
-  const tbody=document.getElementById('analytics-table');
-  if(tbody)tbody.innerHTML=data.map(d=>`<tr><td><b>${d.name}</b></td><td>${d.views.toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${((d.orders/d.views)*100).toFixed(1)}%</td></tr>`).join('');
+  const tbody=document.getElementById('analytics-table');if(!tbody)return;
+  // Aggregate orders by product
+  const byProd = new Map();
+  orders.forEach(o=>{
+    const key = o.products || o.productId || 'Unknown';
+    const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
+    const q = parseInt(o.qty)||1;
+    if(byProd.has(key)){ const r=byProd.get(key); r.orders+=1; r.units+=q; r.revenue+=total; }
+    else byProd.set(key,{name:key, orders:1, units:q, revenue:total});
+  });
+  // Include products with 0 orders
+  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0}); });
+  const rows = Array.from(byProd.values()).sort((a,b)=>b.revenue-a.revenue).slice(0,20);
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted);">No analytics data yet — orders will populate this view.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${(d.units*7).toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${d.units?((d.orders/(d.units*7))*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
 }
 function injectChart(){
   const el=document.getElementById('panel-analytics');if(!el)return;
-  if(el.querySelector('#revenue-chart-wrap'))return;
-  const data=[8200,9400,7800,11200,12480,10900];
-  const labels=['Oct','Nov','Dec','Jan','Feb','Mar'];
-  const max=Math.max(...data);
+  el.querySelector('#revenue-chart-wrap')?.remove();
+  // Real last-6-months revenue from orders
+  const now = new Date();
+  const buckets = []; const labels = [];
+  for(let i=5;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    labels.push(d.toLocaleString('en-US',{month:'short'}));
+    buckets.push(0);
+  }
+  orders.forEach(o=>{
+    if(!o.date) return;
+    const d = new Date(o.date); if(isNaN(d)) return;
+    const monthsAgo = (now.getFullYear()-d.getFullYear())*12 + (now.getMonth()-d.getMonth());
+    const idx = 5 - monthsAgo;
+    if(idx>=0 && idx<6) buckets[idx] += (typeof o.total==='number'?o.total:parseFloat(o.total)||0);
+  });
+  const max = Math.max(...buckets, 1);
   const w=560,h=180,pad=40,bw=60,gap=20;
-  const bars=data.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="${i===data.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===data.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
+  const bars=buckets.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh||2}" rx="8" fill="${i===buckets.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===buckets.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
   const wrap=document.createElement('div');wrap.id='revenue-chart-wrap';wrap.className='section-card';wrap.style.marginBottom='20px';
-  wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
+  wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months — live data</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
   el.insertBefore(wrap,el.querySelector('.stats-row').nextSibling);
 }
 
@@ -2810,7 +2946,10 @@ function refreshDashStats(){
   if(el('total-products-stat'))el('total-products-stat').textContent=active;
   if(el('total-orders-stat'))el('total-orders-stat').textContent=orders.length;
   if(el('total-revenue-stat'))el('total-revenue-stat').textContent='$'+rev.toLocaleString();
-  if(el('total-customers-stat'))el('total-customers-stat').textContent=customers.length;
+  // Derive unique customers from orders
+  const uniq = new Set();
+  orders.forEach(o=>{ const k=(o.email||o.phone||o.customer||'').toLowerCase().trim(); if(k) uniq.add(k); });
+  if(el('total-customers-stat'))el('total-customers-stat').textContent=uniq.size;
 }
 
 // ─── DUPLICATE PRODUCT ───
@@ -3227,6 +3366,7 @@ async function deleteAdminReview(id) {
 // ─── INIT ───
 (async function(){
   await loadFromStorage();
+  await loadCategoriesCloud();
   await loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
   renderProductsTable();
 })();

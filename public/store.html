@@ -2256,6 +2256,15 @@ function applyTemplate(p) {
   
   const TC = p.templateContent || {};
 
+  // Universal hero sub-headline (per template) — inserted right under sp-title
+  const subMap = {aero:TC.aeroSub, luvea:TC.luveaSub, radiance:TC.radSub, dark:TC.darkSub, classic:TC.classicSub};
+  const subText = subMap[tpl];
+  if (subText) {
+    const titleEl = document.getElementById('sp-title');
+    if (titleEl) titleEl.insertAdjacentHTML('afterend', `<div class="tpl-injected" style="font-size:14px;color:var(--muted);margin:-4px 0 10px;line-height:1.5;">${subText}</div>`);
+  }
+
+
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
@@ -2280,15 +2289,15 @@ function applyTemplate(p) {
         <div class="sp-stock-text">🔴 ${TC.aeroStock || 'Only a few left in stock'}</div>
         <div class="sp-stock-bar-inner"><div class="sp-stock-bar-fill" style="width:${Math.min(92, Math.max(60, 100 - (p.stock||10)*3))}%;"></div></div>
       </div>
-      <div class="sp-hassle">↩️ ${p.returnDays || '100 Day'} hassle free returns</div>
+      <div class="sp-hassle">↩️ ${TC.aeroHassle || `${p.returnDays || '100 Day'} hassle free returns`}</div>
       <div class="sp-pay-icons">
         <div class="sp-pay-icon">Visa</div><div class="sp-pay-icon">MC</div><div class="sp-pay-icon">Amex</div>
         <div class="sp-pay-icon">Apple</div><div class="sp-pay-icon">GPay</div><div class="sp-pay-icon">PayPal</div>
       </div>
       <div class="sp-guarantee-strip">
-        <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">Durability guaranteed</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over ${formatMoney(Math.round(p.price*1.5), p)}</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">Risk-free</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">${TC.aeroG1 || 'Durability guaranteed'}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">${TC.aeroG2 || `Orders over ${formatMoney(Math.round(p.price*1.5), p)}`}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">${TC.aeroG3 || 'Risk-free'}</div></div>
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterCta);
@@ -2366,7 +2375,7 @@ function applyTemplate(p) {
     }
     
     // Free gift included banner
-    const freeGiftIncludedHTML = bundles.length > 1 ? `<div class="tpl-injected sp-free-gift-included"><div class="fg-icon">🎁</div><strong>FREE "YOUR GIFT" INCLUDED</strong></div>` : '';
+    const freeGiftIncludedHTML = bundles.length > 1 ? `<div class="tpl-injected sp-free-gift-included"><div class="fg-icon">🎁</div><strong>${TC.radFgInc || 'FREE "YOUR GIFT" INCLUDED'}</strong></div>` : '';
     
     // Insert all before CTAs
     const callBar = spInfo?.querySelector('.sp-call-bar');
@@ -2641,14 +2650,16 @@ function buildCTAs(p) {
   const m  = p.checkoutMethod || 'standard';
   const fc = p.formConfig || {};
   const lbl = fc.btnLabel || 'Fill Order Form →';
+  const TC = p.templateContent || {};
+  const buyLbl = (p.pageTemplate==='luvea' && TC.luveaCta) ? TC.luveaCta : '⚡ Buy Now — Guest Checkout';
   let html2 = '';
   if (m === 'standard') {
-    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">⚡ Buy Now — Guest Checkout</button>
+    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">${buyLbl}</button>
              <button class="btn-add-sp" id="add-cart-sp">🛒 Add to Cart</button>`;
   } else if (m === 'form') {
     html2 = `<button class="btn-order-form" onclick="openOrderForm()">📋 ${lbl}</button>`;
   } else {
-    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">⚡ Buy Now — Guest Checkout</button>
+    html2 = `<button class="btn-buy-now" onclick="openModal('checkout-modal')">${buyLbl}</button>
              <button class="btn-add-sp" id="add-cart-sp">🛒 Add to Cart</button>
              <div class="or-divider">— OR —</div>
              <button class="btn-order-form" onclick="openOrderForm()">📋 ${lbl}</button>`;
@@ -2688,7 +2699,31 @@ function buildCTAs(p) {
 }
 function selColor(el, name) { document.querySelectorAll('.sp-color').forEach(c=>c.classList.remove('active')); el.classList.add('active'); document.getElementById('color-txt').textContent=name; }
 function selSize(el)  { if(el.classList.contains('out'))return; document.querySelectorAll('.sp-size').forEach(s=>s.classList.remove('active')); el.classList.add('active'); }
-function chgQty(d)    { qty=Math.max(1,Math.min(10,qty+d)); document.getElementById('qty-val').value=qty; }
+function chgQty(d)    {
+  qty=Math.max(1,Math.min(10,qty+d));
+  document.getElementById('qty-val').value=qty;
+  const p = productById(currentProductId);
+  if (!p) return;
+  // If bundles or radiance variants drive price, don't override
+  const usingBundle = Array.isArray(p.bundles) && p.bundles.length > 0;
+  if (usingBundle) return;
+  const unit = Number(p.price)||0;
+  const wasUnit = Number(p.wasPrice)||0;
+  document.getElementById('sp-price').textContent = formatMoney(unit*qty, p);
+  const wasEl = document.getElementById('sp-was');
+  if (wasEl) wasEl.textContent = wasUnit ? formatMoney(wasUnit*qty, p) : '';
+  const saveEl = document.getElementById('sp-save');
+  if (saveEl) {
+    const save = wasUnit ? (wasUnit - unit)*qty : 0;
+    saveEl.textContent = save>0 ? 'Save '+formatMoney(save, p) : '';
+    saveEl.style.display = save>0?'inline-flex':'none';
+  }
+  // Update checkout modal totals
+  const tax = Math.round(unit*qty*0.08);
+  const ckP = document.getElementById('ck-prod-price'); if(ckP) ckP.textContent = formatMoney(unit*qty,p);
+  const ckT = document.getElementById('ck-tax'); if(ckT) ckT.textContent = formatMoney(tax,p);
+  const ckTot = document.getElementById('ck-total'); if(ckTot) ckTot.textContent = formatMoney(unit*qty+tax,p);
+}
 function switchPdTab(btn, id) {
   document.querySelectorAll('.pd-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.pd-content').forEach(c=>c.classList.remove('active'));
