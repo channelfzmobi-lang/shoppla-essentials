@@ -2289,15 +2289,15 @@ function applyTemplate(p) {
         <div class="sp-stock-text">🔴 ${TC.aeroStock || 'Only a few left in stock'}</div>
         <div class="sp-stock-bar-inner"><div class="sp-stock-bar-fill" style="width:${Math.min(92, Math.max(60, 100 - (p.stock||10)*3))}%;"></div></div>
       </div>
-      <div class="sp-hassle">↩️ ${p.returnDays || '100 Day'} hassle free returns</div>
+      <div class="sp-hassle">↩️ ${TC.aeroHassle || `${p.returnDays || '100 Day'} hassle free returns`}</div>
       <div class="sp-pay-icons">
         <div class="sp-pay-icon">Visa</div><div class="sp-pay-icon">MC</div><div class="sp-pay-icon">Amex</div>
         <div class="sp-pay-icon">Apple</div><div class="sp-pay-icon">GPay</div><div class="sp-pay-icon">PayPal</div>
       </div>
       <div class="sp-guarantee-strip">
-        <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">Durability guaranteed</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">Orders over ${formatMoney(Math.round(p.price*1.5), p)}</div></div>
-        <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">Risk-free</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🛡️</span><div class="gi-title">${p.warranty||'Warranty for life'}</div><div class="gi-sub">${TC.aeroG1 || 'Durability guaranteed'}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">📦</span><div class="gi-title">Free Shipping</div><div class="gi-sub">${TC.aeroG2 || `Orders over ${formatMoney(Math.round(p.price*1.5), p)}`}</div></div>
+        <div class="sp-guarantee-item"><span style="font-size:22px;">🌐</span><div class="gi-title">Try it for ${p.returnDays||'100 days'}</div><div class="gi-sub">${TC.aeroG3 || 'Risk-free'}</div></div>
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterCta);
