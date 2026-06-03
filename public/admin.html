@@ -3363,6 +3363,7 @@ async function deleteAdminReview(id) {
 // ─── INIT ───
 (async function(){
   await loadFromStorage();
+  await loadCategoriesCloud();
   await loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
   renderProductsTable();
 })();
