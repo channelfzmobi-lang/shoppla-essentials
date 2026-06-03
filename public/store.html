@@ -2256,6 +2256,15 @@ function applyTemplate(p) {
   
   const TC = p.templateContent || {};
 
+  // Universal hero sub-headline (per template) — inserted right under sp-title
+  const subMap = {aero:TC.aeroSub, luvea:TC.luveaSub, radiance:TC.radSub, dark:TC.darkSub, classic:TC.classicSub};
+  const subText = subMap[tpl];
+  if (subText) {
+    const titleEl = document.getElementById('sp-title');
+    if (titleEl) titleEl.insertAdjacentHTML('afterend', `<div class="tpl-injected" style="font-size:14px;color:var(--muted);margin:-4px 0 10px;line-height:1.5;">${subText}</div>`);
+  }
+
+
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
