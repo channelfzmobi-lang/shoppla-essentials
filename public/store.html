@@ -2375,7 +2375,7 @@ function applyTemplate(p) {
     }
     
     // Free gift included banner
-    const freeGiftIncludedHTML = bundles.length > 1 ? `<div class="tpl-injected sp-free-gift-included"><div class="fg-icon">🎁</div><strong>FREE "YOUR GIFT" INCLUDED</strong></div>` : '';
+    const freeGiftIncludedHTML = bundles.length > 1 ? `<div class="tpl-injected sp-free-gift-included"><div class="fg-icon">🎁</div><strong>${TC.radFgInc || 'FREE "YOUR GIFT" INCLUDED'}</strong></div>` : '';
     
     // Insert all before CTAs
     const callBar = spInfo?.querySelector('.sp-call-bar');
