@@ -2946,7 +2946,10 @@ function refreshDashStats(){
   if(el('total-products-stat'))el('total-products-stat').textContent=active;
   if(el('total-orders-stat'))el('total-orders-stat').textContent=orders.length;
   if(el('total-revenue-stat'))el('total-revenue-stat').textContent='$'+rev.toLocaleString();
-  if(el('total-customers-stat'))el('total-customers-stat').textContent=customers.length;
+  // Derive unique customers from orders
+  const uniq = new Set();
+  orders.forEach(o=>{ const k=(o.email||o.phone||o.customer||'').toLowerCase().trim(); if(k) uniq.add(k); });
+  if(el('total-customers-stat'))el('total-customers-stat').textContent=uniq.size;
 }
 
 // ─── DUPLICATE PRODUCT ───
