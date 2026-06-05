@@ -3218,8 +3218,11 @@ window.isInstallmentValid = isInstallmentValid;
 async function globalSaveChanges(){
   const activePanel = document.querySelector('.panel.active')?.id || '';
   try{
-    if(activePanel==='add-product' || document.getElementById('fp-name')?.value){
+    if(activePanel==='panel-add-product' || document.getElementById('fp-name')?.value){
       await saveProduct(false); return;
+    }
+    if(activePanel==='panel-settings' || activePanel==='panel-appearance'){
+      await saveSettings(); return;
     }
     showToast('⏳ Saving…');
     const ok = await saveToStorage();
