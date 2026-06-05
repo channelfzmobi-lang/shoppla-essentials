@@ -1221,12 +1221,16 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="sc-head"><div class="sc-title">Contact & Support Info</div></div>
         <div class="sc-body">
           <div class="form-grid-2">
-            <div class="form-group"><label class="form-lbl">Support Email</label><input class="form-input" value="support@shoppla.com"/></div>
-            <div class="form-group"><label class="form-lbl">Phone / WhatsApp</label><input class="form-input" value="+1 (800) SHOPPLA"/></div>
-            <div class="form-group"><label class="form-lbl">WhatsApp Business Link</label><input class="form-input" placeholder="https://wa.me/..."/></div>
-            <div class="form-group"><label class="form-lbl">Zoom Meeting Link</label><input class="form-input" placeholder="https://zoom.us/j/..."/></div>
+            <div class="form-group"><label class="form-lbl">Support Email</label><input class="form-input" id="s-support-email" value="support@shoppla.com"/></div>
+            <div class="form-group"><label class="form-lbl">Phone / WhatsApp</label><input class="form-input" id="s-phone" value="+1 (800) SHOPPLA"/></div>
+            <div class="form-group"><label class="form-lbl">WhatsApp Business Link</label><input class="form-input" id="s-whatsapp" placeholder="https://wa.me/..."/></div>
+            <div class="form-group"><label class="form-lbl">Zoom Meeting Link</label><input class="form-input" id="s-zoom" placeholder="https://zoom.us/j/..."/></div>
+            <div class="form-group"><label class="form-lbl">Instagram URL</label><input class="form-input" id="s-instagram" value="https://www.instagram.com/shoppla.co/"/></div>
+            <div class="form-group"><label class="form-lbl">Threads URL</label><input class="form-input" id="s-threads" value="https://www.threads.com/@shoppla.co?xmt=AQG0AoM3nZcT5gxVyrCRu0wFr8udqP1AU3J91MPwEYPWcoM"/></div>
+            <div class="form-group"><label class="form-lbl">X / Twitter URL</label><input class="form-input" id="s-x" value="https://x.com/shoppla"/></div>
+            <div class="form-group"><label class="form-lbl">TikTok URL</label><input class="form-input" id="s-tiktok" value="https://www.tiktok.com/@shoppla.co"/></div>
           </div>
-          <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Contact info saved!')">Save</button>
+          <button class="hdr-btn hdr-btn-primary" onclick="saveSettings()">Save</button>
         </div>
       </div>
     </div>
