@@ -1831,6 +1831,7 @@ const STORAGE_KEY = 'shoppla_products_v1';
 const ORDERS_KEY  = 'shoppla_orders_v1';
 const CART_KEY    = 'shoppla_cart_v1';
 const WISH_KEY    = 'shoppla_wishlist_v1';
+const SETTINGS_KEY = 'shoppla_settings_v1';
 
 // ═══ DEFAULT PRODUCTS ═══
 const DEFAULT_PRODUCTS = [
@@ -1851,6 +1852,8 @@ let qty = 1;
 let stars = 5;
 let activeOrderData = {};
 let toastTimer = null;
+let storeSettings = {};
+let selectedOfferType = 'full';
 const DEFAULT_PD_DETAIL_HTML = document.getElementById('pd-detail')?.innerHTML || '';
 
 const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
