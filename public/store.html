@@ -2200,11 +2200,14 @@ function getInstallmentBreakdown(p){
   if(!(first>0&&first<=total)) return null;
   return {label:ip.label||'Installment Plan',mode:ip.mode||'selectable',total,first,rest:(total-first)/(count-1),count,colors:ip.colors||{}};
 }
-function currentUnitDue(p){ const b=getInstallmentBreakdown(p); return b&&selectedOfferType==='installment'?b.first:Number(p?.price)||0; }
+function selectedBundle(p){ return (Array.isArray(p?.bundles) && selectedBundleIdx !== null && p.bundles[selectedBundleIdx]) ? p.bundles[selectedBundleIdx] : null; }
+function currentFullTotal(p){ const bun=selectedBundle(p); return bun ? Number(bun.price||0) : (Number(p?.price)||0)*(qty||1); }
+function currentDueTotal(p){ const b=getInstallmentBreakdown(p); return b&&selectedOfferType==='installment' ? b.first*(qty||1) : currentFullTotal(p); }
+function currentUnitDue(p){ return (currentDueTotal(p)/(qty||1)) || 0; }
 function selectedOfferLabel(p){ const b=getInstallmentBreakdown(p); return b&&selectedOfferType==='installment'?`${b.label}: ${formatMoney(b.first,p)} today + ${b.count-1} × ${formatMoney(b.rest,p)}`:'Full payment'; }
 function updateSalesPricing(){
   const p=productById(currentProductId); if(!p)return;
-  const unit=currentUnitDue(p), subtotal=unit*(qty||1), fullSubtotal=(Number(p.price)||0)*(qty||1), wasUnit=Number(p.wasPrice)||0;
+  const subtotal=currentDueTotal(p), fullSubtotal=currentFullTotal(p), wasUnit=Number(p.wasPrice)||0;
   document.getElementById('sp-price').textContent=formatMoney(subtotal,p);
   const wasEl=document.getElementById('sp-was'); if(wasEl) wasEl.textContent=selectedOfferType==='installment'?formatMoney(fullSubtotal,p):(wasUnit?formatMoney(wasUnit*(qty||1),p):'');
   const saveEl=document.getElementById('sp-save'); if(saveEl){const save=selectedOfferType==='installment'?(fullSubtotal-subtotal):(wasUnit?(wasUnit-Number(p.price))*(qty||1):0);saveEl.textContent=save>0?(selectedOfferType==='installment'?'Due later ':'Save ')+formatMoney(save,p):'';saveEl.style.display=save>0?'inline-flex':'none';}
