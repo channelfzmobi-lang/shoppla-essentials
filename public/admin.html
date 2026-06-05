@@ -2659,7 +2659,7 @@ function renderCustomers(){
       c.orders += 1; c.spent += total;
       if(new Date(o.date||0) < new Date(c.joined||0)) c.joined = o.date;
     } else {
-      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, type:'guest', joined:o.date||''});
+      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, currency:orderCurrency(o), type:'guest', joined:o.date||''});
     }
   });
   const list = Array.from(map.values()).sort((a,b)=>b.spent-a.spent);
@@ -2673,7 +2673,7 @@ function renderCustomers(){
       return `
       <tr>
         <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${initial}</div><b>${c.name}</b></div></td>
-        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>$${c.spent.toLocaleString()}</td>
+        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>${formatAdminMoney(c.spent,c.currency)}</td>
         <td><span class="badge badge-gray">${c.type}</span></td>
         <td>${joined}</td>
         <td><div class="table-actions">${c.email?`<button class="tbl-btn" onclick="navigator.clipboard.writeText('${c.email}');showToast('📋 Email copied')">Copy Email</button>`:''}</div></td>
