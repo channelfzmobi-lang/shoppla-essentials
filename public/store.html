@@ -280,6 +280,18 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .sp-install.is-plan .ip-first{color:#8a3a00;font-weight:800;}
 .sp-install.is-plan .ip-rest{color:#3b2a06;font-weight:700;}
 .sp-install.is-plan .ip-total{display:inline-block;margin-left:6px;font-size:12px;color:#7a6020;}
+.sp-offer-options{display:flex;flex-direction:column;gap:10px;margin:0 0 18px;}
+.sp-offer-option{position:relative;display:flex;align-items:flex-start;gap:12px;border:2px solid var(--border);border-radius:14px;background:#fff;padding:13px 15px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;}
+.sp-offer-option:hover{transform:translateY(-1px);border-color:var(--accent);}
+.sp-offer-option.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,84,26,.1);}
+.sp-offer-radio{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;margin-top:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sp-offer-option.active .sp-offer-radio{border-color:var(--accent);}
+.sp-offer-option.active .sp-offer-radio::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.sp-offer-name{font-size:14px;font-weight:800;line-height:1.25;}
+.sp-offer-sub{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:3px;}
+.sp-offer-price{margin-left:auto;text-align:right;font-family:'Fraunces',serif;font-size:18px;font-weight:900;white-space:nowrap;}
+.sp-offer-option.installment{animation:installOfferGlow 2.2s ease-in-out infinite;}
+@keyframes installOfferGlow{0%,100%{box-shadow:0 0 0 0 var(--ip-glow-1),0 0 20px 1px var(--ip-glow-3);}50%{box-shadow:0 0 0 6px var(--ip-glow-2),0 0 32px 7px var(--ip-glow-4);}}
 @keyframes installGlow{
   0%,100%{box-shadow:0 0 0 0 rgba(245,180,0,.55), 0 0 22px 2px rgba(245,180,0,.22); border-color:#f5b400;}
   50%   {box-shadow:0 0 0 6px rgba(245,180,0,0),   0 0 32px 8px rgba(245,180,0,.55); border-color:#ffcd3a;}
@@ -1819,6 +1831,7 @@ const STORAGE_KEY = 'shoppla_products_v1';
 const ORDERS_KEY  = 'shoppla_orders_v1';
 const CART_KEY    = 'shoppla_cart_v1';
 const WISH_KEY    = 'shoppla_wishlist_v1';
+const SETTINGS_KEY = 'shoppla_settings_v1';
 
 // ═══ DEFAULT PRODUCTS ═══
 const DEFAULT_PRODUCTS = [
@@ -1839,6 +1852,8 @@ let qty = 1;
 let stars = 5;
 let activeOrderData = {};
 let toastTimer = null;
+let storeSettings = {};
+let selectedOfferType = 'full';
 const DEFAULT_PD_DETAIL_HTML = document.getElementById('pd-detail')?.innerHTML || '';
 
 const CURRENCIES = { NGN:{symbol:'₦',code:'NGN'}, GHS:{symbol:'₵',code:'GHS'}, USD:{symbol:'$',code:'USD'} };
@@ -1848,6 +1863,13 @@ function formatCurrencyAmount(amount, currency='NGN'){ const c=CURRENCIES[String
 function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function productById(id){return products.find(x=>String(x.id)===String(id)||String(x._cloud_id||'')===String(id));}
 function getImgSrc(img){ return typeof img === 'string' ? img : (img && (img.url || img.base64)) || ''; }
+async function loadSettings(){
+  if(sb){
+    try{const {data}=await sb.from('store_settings').select('value').eq('key','site').maybeSingle(); if(data?.value){storeSettings=data.value;localStorage.setItem(SETTINGS_KEY,JSON.stringify(storeSettings));return;}}
+    catch(e){console.warn('Settings load error:',e);}
+  }
+  try{storeSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')||{};}catch(e){storeSettings={};}
+}
 
 // ═══ STORAGE ═══
 async function loadData() {
@@ -1874,6 +1896,8 @@ async function loadData() {
           pageTemplate:p.page_template||'classic',
           bundles:(p.form_config&&p.form_config.bundles)||[],
           benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
+          templateIconSections:(p.form_config&&p.form_config.templateIconSections)||[],
+          templateFaqSections:(p.form_config&&p.form_config.templateFaqSections)||[],
           templateContent:(p.form_config&&p.form_config.templateContent)||{},
         }));
         return;
@@ -2035,8 +2059,42 @@ function renderGrid(gridId, data, actions=true) {
 
 // ═══ HOME GRID ═══
 function renderHome(cat) {
+  applyStoreSettings();
+  renderHomeCategories();
   const featured = cat ? products.filter(p => (p.category||'').toLowerCase().includes(cat.toLowerCase())) : products;
   renderGrid('home-grid', featured.length ? featured : products);
+}
+
+function normalizeExternalUrl(url=''){
+  url=String(url||'').trim();
+  if(!url) return '';
+  return /^https?:\/\//i.test(url) ? url : 'https://' + url.replace(/^\/+/, '');
+}
+function setText(sel, text){ const el=document.querySelector(sel); if(el && text!==undefined && text!=='') el.textContent=text; }
+function applyStoreSettings(){
+  const h=storeSettings.homepage||{}, s=storeSettings.social||{};
+  const storeName=h.storeName||'Shoppla';
+  document.querySelectorAll('.logo,.f-logo').forEach(el=>{el.innerHTML=`${escHTML(storeName)}<em>.</em>`;});
+  setText('.hero-eye', h.heroEyebrow);
+  if(h.heroHeadline){ const el=document.querySelector('.hero-h'); if(el) el.textContent=h.heroHeadline; }
+  setText('.hero-p', h.heroSubtext);
+  if(h.heroCta){ const b=document.querySelector('.hero-btns .btn-primary'); if(b)b.textContent=h.heroCta; }
+  if(h.topbar){ const tb=document.querySelector('.topbar-inner'); if(tb) tb.innerHTML=`${escHTML(h.topbar)} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${escHTML(h.topbar)}`; }
+  if(h.productsTitle){ const t=document.getElementById('prods-title'); if(t)t.textContent=h.productsTitle; }
+  setText('#products-section .sec-sub', h.productsSub);
+  setText('.nl-h', h.newsletterTitle); setText('.nl-s', h.newsletterSub); setText('.f-desc', h.footerDesc);
+  const links={Instagram:s.instagram,Threads:s.threads,X:s.x,TikTok:s.tiktok};
+  document.querySelectorAll('.f-social a').forEach(a=>{ const href=normalizeExternalUrl(links[a.title]||a.getAttribute('href')); if(href) a.href=href; });
+}
+
+function renderHomeCategories(){
+  const counts={}; const icons={'Furniture':'🛋️','Electronics':'📱','Fashion':'👗','Kitchen':'🍳','Bedding':'🛏️','Lighting':'💡','Outdoor':'🌿','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
+  products.filter(p=>p.status!=='draft').forEach(p=>{const n=p.category||'Other'; counts[n]=(counts[n]||0)+1;});
+  const cats=Object.keys(counts).sort();
+  const bar=document.querySelector('.cat-bar');
+  if(bar) bar.innerHTML=`<div class="cat-tab active" onclick="filterCat('All',this)">All</div>`+cats.map(c=>`<div class="cat-tab" onclick="filterCat('${escHTML(c)}',this)">${escHTML(c)}</div>`).join('')+`<div class="cat-tab" onclick="gotoInner('deals-page')">Deals 🔥</div>`;
+  const grid=document.querySelector('.cat-grid');
+  if(grid) grid.innerHTML=(cats.length?cats:['All']).map(c=>`<div class="cat-card" onclick="filterCat('${escHTML(c==='All'?'':c)}')"><div class="cat-icon">${icons[c]||'📦'}</div><div class="cat-name">${escHTML(c)}</div><div class="cat-count">${counts[c]||products.length} product${(counts[c]||products.length)===1?'':'s'}</div></div>`).join('')+`<div class="cat-card" onclick="gotoInner('deals-page')"><div class="cat-icon">🔥</div><div class="cat-name">Clearance</div><div class="cat-count">Hot deals</div></div>`;
 }
 
 function filterCat(cat, tabEl) {
@@ -2136,11 +2194,58 @@ function applyProductShippingReturns(p){
   }
 }
 
+function hexToRgba(hex,a){const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex||'');return m?`rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a})`:(hex||`rgba(245,180,0,${a})`);}
+function getInstallmentBreakdown(p){
+  const ip=(p?.formConfig&&p.formConfig.installmentPlan)||null;
+  if(!ip||!ip.enabled) return null;
+  const total=Number(p.price)||0, first=(Number(ip.cost)||0)+(Number(ip.profit)||0), count=Math.max(2,Math.min(12,parseInt(ip.count)||3));
+  if(!(first>0&&first<=total)) return null;
+  return {label:ip.label||'Installment Plan',mode:ip.mode||'selectable',total,first,rest:(total-first)/(count-1),count,colors:ip.colors||{}};
+}
+function selectedBundle(p){ return (Array.isArray(p?.bundles) && selectedBundleIdx !== null && p.bundles[selectedBundleIdx]) ? p.bundles[selectedBundleIdx] : null; }
+function currentFullTotal(p){ const bun=selectedBundle(p); return bun ? Number(bun.price||0) : (Number(p?.price)||0)*(qty||1); }
+function currentDueTotal(p){ const b=getInstallmentBreakdown(p); return b&&selectedOfferType==='installment' ? b.first*(qty||1) : currentFullTotal(p); }
+function currentUnitDue(p){ return (currentDueTotal(p)/(qty||1)) || 0; }
+function selectedOfferLabel(p){ const b=getInstallmentBreakdown(p); return b&&selectedOfferType==='installment'?`${b.label}: ${formatMoney(b.first,p)} today + ${b.count-1} × ${formatMoney(b.rest,p)}`:'Full payment'; }
+function updateSalesPricing(){
+  const p=productById(currentProductId); if(!p)return;
+  const subtotal=currentDueTotal(p), fullSubtotal=currentFullTotal(p), wasUnit=Number(p.wasPrice)||0;
+  document.getElementById('sp-price').textContent=formatMoney(subtotal,p);
+  const wasEl=document.getElementById('sp-was'); if(wasEl) wasEl.textContent=selectedOfferType==='installment'?formatMoney(fullSubtotal,p):(wasUnit?formatMoney(wasUnit*(qty||1),p):'');
+  const saveEl=document.getElementById('sp-save'); if(saveEl){const save=selectedOfferType==='installment'?(fullSubtotal-subtotal):(wasUnit?(wasUnit-Number(p.price))*(qty||1):0);saveEl.textContent=save>0?(selectedOfferType==='installment'?'Due later ':'Save ')+formatMoney(save,p):'';saveEl.style.display=save>0?'inline-flex':'none';}
+  document.querySelectorAll('.sp-offer-option').forEach(el=>el.classList.toggle('active',el.dataset.offer===selectedOfferType));
+  const tax=Math.round(subtotal*0.08); ['ck-prod-price','of-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=formatMoney(subtotal,p);});
+  const ckTax=document.getElementById('ck-tax'); if(ckTax) ckTax.textContent=formatMoney(tax,p);
+  const ckTot=document.getElementById('ck-total'); if(ckTot) ckTot.textContent=formatMoney(subtotal+tax,p);
+  const ofTot=document.getElementById('of-total'); if(ofTot) ofTot.textContent=formatMoney(subtotal,p);
+}
+function selectOffer(type){ selectedOfferType=type||'full'; updateSalesPricing(); }
+function renderInstallmentOffer(p){
+  const instEl=document.getElementById('sp-install'); if(!instEl)return;
+  document.getElementById('sp-offer-options')?.remove();
+  const b=getInstallmentBreakdown(p);
+  if(!b){instEl.style.display='';instEl.classList.remove('is-plan');instEl.innerHTML=p.installment||'or <b>4 interest-free payments</b> with Shoppla Pay';return;}
+  const bg=b.colors.bg||'#fff3c4', bd=b.colors.border||'#f5b400', gl=b.colors.glow||'#f5b400';
+  if(b.mode==='only') selectedOfferType='installment'; else if(selectedOfferType!=='installment') selectedOfferType='full';
+  instEl.style.display=b.mode==='notice'?'':'none';
+  instEl.classList.toggle('is-plan',b.mode==='notice');
+  instEl.innerHTML=`<span class="ip-headline">✨ ${escHTML(b.label)} ✨</span>Pay <span class="ip-first">${formatMoney(b.first,p)}</span> today, then <span class="ip-rest">${b.count-1} × ${formatMoney(b.rest,p)}</span><span class="ip-total">(Total ${formatMoney(b.total,p)})</span>`;
+  if(b.mode==='notice') return;
+  const options=`<div class="sp-offer-options" id="sp-offer-options">
+    ${b.mode!=='only'?`<div class="sp-offer-option" data-offer="full" onclick="selectOffer('full')"><div class="sp-offer-radio"></div><div><div class="sp-offer-name">Pay in full</div><div class="sp-offer-sub">Complete payment now</div></div><div class="sp-offer-price">${formatMoney(b.total,p)}</div></div>`:''}
+    <div class="sp-offer-option installment" data-offer="installment" onclick="selectOffer('installment')" style="background:${bg};border-color:${bd};--ip-glow-1:${hexToRgba(gl,.55)};--ip-glow-2:${hexToRgba(gl,0)};--ip-glow-3:${hexToRgba(gl,.22)};--ip-glow-4:${hexToRgba(gl,.55)};"><div class="sp-offer-radio"></div><div><div class="sp-offer-name">${escHTML(b.label)}</div><div class="sp-offer-sub">Pay ${formatMoney(b.first,p)} today, then ${b.count-1} × ${formatMoney(b.rest,p)}</div></div><div class="sp-offer-price">${formatMoney(b.first,p)}</div></div>
+  </div>`;
+  instEl.insertAdjacentHTML('afterend',options);
+}
+
 function openSalesPage(id) {
   const p = productById(id);
   if (!p) return;
   currentProductId = p._cloud_id || p.id;
   qty = 1;
+  selectedBundleIdx = 0;
+  selectedVariantIdx = 0;
+  selectedOfferType = getInstallmentBreakdown(p)?.mode === 'only' ? 'installment' : 'full';
   const priceStr = formatMoney(p.price, p);
   const wasStr   = p.wasPrice ? formatMoney(p.wasPrice, p) : '';
   const saveStr  = p.wasPrice ? 'Save '+formatMoney(p.wasPrice-p.price, p) : '';
@@ -2153,56 +2258,14 @@ function openSalesPage(id) {
   document.getElementById('sp-cat-bc').textContent  = p.category||'';
   document.getElementById('sp-name-bc').textContent = p.name;
   document.getElementById('sp-vid-icon').textContent = p.icon||'📦';
-  const instEl = document.getElementById('sp-install');
-  if (instEl) {
-    const ip = (p.formConfig && p.formConfig.installmentPlan) || null;
-    let isPlan = false;
-    if (ip && ip.enabled) {
-      const total = parseFloat(p.price)||0;
-      const first = (parseFloat(ip.cost)||0) + (parseFloat(ip.profit)||0);
-      const count = Math.max(2, Math.min(12, parseInt(ip.count)||3));
-      const rest  = count > 1 ? Math.max(0, total - first) / (count - 1) : 0;
-      if (first > 0 && first <= total) {
-        const fmt = (n)=>formatMoney(n, p);
-        const label = (ip.label||'Installment Plan Available');
-        instEl.innerHTML = `
-          <span class="ip-headline">✨ ${label} ✨</span>
-          Pay <span class="ip-first">${fmt(first)}</span> today, then
-          <span class="ip-rest">${count-1} × ${fmt(rest)}</span>
-          <span class="ip-total">(Total ${fmt(total)})</span>`;
-        isPlan = true;
-      } else {
-        instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
-      }
-    } else {
-      instEl.innerHTML = p.installment || 'or <b>4 interest-free payments</b> with Shoppla Pay';
-    }
-    instEl.classList.toggle('is-plan', isPlan);
-    // Apply admin-chosen colors
-    if (isPlan && ip && ip.colors) {
-      const c = ip.colors;
-      const bg = c.bg||'#fff3c4', bd = c.border||'#f5b400', gl = c.glow||'#f5b400';
-      const hexToRgba=(hex,a)=>{const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return m?`rgba(${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)},${a})`:hex;};
-      instEl.style.background = `linear-gradient(135deg, ${bg}, ${hexToRgba(bg,.85)})`;
-      instEl.style.borderColor = bd;
-      instEl.style.setProperty('--ip-glow-1', hexToRgba(gl,.55));
-      instEl.style.setProperty('--ip-glow-2', hexToRgba(gl,0));
-      instEl.style.setProperty('--ip-glow-3', hexToRgba(gl,.22));
-      instEl.style.setProperty('--ip-glow-4', hexToRgba(gl,.55));
-      instEl.style.animation = 'installGlowDyn 2.2s ease-in-out infinite';
-    } else {
-      instEl.style.background = '';
-      instEl.style.borderColor = '';
-      instEl.style.animation = '';
-    }
-  }
+  renderInstallmentOffer(p);
   document.getElementById('qty-val').value = 1;
 
   document.getElementById('ck-prod-name').textContent = p.name;
   document.getElementById('ck-prod-price').textContent = priceStr;
-  const tax = Math.round(p.price * 0.08);
+  const tax = Math.round(currentUnitDue(p) * 0.08);
   document.getElementById('ck-tax').textContent  = formatMoney(tax, p);
-  document.getElementById('ck-total').textContent = formatMoney(p.price+tax, p);
+  document.getElementById('ck-total').textContent = formatMoney(currentUnitDue(p)+tax, p);
 
   const spInfo = document.getElementById('sp-info');
   if (spInfo) spInfo.style.background = p.pageColor||'#fff';
@@ -2214,6 +2277,7 @@ function openSalesPage(id) {
   buildVariants(p);
   buildCTAs(p);
   applyTemplate(p);
+  updateSalesPricing();
   renderProductDetailSections(p);
   applyProductShippingReturns(p);
 
@@ -2236,7 +2300,7 @@ function applyTemplate(p) {
   // Build benefit badges for dark template
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       (tpl === 'dark') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
     if (bb.length && tpl === 'dark') {
       badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
@@ -2255,6 +2319,8 @@ function applyTemplate(p) {
   const trustRow = spInfo?.querySelector('.trust-row');
   
   const TC = p.templateContent || {};
+  const iconSections = Array.isArray(p.templateIconSections) && p.templateIconSections.length ? p.templateIconSections : null;
+  const faqSections = Array.isArray(p.templateFaqSections) && p.templateFaqSections.length ? p.templateFaqSections : null;
 
   // Universal hero sub-headline (per template) — inserted right under sp-title
   const subMap = {aero:TC.aeroSub, luvea:TC.luveaSub, radiance:TC.radSub, dark:TC.darkSub, classic:TC.classicSub};
@@ -2268,10 +2334,10 @@ function applyTemplate(p) {
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✓',text:'Powerful multi-surface suction'},{icon:'✓',text:'Lightweight, easy-to-use design'},{icon:'✓',text:'Works on carpet, rugs, stairs & upholstery'}];
     const aeroTitle = TC.aeroTitle || (p.desc ? p.desc.split('.')[0] : 'Key Benefits');
-    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}` : '');
+    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free ${formatMoney(Math.round(p.price*0.3),p)} attachment on all orders over ${formatMoney(Math.round(p.price*1.5),p)}` : '');
     const checklistHTML = `<div class="tpl-injected">
       <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${aeroTitle}</div>
       <ul class="sp-checklist">${bb.map(b => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${b.text}</li>`).join('')}</ul>
@@ -2310,7 +2376,7 @@ function applyTemplate(p) {
     if (guestNotice) { guestNotice.classList.add('tpl-injected'); guestNotice.style.display = 'none'; }
     
     // Benefit grid
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'🌊',text:'Reduced Wrinkles'},{icon:'☀️',text:'Radiant Skin'},{icon:'⊞',text:'Less Dark Spots'},{icon:'🔬',text:'Reduced Acne'}];
     const gridHTML = `<div class="tpl-injected">
       <div style="font-size:14px;font-weight:700;margin-bottom:10px;">${TC.luveaTitle || 'After 6 weeks, visibly see:'}</div>
@@ -2324,8 +2390,8 @@ function applyTemplate(p) {
     if (insertPt) insertPt.insertAdjacentHTML('afterend', gridHTML);
     
     // Guarantee banner + FAQ after trust row
-    const faqItems = p.contentSections && p.contentSections.length ? 
-      p.contentSections.slice(0,5).map(s => ({q: s.heading||s.eyebrow||'Question', a: s.body||'Answer'})) :
+    const faqItems = faqSections ? faqSections : p.contentSections && p.contentSections.length ? 
+      p.contentSections.slice(0,5).map(s => ({q: s.headline||s.eyebrow||'Question', a: s.body||s.faqs||'Answer'})) :
       [{q:'Description',a:p.desc||'Product description goes here.'},{q:'How to use',a:'Application instructions go here.'},{q:'Does it really work?',a:'Information about efficacy goes here.'},{q:'What is the 100% results guarantee?',a:'Details about the guarantee go here.'}];
     
     const afterCtaHTML = `<div class="tpl-injected">
@@ -2348,7 +2414,7 @@ function applyTemplate(p) {
     if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
     
     // Benefit grid (2x2)
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✨',text:'Short Benefit 1'},{icon:'⏱',text:'Short Benefit 2'},{icon:'💎',text:'Short Benefit 3'},{icon:'🎯',text:'Short Benefit 4'}];
     const benefitHTML = `<div class="tpl-injected" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
       ${bb.slice(0,4).map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;"><span style="font-size:16px;">${b.icon}</span>${b.text}</div>`).join('')}
@@ -2363,7 +2429,7 @@ function applyTemplate(p) {
       variantHTML = `<div class="tpl-injected sp-variant-cards">${bundles.map((b, i) => {
         const tag = b.tag || (i===bundles.length-1 ? 'BEST DEAL' : '');
         const bonus = b.qty > 1 ? `${b.qty-1} FREE GIFTS` : '';
-        return `<div class="sp-variant-card${i===0?' active':''}" onclick="selectVariantCard(${i})">
+        return `<div class="sp-variant-card${i===selectedBundleIdx?' active':''}" onclick="selectVariantCard(${i})">
           ${tag ? `<div class="sp-vc-tag">${tag}</div>` : ''}
           ${bonus ? `<div class="sp-vc-bonus">${bonus}</div>` : ''}
           ${imgSrc ? `<img class="sp-vc-img" src="${imgSrc}" alt="${b.label}"/>` : '<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;">${p.icon||"📦"}</div>'}
@@ -2385,7 +2451,7 @@ function applyTemplate(p) {
     }
     
     // Selling out bar + money back after trust row
-    const soldPct = Math.floor(Math.random()*15 + 80);
+    const soldPct = Math.min(96, Math.max(35, 100 - ((p.stock||10)*4)));
     const afterTrustHTML = `<div class="tpl-injected">
       <div class="sp-selling-out">
         <div class="so-header">${TC.radSoTitle || '🔥 SELLING OUT FAST'}</div>
@@ -2399,6 +2465,10 @@ function applyTemplate(p) {
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterTrustHTML);
+  }
+  if (faqSections && tpl !== 'luvea' && trustRow) {
+    trustRow.insertAdjacentHTML('afterend', `<div class="tpl-injected sp-faq-section" style="margin-top:18px;border-top:1px solid var(--border);padding-top:6px;">${faqSections.map(f=>`<div class="sp-faq-item" onclick="this.classList.toggle('open')"><div class="sp-faq-q" style="display:flex;justify-content:space-between;cursor:pointer;font-size:14px;font-weight:700;padding:14px 0;border-bottom:1px solid var(--border);"><span>${escHTML(f.q||'Question')}</span><span class="faq-plus">+</span></div><div class="sp-faq-a" style="display:none;font-size:13.5px;color:var(--muted);line-height:1.7;margin-top:10px;">${escHTML(f.a||'')}</div></div>`).join('')}</div>`);
+    document.querySelectorAll('.sp-faq-section .sp-faq-item').forEach(item=>item.addEventListener('click',()=>{const a=item.querySelector('.sp-faq-a'); if(a)a.style.display=item.classList.contains('open')?'block':'none';}));
   }
   
   // Build bundle cards (for aero template uses the standard bundle system)
@@ -2429,11 +2499,9 @@ function selectVariantCard(idx) {
   });
   const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
-    const wasEl = document.getElementById('sp-was');
-    if (wasEl && p.bundles[idx].qty > 1) {
-      wasEl.textContent = formatMoney(p.price * p.bundles[idx].qty, p);
-    }
+    qty = Math.max(1, parseInt(p.bundles[idx].qty)||1);
+    const q=document.getElementById('qty-val'); if(q) q.value=qty;
+    updateSalesPricing();
   }
 }
 
@@ -2487,7 +2555,9 @@ function selectBundle(idx) {
   });
   const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
+    qty = Math.max(1, parseInt(p.bundles[idx].qty)||1);
+    const q=document.getElementById('qty-val'); if(q) q.value=qty;
+    updateSalesPricing();
   }
 }
 
@@ -2704,25 +2774,7 @@ function chgQty(d)    {
   document.getElementById('qty-val').value=qty;
   const p = productById(currentProductId);
   if (!p) return;
-  // If bundles or radiance variants drive price, don't override
-  const usingBundle = Array.isArray(p.bundles) && p.bundles.length > 0;
-  if (usingBundle) return;
-  const unit = Number(p.price)||0;
-  const wasUnit = Number(p.wasPrice)||0;
-  document.getElementById('sp-price').textContent = formatMoney(unit*qty, p);
-  const wasEl = document.getElementById('sp-was');
-  if (wasEl) wasEl.textContent = wasUnit ? formatMoney(wasUnit*qty, p) : '';
-  const saveEl = document.getElementById('sp-save');
-  if (saveEl) {
-    const save = wasUnit ? (wasUnit - unit)*qty : 0;
-    saveEl.textContent = save>0 ? 'Save '+formatMoney(save, p) : '';
-    saveEl.style.display = save>0?'inline-flex':'none';
-  }
-  // Update checkout modal totals
-  const tax = Math.round(unit*qty*0.08);
-  const ckP = document.getElementById('ck-prod-price'); if(ckP) ckP.textContent = formatMoney(unit*qty,p);
-  const ckT = document.getElementById('ck-tax'); if(ckT) ckT.textContent = formatMoney(tax,p);
-  const ckTot = document.getElementById('ck-total'); if(ckTot) ckTot.textContent = formatMoney(unit*qty+tax,p);
+  updateSalesPricing();
 }
 function switchPdTab(btn, id) {
   document.querySelectorAll('.pd-tab').forEach(t=>t.classList.remove('active'));
@@ -2746,15 +2798,16 @@ async function placeOrder() {
   if (!fname) { toast('⚠️ Please enter your name'); return; }
   if (!email||!email.includes('@')) { toast('⚠️ Please enter a valid email'); return; }
   const p = productById(currentProductId);
-  const total = p ? p.price + Math.round(p.price*0.08) : 0;
+  const subtotal = p ? currentDueTotal(p) : 0;
+  const total = subtotal + Math.round(subtotal*0.08);
   const oid = Math.floor(1000+Math.random()*9000);
   const orders = getOrders();
-  orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, currency:p?getCurrency(p):'NGN', date:'Just now', status:'pending'});
+  orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, currency:p?getCurrency(p):'NGN', paymentMethod:selectedOfferLabel(p), notes:selectedOfferType==='installment'?'Installment offer selected':'', date:'Just now', status:'pending'});
   await saveOrders(orders);
   saveCart([]);
   refreshBadge();
   closeModal('checkout-modal');
-  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:p?formatMoney(total,p):formatCurrencyAmount(total),
+  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:p?formatMoney(total,p):formatCurrencyAmount(total), paymentPlan:selectedOfferLabel(p),
     heading:'Order Confirmed! 🎉', sub:"We've received your order and will be in touch shortly.",
     body:'Check your email for confirmation. Our team will contact you to confirm delivery.' });
 }
@@ -2765,7 +2818,7 @@ function renderExternalFormEmbed(code, product) {
   const raw = String(code || '').trim();
   if (!raw) return '';
   const ty = new URL(location.origin + '/thank-you');
-  if(product){ ty.searchParams.set('product_id', product._cloud_id||product.id||''); ty.searchParams.set('product', product.name||''); ty.searchParams.set('amount', product.price||0); ty.searchParams.set('currency', getCurrency(product)); }
+  if(product){ ty.searchParams.set('product_id', product._cloud_id||product.id||''); ty.searchParams.set('product', product.name||''); ty.searchParams.set('amount', currentDueTotal(product)||product.price||0); ty.searchParams.set('offer', selectedOfferLabel(product)); ty.searchParams.set('currency', getCurrency(product)); }
   ty.searchParams.set('source','external_form');
   const iframeSrc = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)?.[1];
   const directUrl = /^https?:\/\/\S+$/i.test(raw) ? raw : '';
@@ -2775,7 +2828,8 @@ function renderExternalFormEmbed(code, product) {
       const u = new URL(src);
       u.searchParams.set('product', product.name||'');
       u.searchParams.set('product_id', product._cloud_id||product.id||'');
-      u.searchParams.set('amount', product.price||0);
+      u.searchParams.set('amount', currentDueTotal(product)||product.price||0);
+      u.searchParams.set('offer', selectedOfferLabel(product));
       u.searchParams.set('currency', getCurrency(product));
       u.searchParams.set('thank_you_url', ty.toString());
       u.searchParams.set('success_url', ty.toString());
@@ -2794,11 +2848,12 @@ function openOrderForm() {
   const p = productById(currentProductId);
   if (!p) return;
   const fc = p.formConfig || {};
+  updateSalesPricing();
   document.getElementById('of-title').textContent = fc.heading || 'Order Now — Quick & Easy';
   document.getElementById('of-sub').textContent   = fc.subtext || 'Fill your details and we\'ll get it to you fast';
   document.getElementById('of-prod').textContent  = p.name;
-  document.getElementById('of-price').textContent = formatMoney(p.price, p);
-  document.getElementById('of-total').textContent = formatMoney(p.price*(qty||1), p);
+  document.getElementById('of-price').textContent = formatMoney(currentDueTotal(p), p);
+  document.getElementById('of-total').textContent = formatMoney(currentDueTotal(p), p);
   // Thumb
   const t = document.getElementById('of-thumb');
   if (p.images && p.images.length) { const src=typeof p.images[0]==='string'?p.images[0]:(p.images[0].url||p.images[0].base64||''); t.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:9px;"/>` : (p.icon||'📦'); }
@@ -2843,7 +2898,8 @@ function openOrderForm() {
   const qEl = document.getElementById('of-qty');
   if (qEl) qEl.addEventListener('input', () => {
     const q = parseInt(qEl.value)||1;
-    document.getElementById('of-total').textContent = formatMoney(p.price*q, p);
+    qty = Math.max(1,q);
+    updateSalesPricing();
   });
 
   // Buttons
@@ -2868,20 +2924,21 @@ async function submitOrderForm(route) {
   if (!phone)                  { toast('⚠️ Please enter your phone number'); return; }
   if (!address)                { toast('⚠️ Please enter your delivery address'); return; }
   const qtyV   = parseInt(document.getElementById('of-qty')?.value||1)||1;
-  const total  = p.price * qtyV;
+  qty = Math.max(1, qtyV);
+  const total  = currentDueTotal(p);
   const oid    = Math.floor(1000+Math.random()*9000);
   activeOrderData = { id:oid, name, email, phone, address, city:g('city'), qty:qtyV,
     color:g('color'), size:g('size'), notes:g('notes'), product:p.name, price:formatMoney(p.price, p),
-    total:formatMoney(total, p), route };
+    total:formatMoney(total, p), route, paymentPlan:selectedOfferLabel(p) };
   const orders = getOrders();
-  orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:g('notes'), total, currency:getCurrency(p), date:'Just now', status:'pending'});
+  orders.unshift({id:oid, customer:name, email, phone, address, city:g('city'), products:p.name, productId:p._cloud_id||p.id||null, qty:qtyV, color:g('color'), size:g('size'), notes:[g('notes'), selectedOfferType==='installment'?'Installment offer selected':''].filter(Boolean).join(' · '), total, currency:getCurrency(p), paymentMethod:selectedOfferLabel(p), date:'Just now', status:'pending'});
   await saveOrders(orders);
   saveCart([]); refreshBadge();
   closeModal('order-form-modal');
   if (route==='pod') {
     const tc = p.tyConfig || {};
     showThankyou({ id:oid, name, email, product:p.name, qty:qtyV, color:g('color'), size:g('size'),
-      address, city:g('city'), phone, total:formatMoney(total, p),
+      address, city:g('city'), phone, total:formatMoney(total, p), paymentPlan:selectedOfferLabel(p),
       heading: tc.heading||'Order Confirmed! 🎉',
       sub:     tc.sub    ||"We've received your order and will contact you to confirm delivery.",
       body:    tc.body   ||'Our team will call you within 2 hours to confirm your delivery slot.' });
@@ -2936,6 +2993,7 @@ function processPayment() {
         id: activeOrderData.id||Math.floor(1000+Math.random()*9000),
         name: activeOrderData.name||name, product: activeOrderData.product||'', qty: activeOrderData.qty||1,
         total: activeOrderData.total||'', phone: activeOrderData.phone||'', address: activeOrderData.address||'',
+        paymentPlan: activeOrderData.paymentPlan||'',
         heading: tc.heading||'Payment Successful! 🎉',
         sub: tc.sub||"Your payment was confirmed and your order is being processed.",
         body: tc.body||"You'll receive a confirmation email with your tracking details shortly."
@@ -2953,6 +3011,7 @@ function showThankyou(d) {
     <div class="ty-row"><span>Order #</span><b>${d.id}</b></div>
     <div class="ty-row"><span>Product</span><b>${d.product}</b></div>
     <div class="ty-row"><span>Quantity</span><b>${d.qty||1}</b></div>
+    ${d.paymentPlan?`<div class="ty-row"><span>Offer</span><b>${d.paymentPlan}</b></div>`:''}
     ${d.color?`<div class="ty-row"><span>Colour</span><b>${d.color}</b></div>`:''}
     ${d.size?`<div class="ty-row"><span>Size</span><b>${d.size}</b></div>`:''}
     ${d.address?`<div class="ty-row"><span>Delivery to</span><b>${d.address}${d.city?', '+d.city:''}</b></div>`:''}
@@ -3226,6 +3285,7 @@ function subscribeToCloudChanges(){
   if(_cloudChannel){ try{ sb.removeChannel(_cloudChannel); }catch(e){} _cloudChannel=null; }
   _cloudChannel = sb.channel('shoppla-storefront-live-'+Date.now())
     .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=productById(currentProductId); if(p) openSalesPage(p.id);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'store_settings'},async()=>{await loadSettings(); renderHome();})
     .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=productById(currentProductId); if(p) showAgentOnCallBar(p);}})
     .on('postgres_changes',{event:'*',schema:'public',table:'reviews'},async()=>{if(currentProductId){await loadCloudReviews(currentProductId); renderCloudReviews(currentProductId);}})
     .subscribe();
@@ -3234,6 +3294,7 @@ function subscribeToCloudChanges(){
 // ═══ INIT ═══
 (async function(){
   await loadData();
+  await loadSettings();
   await loadAgents();
   await loadCloudReviews();
   renderHome();

@@ -291,7 +291,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
     <div class="sb-item" onclick="nav(this,'products')"><span class="sb-icon">📦</span>Products<span class="sb-badge" id="prod-count-badge">8</span></div>
     <div class="sb-item" onclick="nav(this,'add-product')"><span class="sb-icon">➕</span>Add Product</div>
     <div class="sb-item" onclick="nav(this,'categories')"><span class="sb-icon">🗂</span>Categories</div>
-    <div class="sb-item" onclick="nav(this,'orders')"><span class="sb-icon">🛒</span>Orders<span class="sb-badge">3</span></div>
+    <div class="sb-item" onclick="nav(this,'orders')"><span class="sb-icon">🛒</span>Orders<span class="sb-badge" id="orders-count-badge">0</span></div>
     <div class="sb-item" onclick="nav(this,'customers')"><span class="sb-icon">👥</span>Customers</div>
     <div class="sb-item" onclick="nav(this,'agents')"><span class="sb-icon">🎧</span>Support Agents</div>
     <div class="sb-item" onclick="nav(this,'reviews')"><span class="sb-icon">⭐</span>Reviews</div>
@@ -342,29 +342,29 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
     <!-- ═══ DASHBOARD ═══ -->
     <div class="panel active" id="panel-dash">
       <div class="stats-row">
-        <div class="stat-card orange">
+          <div class="stat-card orange">
           <div class="stat-icon">💰</div>
-          <div class="stat-val">$12,480</div>
+            <div class="stat-val" id="total-revenue-stat">₦0</div>
           <div class="stat-lbl">Total Revenue</div>
-          <div class="stat-change up">↑ 18% this month</div>
+            <div class="stat-change up" id="revenue-change-stat">Live orders</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-icon">🛒</div>
-          <div class="stat-val">247</div>
+            <div class="stat-val" id="total-orders-stat">0</div>
           <div class="stat-lbl">Total Orders</div>
-          <div class="stat-change up">↑ 12% this week</div>
+            <div class="stat-change up" id="orders-change-stat">Live orders</div>
         </div>
         <div class="stat-card green">
           <div class="stat-icon">👥</div>
-          <div class="stat-val">1,842</div>
+            <div class="stat-val" id="total-customers-stat">0</div>
           <div class="stat-lbl">Customers</div>
-          <div class="stat-change up">↑ 8% this month</div>
+            <div class="stat-change up" id="customers-change-stat">From real orders</div>
         </div>
         <div class="stat-card blue">
           <div class="stat-icon">📦</div>
           <div class="stat-val" id="total-products-stat">8</div>
           <div class="stat-lbl">Active Products</div>
-          <div class="stat-change up">↑ 2 added this week</div>
+            <div class="stat-change up" id="products-change-stat">Published products</div>
         </div>
       </div>
 
@@ -377,7 +377,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=orders]'),'orders')">
           <div class="qa-icon">📬</div>
           <div class="qa-title">New Orders</div>
-          <div class="qa-sub">3 awaiting</div>
+          <div class="qa-sub" id="qa-orders-sub">0 awaiting</div>
         </div>
         <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=appearance]'),'appearance')">
           <div class="qa-icon">🎨</div>
@@ -407,13 +407,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="section-card">
           <div class="sc-head"><div><div class="sc-title">Recent Activity</div></div></div>
           <div class="sc-body" style="padding:14px 18px;">
-            <div class="activity-list">
-              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">🛒</div><div><div class="act-msg"><b>New order #1047</b> from Sarah M.</div><div class="act-time">2 min ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#e8f8ee;">⭐</div><div><div class="act-msg"><b>5-star review</b> on Velvet Sofa</div><div class="act-time">14 min ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">📦</div><div><div class="act-msg"><b>Low stock alert:</b> Espresso Machine (2 left)</div><div class="act-time">1 hr ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#eff6ff;">👤</div><div><div class="act-msg"><b>New customer</b> registered: James T.</div><div class="act-time">2 hr ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#f5f3ff;">✅</div><div><div class="act-msg"><b>Order #1044</b> shipped to Amina K.</div><div class="act-time">3 hr ago</div></div></div>
-            </div>
+            <div class="activity-list" id="activity-list"></div>
           </div>
         </div>
       </div>
@@ -616,6 +610,16 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
               <label class="form-lbl">🏷️ Benefit Badges (Optional)</label>
               <div class="form-hint" style="margin-bottom:8px;">Used by every template — checklist (Aero), 4-icon grid (LUVEA/Radiance), floating image badges (Dark). One per line: emoji|text</div>
               <textarea class="form-textarea" id="fp-benefit-badges" placeholder="💪|Premium Quality&#10;🧠|Expert Tested&#10;✅|Third-Party Verified&#10;🔬|13.6x Absorption" style="min-height:80px;"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">🔹 Template Icon Subsections</label>
+              <div class="form-hint" style="margin-bottom:8px;">For icon grids like the screenshot. One per line: emoji|title|subtext. Used by LUVEA, Radiance, Dark and Classic.</div>
+              <textarea class="form-textarea" id="fp-template-icon-sections" placeholder="🌊|Reduced Wrinkles|Visible smoothing support&#10;☀️|Radiant Skin|Brighter-looking finish&#10;⊞|Less Dark Spots|More even tone&#10;🔬|Reduced Acne|Clearer-looking skin" style="min-height:90px;"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">❓ Template FAQ / Accordion Subsections</label>
+              <div class="form-hint" style="margin-bottom:8px;">For accordion rows like the screenshot. One per line: question|answer. Used by all salespage templates.</div>
+              <textarea class="form-textarea" id="fp-template-faq-sections" placeholder="✨ Why Everyone's Obsessed|Add your answer here&#10;Question|Answer text here&#10;Question|Answer text here" style="min-height:110px;"></textarea>
             </div>
             <div class="form-group">
               <label class="form-lbl">🧩 External Buy Now Form (Optional)</label>
@@ -852,6 +856,15 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                     <input class="form-input" id="fp-ip-label" placeholder="e.g. Pay-Small-Small Plan" oninput="updateInstallmentPreview()"/>
                     <div class="form-hint">Name shown to customers on the sales page.</div>
                     <div id="fp-ip-error-label" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
+                  </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label class="form-lbl">How customers use this plan</label>
+                    <select class="form-select" id="fp-ip-mode" onchange="updateInstallmentPreview()">
+                      <option value="selectable">Selectable offer — customer chooses Full Payment or Installment</option>
+                      <option value="notice">Notice only — show plan text without selectable pricing</option>
+                      <option value="only">Installment only — make installment the default order option</option>
+                    </select>
+                    <div class="form-hint">Use “Selectable offer” when customers should pick the payment plan before the order form.</div>
                   </div>
                 </div>
                 <div id="fp-ip-preview" style="margin-top:10px;padding:14px;border-radius:10px;background:#fff8ee;border:1px solid #f0d8a8;font-size:13px;color:#5a3d10;display:none;"></div>
@@ -1134,7 +1147,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-group">
               <label class="form-lbl">Store Name</label>
-              <input class="form-input" value="Shoppla" oninput="document.getElementById('logo-preview').childNodes[0].textContent=this.value"/>
+              <input class="form-input" id="home-store-name" value="Shoppla" oninput="document.getElementById('logo-preview').childNodes[0].textContent=this.value"/>
             </div>
             <div class="upload-zone" style="padding:20px;" onclick="showToast('📁 File picker would open here')">
               <div class="upload-icon" style="font-size:24px;">🖼</div>
@@ -1148,22 +1161,30 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             <div class="form-grid-2">
               <div class="form-group">
                 <label class="form-lbl">Hero Headline</label>
-                <input class="form-input" value="Shop Everything You Love"/>
+                <input class="form-input" id="home-hero-headline" value="Shop Everything You Love"/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">Hero Subtext</label>
-                <input class="form-input" value="UGC video reviews on every product. Live calls. Guest checkout."/>
+                <input class="form-input" id="home-hero-subtext" value="UGC video reviews on every product. Live calls. Guest checkout."/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">CTA Button Text</label>
-                <input class="form-input" value="Shop Now →"/>
+                <input class="form-input" id="home-hero-cta" value="Shop Now →"/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">Topbar Announcement</label>
-                <input class="form-input" value="🎉 Free shipping on orders over $49 · No account needed"/>
+                <input class="form-input" id="home-topbar" value="🎉 Free shipping on orders over ₦49,000 · No account needed"/>
               </div>
             </div>
-            <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Hero settings saved!')">Save Hero</button>
+            <div class="form-grid-2">
+              <div class="form-group"><label class="form-lbl">Hero Eyebrow</label><input class="form-input" id="home-hero-eyebrow" value="✦ Spring Collection 2026"/></div>
+              <div class="form-group"><label class="form-lbl">Products Section Title</label><input class="form-input" id="home-products-title" value="Featured Products"/></div>
+              <div class="form-group"><label class="form-lbl">Products Section Subtext</label><input class="form-input" id="home-products-sub" value="▶ UGC video · 📞 Live call · ⚡ Guest checkout"/></div>
+              <div class="form-group"><label class="form-lbl">Newsletter Headline</label><input class="form-input" id="home-newsletter-title" value="Get the Best Deals First 🎁"/></div>
+              <div class="form-group"><label class="form-lbl">Newsletter Subtext</label><input class="form-input" id="home-newsletter-sub" value="Join our shoppers. Unsubscribe anytime."/></div>
+              <div class="form-group"><label class="form-lbl">Footer Description</label><input class="form-input" id="home-footer-desc" value="UGC video on every listing. Live expert calls. Instant guest checkout."/></div>
+            </div>
+            <button class="hdr-btn hdr-btn-primary" onclick="saveSettings()">Save Homepage</button>
           </div>
         </div>
       </div>
@@ -1176,23 +1197,23 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="sc-body">
           <div class="setting-row">
             <div><div class="setting-lbl">Guest Checkout</div><div class="setting-sub">Allow purchases without account registration</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle on" id="s-guest" onclick="this.classList.toggle('on')"></div>
           </div>
           <div class="setting-row">
             <div><div class="setting-lbl">Live Call Button</div><div class="setting-sub">Show live call button on all product cards</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle on" id="s-livecall" onclick="this.classList.toggle('on')"></div>
           </div>
           <div class="setting-row">
             <div><div class="setting-lbl">UGC Video on Cards</div><div class="setting-sub">Auto-play UGC video preview on product cards</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle on" id="s-ugc" onclick="this.classList.toggle('on')"></div>
           </div>
           <div class="setting-row">
             <div><div class="setting-lbl">Flash Sale Banner</div><div class="setting-sub">Show countdown flash sale on homepage</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle on" id="s-flash" onclick="this.classList.toggle('on')"></div>
           </div>
           <div class="setting-row">
             <div><div class="setting-lbl">Email Notifications</div><div class="setting-sub">Receive email for every new order</div></div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div class="toggle on" id="s-email" onclick="this.classList.toggle('on')"></div>
           </div>
         </div>
       </div>
@@ -1200,12 +1221,16 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="sc-head"><div class="sc-title">Contact & Support Info</div></div>
         <div class="sc-body">
           <div class="form-grid-2">
-            <div class="form-group"><label class="form-lbl">Support Email</label><input class="form-input" value="support@shoppla.com"/></div>
-            <div class="form-group"><label class="form-lbl">Phone / WhatsApp</label><input class="form-input" value="+1 (800) SHOPPLA"/></div>
-            <div class="form-group"><label class="form-lbl">WhatsApp Business Link</label><input class="form-input" placeholder="https://wa.me/..."/></div>
-            <div class="form-group"><label class="form-lbl">Zoom Meeting Link</label><input class="form-input" placeholder="https://zoom.us/j/..."/></div>
+            <div class="form-group"><label class="form-lbl">Support Email</label><input class="form-input" id="s-support-email" value="support@shoppla.com"/></div>
+            <div class="form-group"><label class="form-lbl">Phone / WhatsApp</label><input class="form-input" id="s-phone" value="+1 (800) SHOPPLA"/></div>
+            <div class="form-group"><label class="form-lbl">WhatsApp Business Link</label><input class="form-input" id="s-whatsapp" placeholder="https://wa.me/..."/></div>
+            <div class="form-group"><label class="form-lbl">Zoom Meeting Link</label><input class="form-input" id="s-zoom" placeholder="https://zoom.us/j/..."/></div>
+            <div class="form-group"><label class="form-lbl">Instagram URL</label><input class="form-input" id="s-instagram" value="https://www.instagram.com/shoppla.co/"/></div>
+            <div class="form-group"><label class="form-lbl">Threads URL</label><input class="form-input" id="s-threads" value="https://www.threads.com/@shoppla.co?xmt=AQG0AoM3nZcT5gxVyrCRu0wFr8udqP1AU3J91MPwEYPWcoM"/></div>
+            <div class="form-group"><label class="form-lbl">X / Twitter URL</label><input class="form-input" id="s-x" value="https://x.com/shoppla"/></div>
+            <div class="form-group"><label class="form-lbl">TikTok URL</label><input class="form-input" id="s-tiktok" value="https://www.tiktok.com/@shoppla.co"/></div>
           </div>
-          <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Contact info saved!')">Save</button>
+          <button class="hdr-btn hdr-btn-primary" onclick="saveSettings()">Save</button>
         </div>
       </div>
     </div>
@@ -1265,7 +1290,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="sc-head"><div class="sc-title">Top Products by Revenue</div></div>
         <div style="overflow-x:auto;">
           <table class="data-table">
-            <thead><tr><th>Product</th><th>Views</th><th>Orders</th><th>Revenue</th><th>Conversion</th></tr></thead>
+            <thead><tr><th>Product</th><th>Units Sold</th><th>Orders</th><th>Revenue</th><th>Avg Order</th></tr></thead>
             <tbody id="analytics-table"></tbody>
           </table>
         </div>
@@ -1292,23 +1317,8 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
 
 <script>
 // ─── STATE ───
-let products = [
-  {id:1,name:'Velvet 3-Seater Sofa in Dusty Rose',brand:'Cozy Co.',category:'Furniture',price:649,wasPrice:929,stock:7,status:'active',featured:true,icon:'🛋️',pageColor:'#ffffff'},
-  {id:2,name:'UltraSlim Pro Laptop 15" 512GB',brand:'TechNova',category:'Electronics',price:1199,wasPrice:0,stock:14,status:'active',featured:true,icon:'💻',pageColor:'#ffffff'},
-  {id:3,name:'Air Cloud Running Sneakers White',brand:'Stride',category:'Fashion',price:89,wasPrice:110,stock:42,status:'active',featured:true,icon:'👟',pageColor:'#ffffff'},
-  {id:4,name:'Espresso Machine with Milk Frother',brand:'Brew Master',category:'Kitchen',price:299,wasPrice:349,stock:2,status:'active',featured:true,icon:'☕',pageColor:'#fff5f3'},
-  {id:5,name:'Smart LED Pendant Light Gold',brand:'LumiGlow',category:'Lighting',price:129,wasPrice:152,stock:18,status:'active',featured:false,icon:'💡',pageColor:'#ffffff'},
-  {id:6,name:'Noise-Cancelling Wireless Headphones',brand:'SoundWave',category:'Electronics',price:199,wasPrice:249,stock:31,status:'active',featured:true,icon:'🎧',pageColor:'#f3f8ff'},
-  {id:7,name:'Rattan Garden Chair Set (2 pcs)',brand:'GreenSpace',category:'Outdoor',price:224,wasPrice:299,stock:9,status:'draft',featured:false,icon:'🪑',pageColor:'#f4faf5'},
-  {id:8,name:'Structured Leather Tote Bag Camel',brand:'Luxe & Co.',category:'Fashion',price:159,wasPrice:0,stock:23,status:'active',featured:true,icon:'👜',pageColor:'#ffffff'},
-];
-let orders = [
-  {id:1047,customer:'Sarah M.',email:'sarah@email.com',products:'Velvet 3-Seater Sofa',total:701,date:'Today, 10:23am',status:'pending'},
-  {id:1046,customer:'James T.',email:'james@email.com',products:'Headphones + Laptop',total:1398,date:'Yesterday',status:'processing'},
-  {id:1045,customer:'Amina K.',email:'amina@email.com',products:'Espresso Machine',total:351,date:'Mar 19',status:'shipped'},
-  {id:1044,customer:'David L.',email:'david@email.com',products:'Sneakers (White, L)',total:89,date:'Mar 18',status:'delivered'},
-  {id:1043,customer:'Maria S.',email:'maria@email.com',products:'LED Pendant Light',total:129,date:'Mar 17',status:'delivered'},
-];
+let products = [];
+let orders = [];
 let categories = [];
 let customers  = [];
 let contentSections = [];
@@ -1487,6 +1497,7 @@ function editProduct(id){
     setV('fp-ip-profit', ip.profit!=null?ip.profit:'');
     setV('fp-ip-count', ip.count||3);
     setV('fp-ip-label', ip.label||'');
+    setV('fp-ip-mode', ip.mode||'selectable');
     setTimeout(updateInstallmentPreview,50);
   }
   if(p.tyConfig){
@@ -1540,6 +1551,12 @@ function editProduct(id){
   if(bbEl && p.benefitBadges && p.benefitBadges.length) {
     bbEl.value = p.benefitBadges.map(b => b.icon+'|'+b.text).join('\n');
   } else if(bbEl) { bbEl.value = ''; }
+  const tiEl = document.getElementById('fp-template-icon-sections');
+  if(tiEl && p.templateIconSections && p.templateIconSections.length){ tiEl.value = p.templateIconSections.map(x => [x.icon,x.title,x.sub].filter(v=>v!==undefined).join('|')).join('\n'); }
+  else if(tiEl) tiEl.value = '';
+  const tfEl = document.getElementById('fp-template-faq-sections');
+  if(tfEl && p.templateFaqSections && p.templateFaqSections.length){ tfEl.value = p.templateFaqSections.map(x => `${x.q||''}|${x.a||''}`).join('\n'); }
+  else if(tfEl) tfEl.value = '';
 
   // Bundles
   currentBundles = p.bundles ? [...p.bundles] : [];
@@ -1575,6 +1592,10 @@ async function saveProduct(draft=false){
   const pageTemplate = document.getElementById('fp-template')?.value||'classic';
   const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
   const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
+  const templateIconRaw = document.getElementById('fp-template-icon-sections')?.value.trim()||'';
+  const templateIconSections = templateIconRaw ? templateIconRaw.split('\n').filter(Boolean).map(l=>{const parts=l.split('|');return{icon:(parts[0]||'✅').trim(),title:(parts[1]||parts[0]||'').trim(),sub:(parts.slice(2).join('|')||'').trim()};}).filter(x=>x.title) : [];
+  const templateFaqRaw = document.getElementById('fp-template-faq-sections')?.value.trim()||'';
+  const templateFaqSections = templateFaqRaw ? templateFaqRaw.split('\n').filter(Boolean).map(l=>{const parts=l.split('|');return{q:(parts[0]||'Question').trim(),a:(parts.slice(1).join('|')||'').trim()};}).filter(x=>x.q) : [];
   const bundles = [...currentBundles].filter(b=>b.label&&b.price);
   const isActive = document.getElementById('toggle-active')?.classList.contains('on') !== false;
   const isFeatured = document.getElementById('toggle-featured')?.classList.contains('on') !== false;
@@ -1645,7 +1666,7 @@ async function saveProduct(draft=false){
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
     pageColor:productPageColor, status:(draft||!isActive)?'draft':'active', featured:isFeatured, mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
-    videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
+    videoData, videoURL:effectiveUrl, images, benefitBadges, templateIconSections, templateFaqSections, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections], templateContent,
     checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
@@ -1670,12 +1691,13 @@ async function saveProduct(draft=false){
 }
 
 function clearProductForm(){
-  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code','fp-ip-cost','fp-ip-profit','fp-ip-label'].forEach(id=>{
+  ['fp-name','fp-brand','fp-price','fp-was-price','fp-stock','fp-desc','fp-colors','fp-sizes','fp-tags','fp-video-url','fp-delivery','fp-shipping-notes','fp-return-days','fp-warranty','fp-return-policy','fp-seo-title','fp-seo-desc','fp-slug','fp-installment','fp-sku','fp-external-form-code','fp-ip-cost','fp-ip-profit','fp-ip-label','fp-template-icon-sections','fp-template-faq-sections'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
   document.getElementById('fp-stock').value = 10;
   const ipCount = document.getElementById('fp-ip-count'); if(ipCount) ipCount.value = 3;
+  const ipMode = document.getElementById('fp-ip-mode'); if(ipMode) ipMode.value = 'selectable';
   const ipTog = document.getElementById('toggle-installment-plan'); if(ipTog) ipTog.classList.remove('on');
   const ipPrev = document.getElementById('fp-ip-preview'); if(ipPrev) ipPrev.style.display='none';
   setProductPageColor('#ffffff');
@@ -2131,7 +2153,7 @@ async function saveToStorage(){
         content_sections: p.contentSections||[],
         checkout_method: p.checkoutMethod||'standard',
         payment_route: p.paymentRoute||'pod',
-        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[], templateContent:p.templateContent||{}},
+        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[], templateIconSections:p.templateIconSections||[], templateFaqSections:p.templateFaqSections||[], templateContent:p.templateContent||{}},
         ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: (p.agentId && String(p.agentId).includes('-')) ? p.agentId : null,
         page_template: p.pageTemplate||'classic',
@@ -2183,19 +2205,21 @@ async function loadFromStorage(){
           pageTemplate:p.page_template||'classic',
           bundles:(p.form_config&&p.form_config.bundles)||[],
           benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
+          templateIconSections:(p.form_config&&p.form_config.templateIconSections)||[],
+          templateFaqSections:(p.form_config&&p.form_config.templateFaqSections)||[],
           templateContent:(p.form_config&&p.form_config.templateContent)||{},
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
       }
       const {data:cloudOrders}=await sb.from('orders').select('*').order('created_at',{ascending:false});
       if(cloudOrders&&cloudOrders.length){
-        orders=cloudOrders.map(o=>({
+        orders=cleanOrders(cloudOrders.map(o=>({
           id:o.order_number||o.id, _cloud_id:o.id, customer:o.customer,
           email:o.email, phone:o.phone, address:o.address, city:o.city,
           products:o.products_text, qty:o.qty, color:o.color, size:o.size,
           notes:o.notes, total:Number(o.total), status:o.status,
           paymentMethod:o.payment_method, date:o.created_at, productId:o.product_id,
-        }));
+        })));
         localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
       }
       return;
@@ -2206,7 +2230,7 @@ async function loadFromStorage(){
     const p=localStorage.getItem(STORAGE_KEY);
     const o=localStorage.getItem(ORDERS_KEY);
     if(p) products=JSON.parse(p);
-    if(o) orders=JSON.parse(o);
+    if(o) orders=cleanOrders(JSON.parse(o));
   }catch(e){}
 }
 
@@ -2284,7 +2308,7 @@ function renderAgents(){
         ${a.whatsapp?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>💬</span><a href="${a.whatsapp}" target="_blank" style="color:var(--green);font-weight:600;">WhatsApp</a></div>`:''}
         ${a.zoom?`<div style="font-size:12.5px;display:flex;gap:7px;align-items:center;"><span>📹</span><a href="${a.zoom}" target="_blank" style="color:var(--blue);font-weight:600;">Zoom</a></div>`:''}
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--muted);">📦 Assigned to: <b>${products.filter(p=>String(p.agentId)===String(a.id)).length} product(s)</b> · ✅ Delivered: <b>${split.orders}</b> · Revenue: <b>$${split.revenue.toLocaleString()}</b></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);">📦 Assigned to: <b>${products.filter(p=>String(p.agentId)===String(a.id)).length} product(s)</b> · ✅ Delivered: <b>${split.orders}</b> · Revenue: <b>${formatAdminMoney(split.revenue)}</b></div>
     </div>`}).join('');
   refreshAgentDropdowns();
 }
@@ -2485,6 +2509,16 @@ function copyVal(v){
   try { navigator.clipboard.writeText(String(v||'')); showToast('📋 Copied'); }
   catch(e){ showToast('⚠️ Copy failed'); }
 }
+function isLegacyDemoOrder(o){
+  const demoIds = ['1043','1044','1045','1046','1047'];
+  const demoEmails = ['sarah@email.com','james@email.com','amina@email.com','david@email.com','maria@email.com'];
+  return demoIds.includes(String(o.id)) && demoEmails.includes(String(o.email||'').toLowerCase());
+}
+function cleanOrders(list){ return (Array.isArray(list)?list:[]).filter(o=>!isLegacyDemoOrder(o)); }
+function orderProduct(o){ return products.find(p=>String(p.id)===String(o.productId)||String(p._cloud_id||'')===String(o.productId)||p.name===o.products); }
+function orderCurrency(o){ return (o.currency || orderProduct(o)?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
+function formatOrderMoney(o, amount=o?.total){ return formatAdminMoney(amount, orderCurrency(o)); }
+function displayDate(v){ const d=new Date(v||''); return !v ? '—' : isNaN(d) ? v : d.toLocaleString(); }
 function copyAllOrder(id){
   const o = orders.find(x=>String(x.id)===String(id)); if(!o) return;
   const txt = [
@@ -2501,7 +2535,7 @@ function copyAllOrder(id){
     `Qty: ${o.qty||1}`,
     o.color?`Color: ${o.color}`:null,
     o.size?`Size: ${o.size}`:null,
-    `Total: $${typeof o.total==='number'?o.total.toLocaleString():o.total}`,
+    `Total: ${formatOrderMoney(o)}`,
     o.paymentMethod?`Payment: ${o.paymentMethod}`:null,
     o.notes?`Notes: ${o.notes}`:null,
   ].filter(Boolean).join('\n');
@@ -2559,7 +2593,7 @@ function viewOrder(id){
 
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;border-radius:11px;padding:14px 16px;margin-bottom:14px;">
       <span style="opacity:.7;">Order Total</span>
-      <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">$${typeof o.total==='number'?o.total.toLocaleString():o.total}</span>
+      <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">${formatOrderMoney(o)}</span>
     </div>
 
     <div style="margin-bottom:14px;">
@@ -2584,15 +2618,15 @@ function viewOrder(id){
 // ─── ENHANCED RENDER ORDERS (with viewOrder wired) ───
 function renderOrders(){
   const tbody=document.getElementById('orders-table-body');if(!tbody)return;
-  try{const so=JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]');so.forEach(o=>{if(!orders.find(x=>x.id===o.id))orders.push(o);});}catch(e){}
+  try{const so=cleanOrders(JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]'));so.forEach(o=>{if(!orders.find(x=>String(x.id)===String(o.id)))orders.push(o);});orders=cleanOrders(orders);}catch(e){orders=cleanOrders(orders);}
   const sorted=[...orders].sort((a,b)=>new Date(b.date||b.created_at||0)-new Date(a.date||a.created_at||0));
-  tbody.innerHTML=sorted.map(o=>`
+  tbody.innerHTML=sorted.length?sorted.map(o=>`
     <tr>
       <td><b>#${o.id}</b></td>
       <td>${o.customer}<div style="font-size:12px;color:var(--muted);">${o.email||''}</div></td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.products}</td>
-      <td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
-      <td>${o.date||'—'}</td>
+      <td><b>${formatOrderMoney(o)}</b></td>
+      <td>${displayDate(o.date)}</td>
       <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td>
       <td><div class="table-actions">
         <button class="tbl-btn" onclick="viewOrder(${JSON.stringify(o.id)})">👁 View</button>
@@ -2602,14 +2636,13 @@ function renderOrders(){
           <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
         </select>
       </div></td>
-    </tr>`).join('');
+    </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;padding:38px;color:var(--muted);">No real orders yet — successful checkouts will appear here.</td></tr>`;
   const rt=document.getElementById('recent-orders-table');
-  if(rt)rt.innerHTML=sorted.slice(0,5).map(o=>`
-    <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
-    <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('');
-  const ostat=document.getElementById('total-orders-stat');if(ostat)ostat.textContent=orders.length;
-  const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
-  const rstat=document.getElementById('total-revenue-stat');if(rstat)rstat.textContent='$'+rev.toLocaleString();
+  if(rt) rt.innerHTML = sorted.length ? sorted.slice(0,5).map(o=>`
+    <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>${formatOrderMoney(o)}</b></td>
+    <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('')
+    : `<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted);">No orders yet.</td></tr>`;
+  refreshDashStats();
 }
 
 // ─── CUSTOMERS (derived from real orders) ───
@@ -2626,7 +2659,7 @@ function renderCustomers(){
       c.orders += 1; c.spent += total;
       if(new Date(o.date||0) < new Date(c.joined||0)) c.joined = o.date;
     } else {
-      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, type:'guest', joined:o.date||''});
+      map.set(key, {name:o.customer||'Guest', email:o.email||'', phone:o.phone||'', orders:1, spent:total, currency:orderCurrency(o), type:'guest', joined:o.date||''});
     }
   });
   const list = Array.from(map.values()).sort((a,b)=>b.spent-a.spent);
@@ -2640,7 +2673,7 @@ function renderCustomers(){
       return `
       <tr>
         <td><div class="prod-cell"><div class="prod-thumb" style="font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));">${initial}</div><b>${c.name}</b></div></td>
-        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>$${c.spent.toLocaleString()}</td>
+        <td>${c.email||c.phone||'—'}</td><td>${c.orders}</td><td>${formatAdminMoney(c.spent,c.currency)}</td>
         <td><span class="badge badge-gray">${c.type}</span></td>
         <td>${joined}</td>
         <td><div class="table-actions">${c.email?`<button class="tbl-btn" onclick="navigator.clipboard.writeText('${c.email}');showToast('📋 Email copied')">Copy Email</button>`:''}</div></td>
@@ -2707,6 +2740,19 @@ async function removeCategory(i){
 // ─── ANALYTICS (real product/order data) ───
 function renderAnalytics(){
   const tbody=document.getElementById('analytics-table');if(!tbody)return;
+  orders = cleanOrders(orders);
+  const totalRevenue = orders.reduce((a,o)=>a+(Number(o.total)||0),0);
+  const orderCount = orders.length;
+  const avgOrder = orderCount ? totalRevenue/orderCount : 0;
+  const uniqueCustomers = new Set(orders.map(o=>(o.email||o.phone||o.customer||'').toLowerCase().trim()).filter(Boolean)).size;
+  const activeProducts = Math.max(1, products.filter(p=>p.status!=='draft').length);
+  const setStat=(idx,val,sub)=>{const cards=document.querySelectorAll('#panel-analytics .stat-card');const c=cards[idx];if(!c)return;const v=c.querySelector('.stat-val');const s=c.querySelector('.stat-change');if(v)v.textContent=val;if(s)s.textContent=sub;};
+  const defaultCurrency = orders[0]?.currency || products.find(p=>p.gatewayConfig?.currency)?.gatewayConfig?.currency || 'NGN';
+  setStat(0,String(orderCount),'Real orders');
+  setStat(1, activeProducts ? ((orderCount/activeProducts)*100).toFixed(1)+'%' : '0%','Orders ÷ active products');
+  setStat(2,formatAdminMoney(avgOrder, defaultCurrency),'Average order value');
+  setStat(3,String(uniqueCustomers),'Unique buyers');
+
   // Aggregate orders by product
   const byProd = new Map();
   orders.forEach(o=>{
@@ -2714,16 +2760,16 @@ function renderAnalytics(){
     const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
     const q = parseInt(o.qty)||1;
     if(byProd.has(key)){ const r=byProd.get(key); r.orders+=1; r.units+=q; r.revenue+=total; }
-    else byProd.set(key,{name:key, orders:1, units:q, revenue:total});
+    else byProd.set(key,{name:key, orders:1, units:q, revenue:total, currency:orderCurrency(o)});
   });
   // Include products with 0 orders
-  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0}); });
+  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0, currency:p.gatewayConfig?.currency||'NGN'}); });
   const rows = Array.from(byProd.values()).sort((a,b)=>b.revenue-a.revenue).slice(0,20);
   if(!rows.length){
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted);">No analytics data yet — orders will populate this view.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${(d.units*7).toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${d.units?((d.orders/(d.units*7))*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
+  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${d.units.toLocaleString()}</td><td>${d.orders}</td><td><b>${formatAdminMoney(d.revenue,d.currency)}</b></td><td>${d.orders?formatAdminMoney(d.revenue/d.orders,d.currency):'—'}</td></tr>`).join('');
 }
 function injectChart(){
   const el=document.getElementById('panel-analytics');if(!el)return;
@@ -2745,7 +2791,8 @@ function injectChart(){
   });
   const max = Math.max(...buckets, 1);
   const w=560,h=180,pad=40,bw=60,gap=20;
-  const bars=buckets.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh||2}" rx="8" fill="${i===buckets.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===buckets.length-1?'#e8541a':'#8a8480'}" font-weight="700">$${(v/1000).toFixed(1)}k</text>`;}).join('');
+  const chartCurrency = orders[0]?.currency || products.find(p=>p.gatewayConfig?.currency)?.gatewayConfig?.currency || 'NGN';
+  const bars=buckets.map((v,i)=>{const bh=Math.round((v/max)*(h-pad));const x=pad+i*(bw+gap);const y=h-bh-10;return `<rect x="${x}" y="${y}" width="${bw}" height="${bh||2}" rx="8" fill="${i===buckets.length-1?'#e8541a':'#f0ebe0'}"/><text x="${x+bw/2}" y="${h-2}" text-anchor="middle" font-size="11" fill="#8a8480">${labels[i]}</text><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="10" fill="${i===buckets.length-1?'#e8541a':'#8a8480'}" font-weight="700">${formatAdminMoney(v,chartCurrency)}</text>`;}).join('');
   const wrap=document.createElement('div');wrap.id='revenue-chart-wrap';wrap.className='section-card';wrap.style.marginBottom='20px';
   wrap.innerHTML=`<div class="sc-head"><div><div class="sc-title">Monthly Revenue</div><div class="sc-sub">Last 6 months — live data</div></div></div><div class="sc-body"><svg viewBox="0 0 ${w} ${h+10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${w}px;">${bars}</svg></div>`;
   el.insertBefore(wrap,el.querySelector('.stats-row').nextSibling);
@@ -2868,31 +2915,41 @@ function saveBanner(i){
 }
 
 // ─── SETTINGS ───
-function saveSettings(){
-  const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
-  const toggleStates=ids.map(id=>document.getElementById(id)?.classList.contains('on')??true);
-  const contact={
-    email:document.getElementById('s-support-email')?.value||'',
-    phone:document.getElementById('s-phone')?.value||'',
-    whatsapp:document.getElementById('s-whatsapp')?.value||'',
-    zoom:document.getElementById('s-zoom')?.value||'',
+function collectSettings(){
+  const toggleIds=['s-guest','s-livecall','s-ugc','s-flash','s-email'];
+  const val=id=>document.getElementById(id)?.value||'';
+  return {
+    toggleStates:toggleIds.map(id=>document.getElementById(id)?.classList.contains('on')??true),
+    contact:{email:val('s-support-email'),phone:val('s-phone'),whatsapp:val('s-whatsapp'),zoom:val('s-zoom')},
+    social:{instagram:val('s-instagram'),threads:val('s-threads'),x:val('s-x'),tiktok:val('s-tiktok')},
+    homepage:{storeName:val('home-store-name')||'Shoppla',heroEyebrow:val('home-hero-eyebrow'),heroHeadline:val('home-hero-headline'),heroSubtext:val('home-hero-subtext'),heroCta:val('home-hero-cta'),topbar:val('home-topbar'),productsTitle:val('home-products-title'),productsSub:val('home-products-sub'),newsletterTitle:val('home-newsletter-title'),newsletterSub:val('home-newsletter-sub'),footerDesc:val('home-footer-desc')}
   };
-  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({toggleStates,contact}));}catch(e){}
+}
+async function saveSettings(){
+  const settings=collectSettings();
+  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){}
+  if(sb){
+    try{const {error}=await sb.from('store_settings').upsert({key:'site',value:settings},{onConflict:'key'}); if(error) throw error;}
+    catch(e){console.warn('Settings cloud save error:',e);showToast('❌ Settings cloud save failed');return;}
+  }
+  refreshLivePreview();
   showToast('✅ Settings saved!');
 }
-function loadSettings(){
-  try{
-    const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');
-    const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
-    if(s.toggleStates)s.toggleStates.forEach((on,i)=>{const el=document.getElementById(ids[i]);if(el)el.classList.toggle('on',on);});
-    if(s.contact){
-      ['s-support-email','s-phone','s-whatsapp','s-zoom'].forEach(id=>{
-        const key=id.replace('s-','').replace('support-email','email');
-        const el=document.getElementById(id);
-        if(el&&s.contact[key])el.value=s.contact[key];
-      });
-    }
-  }catch(e){}
+function applySettingsToAdmin(s={}){
+  const ids=['s-guest','s-livecall','s-ugc','s-flash','s-email'];
+  if(s.toggleStates)s.toggleStates.forEach((on,i)=>{const el=document.getElementById(ids[i]);if(el)el.classList.toggle('on',!!on);});
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  const c=s.contact||{}, so=s.social||{}, h=s.homepage||{};
+  set('s-support-email',c.email);set('s-phone',c.phone);set('s-whatsapp',c.whatsapp);set('s-zoom',c.zoom);
+  set('s-instagram',so.instagram);set('s-threads',so.threads);set('s-x',so.x);set('s-tiktok',so.tiktok);
+  set('home-store-name',h.storeName);set('home-hero-eyebrow',h.heroEyebrow);set('home-hero-headline',h.heroHeadline);set('home-hero-subtext',h.heroSubtext);set('home-hero-cta',h.heroCta);set('home-topbar',h.topbar);set('home-products-title',h.productsTitle);set('home-products-sub',h.productsSub);set('home-newsletter-title',h.newsletterTitle);set('home-newsletter-sub',h.newsletterSub);set('home-footer-desc',h.footerDesc);
+  const lp=document.getElementById('logo-preview'); if(lp&&h.storeName) lp.childNodes[0].textContent=h.storeName;
+}
+async function loadSettings(){
+  let s=null;
+  if(sb){try{const {data}=await sb.from('store_settings').select('value').eq('key','site').maybeSingle(); if(data?.value)s=data.value;}catch(e){console.warn('Settings cloud load error:',e);}}
+  if(!s){try{s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){s={};}}
+  applySettingsToAdmin(s||{});
 }
 
 // ─── EXPORT ───
@@ -2940,16 +2997,30 @@ function nav(el,panelId){
 
 // ─── REFRESH STATS ───
 function refreshDashStats(){
+  orders = cleanOrders(orders);
   const active=products.filter(p=>p.status==='active').length;
   const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
+  const currency = orders[0]?.currency || products.find(p=>p.gatewayConfig?.currency)?.gatewayConfig?.currency || 'NGN';
   const el=id=>document.getElementById(id);
   if(el('total-products-stat'))el('total-products-stat').textContent=active;
   if(el('total-orders-stat'))el('total-orders-stat').textContent=orders.length;
-  if(el('total-revenue-stat'))el('total-revenue-stat').textContent='$'+rev.toLocaleString();
+  if(el('total-revenue-stat'))el('total-revenue-stat').textContent=formatAdminMoney(rev,currency);
+  if(el('orders-count-badge'))el('orders-count-badge').textContent=orders.length;
+  if(el('qa-orders-sub'))el('qa-orders-sub').textContent=`${orders.filter(o=>o.status==='pending').length} awaiting`;
   // Derive unique customers from orders
   const uniq = new Set();
   orders.forEach(o=>{ const k=(o.email||o.phone||o.customer||'').toLowerCase().trim(); if(k) uniq.add(k); });
   if(el('total-customers-stat'))el('total-customers-stat').textContent=uniq.size;
+  renderActivityList();
+}
+
+function renderActivityList(){
+  const list=document.getElementById('activity-list'); if(!list)return;
+  const rows=[];
+  cleanOrders(orders).slice(0,4).forEach(o=>rows.push({ico:'🛒',bg:'#fef3ec',msg:`<b>Order #${o.id}</b> from ${escHTML(o.customer||'Customer')} · ${formatOrderMoney(o)}`,time:displayDate(o.date)}));
+  products.filter(p=>Number(p.stock)<=3 && p.status!=='draft').slice(0,2).forEach(p=>rows.push({ico:'📦',bg:'#fff4e8',msg:`<b>Low stock:</b> ${escHTML(p.name)} (${p.stock||0} left)`,time:'Live inventory'}));
+  if(!rows.length){ list.innerHTML='<div style="text-align:center;padding:26px;color:var(--muted);">No activity yet — orders and stock alerts will appear here.</div>'; return; }
+  list.innerHTML=rows.slice(0,5).map(r=>`<div class="activity-item"><div class="act-icon" style="background:${r.bg};">${r.ico}</div><div><div class="act-msg">${r.msg}</div><div class="act-time">${r.time}</div></div></div>`).join('');
 }
 
 // ─── DUPLICATE PRODUCT ───
@@ -2995,7 +3066,7 @@ function openPreview(productId){
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>
-    <div class="price-row"><span class="price">$${p.price}</span>${p.wasPrice?`<span class="was">$${p.wasPrice}</span><span class="save-t">Save $${save}</span>`:''}</div>
+    <div class="price-row"><span class="price">${formatAdminMoney(p.price,p.gatewayConfig?.currency)}</span>${p.wasPrice?`<span class="was">${formatAdminMoney(p.wasPrice,p.gatewayConfig?.currency)}</span><span class="save-t">Save ${formatAdminMoney(save,p.gatewayConfig?.currency)}</span>`:''}</div>
     <div class="call"><span>📞 Questions? Talk live</span><button>Call Now</button></div>
     <button class="cta-p">⚡ Buy Now — Guest Checkout</button>
     <button class="cta-s">🛒 Add to Cart</button>
@@ -3048,12 +3119,13 @@ function getInstallmentPlanFromForm(){
   const countRaw= parseInt(document.getElementById('fp-ip-count')?.value)||3;
   const count   = Math.max(2, Math.min(12, countRaw));
   const label   = document.getElementById('fp-ip-label')?.value.trim()||'';
+  const mode    = document.getElementById('fp-ip-mode')?.value || 'selectable';
   const colors = {
     bg:     document.getElementById('fp-ip-color-bg')?.value     || '#fff3c4',
     border: document.getElementById('fp-ip-color-border')?.value || '#f5b400',
     glow:   document.getElementById('fp-ip-color-glow')?.value   || '#f5b400',
   };
-  return { enabled, cost, profit, count, label, colors };
+  return { enabled, cost, profit, count, label, mode, colors };
 }
 
 function validateInstallmentPlan(plan, productPrice){
@@ -3146,8 +3218,11 @@ window.isInstallmentValid = isInstallmentValid;
 async function globalSaveChanges(){
   const activePanel = document.querySelector('.panel.active')?.id || '';
   try{
-    if(activePanel==='add-product' || document.getElementById('fp-name')?.value){
+    if(activePanel==='panel-add-product' || document.getElementById('fp-name')?.value){
       await saveProduct(false); return;
+    }
+    if(activePanel==='panel-settings' || activePanel==='panel-appearance'){
+      await saveSettings(); return;
     }
     showToast('⏳ Saving…');
     const ok = await saveToStorage();
@@ -3367,7 +3442,7 @@ async function deleteAdminReview(id) {
 (async function(){
   await loadFromStorage();
   await loadCategoriesCloud();
-  await loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
+  await loadAgents(); await loadSettings(); renderOrders();renderMediaLibrary();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
   renderProductsTable();
 })();
 </script>
