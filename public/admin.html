@@ -2740,6 +2740,19 @@ async function removeCategory(i){
 // ─── ANALYTICS (real product/order data) ───
 function renderAnalytics(){
   const tbody=document.getElementById('analytics-table');if(!tbody)return;
+  orders = cleanOrders(orders);
+  const totalRevenue = orders.reduce((a,o)=>a+(Number(o.total)||0),0);
+  const orderCount = orders.length;
+  const avgOrder = orderCount ? totalRevenue/orderCount : 0;
+  const uniqueCustomers = new Set(orders.map(o=>(o.email||o.phone||o.customer||'').toLowerCase().trim()).filter(Boolean)).size;
+  const activeProducts = Math.max(1, products.filter(p=>p.status!=='draft').length);
+  const setStat=(idx,val,sub)=>{const cards=document.querySelectorAll('#panel-analytics .stat-card');const c=cards[idx];if(!c)return;const v=c.querySelector('.stat-val');const s=c.querySelector('.stat-change');if(v)v.textContent=val;if(s)s.textContent=sub;};
+  const defaultCurrency = orders[0]?.currency || products.find(p=>p.gatewayConfig?.currency)?.gatewayConfig?.currency || 'NGN';
+  setStat(0,String(orderCount),'Real orders');
+  setStat(1, activeProducts ? ((orderCount/activeProducts)*100).toFixed(1)+'%' : '0%','Orders ÷ active products');
+  setStat(2,formatAdminMoney(avgOrder, defaultCurrency),'Average order value');
+  setStat(3,String(uniqueCustomers),'Unique buyers');
+
   // Aggregate orders by product
   const byProd = new Map();
   orders.forEach(o=>{
@@ -2747,16 +2760,16 @@ function renderAnalytics(){
     const total = typeof o.total==='number'?o.total:(parseFloat(o.total)||0);
     const q = parseInt(o.qty)||1;
     if(byProd.has(key)){ const r=byProd.get(key); r.orders+=1; r.units+=q; r.revenue+=total; }
-    else byProd.set(key,{name:key, orders:1, units:q, revenue:total});
+    else byProd.set(key,{name:key, orders:1, units:q, revenue:total, currency:orderCurrency(o)});
   });
   // Include products with 0 orders
-  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0}); });
+  products.forEach(p=>{ if(!byProd.has(p.name)) byProd.set(p.name,{name:p.name, orders:0, units:0, revenue:0, currency:p.gatewayConfig?.currency||'NGN'}); });
   const rows = Array.from(byProd.values()).sort((a,b)=>b.revenue-a.revenue).slice(0,20);
   if(!rows.length){
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted);">No analytics data yet — orders will populate this view.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${(d.units*7).toLocaleString()}</td><td>${d.orders}</td><td><b>$${d.revenue.toLocaleString()}</b></td><td>${d.units?((d.orders/(d.units*7))*100).toFixed(1)+'%':'—'}</td></tr>`).join('');
+  tbody.innerHTML = rows.map(d=>`<tr><td><b>${d.name}</b></td><td>${d.units.toLocaleString()}</td><td>${d.orders}</td><td><b>${formatAdminMoney(d.revenue,d.currency)}</b></td><td>${d.orders?formatAdminMoney(d.revenue/d.orders,d.currency):'—'}</td></tr>`).join('');
 }
 function injectChart(){
   const el=document.getElementById('panel-analytics');if(!el)return;
