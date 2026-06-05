@@ -3071,12 +3071,13 @@ function getInstallmentPlanFromForm(){
   const countRaw= parseInt(document.getElementById('fp-ip-count')?.value)||3;
   const count   = Math.max(2, Math.min(12, countRaw));
   const label   = document.getElementById('fp-ip-label')?.value.trim()||'';
+  const mode    = document.getElementById('fp-ip-mode')?.value || 'selectable';
   const colors = {
     bg:     document.getElementById('fp-ip-color-bg')?.value     || '#fff3c4',
     border: document.getElementById('fp-ip-color-border')?.value || '#f5b400',
     glow:   document.getElementById('fp-ip-color-glow')?.value   || '#f5b400',
   };
-  return { enabled, cost, profit, count, label, colors };
+  return { enabled, cost, profit, count, label, mode, colors };
 }
 
 function validateInstallmentPlan(plan, productPrice){
