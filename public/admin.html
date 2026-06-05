@@ -2987,16 +2987,30 @@ function nav(el,panelId){
 
 // ─── REFRESH STATS ───
 function refreshDashStats(){
+  orders = cleanOrders(orders);
   const active=products.filter(p=>p.status==='active').length;
   const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
+  const currency = orders[0]?.currency || products.find(p=>p.gatewayConfig?.currency)?.gatewayConfig?.currency || 'NGN';
   const el=id=>document.getElementById(id);
   if(el('total-products-stat'))el('total-products-stat').textContent=active;
   if(el('total-orders-stat'))el('total-orders-stat').textContent=orders.length;
-  if(el('total-revenue-stat'))el('total-revenue-stat').textContent='$'+rev.toLocaleString();
+  if(el('total-revenue-stat'))el('total-revenue-stat').textContent=formatAdminMoney(rev,currency);
+  if(el('orders-count-badge'))el('orders-count-badge').textContent=orders.length;
+  if(el('qa-orders-sub'))el('qa-orders-sub').textContent=`${orders.filter(o=>o.status==='pending').length} awaiting`;
   // Derive unique customers from orders
   const uniq = new Set();
   orders.forEach(o=>{ const k=(o.email||o.phone||o.customer||'').toLowerCase().trim(); if(k) uniq.add(k); });
   if(el('total-customers-stat'))el('total-customers-stat').textContent=uniq.size;
+  renderActivityList();
+}
+
+function renderActivityList(){
+  const list=document.getElementById('activity-list'); if(!list)return;
+  const rows=[];
+  cleanOrders(orders).slice(0,4).forEach(o=>rows.push({ico:'🛒',bg:'#fef3ec',msg:`<b>Order #${o.id}</b> from ${escHTML(o.customer||'Customer')} · ${formatOrderMoney(o)}`,time:displayDate(o.date)}));
+  products.filter(p=>Number(p.stock)<=3 && p.status!=='draft').slice(0,2).forEach(p=>rows.push({ico:'📦',bg:'#fff4e8',msg:`<b>Low stock:</b> ${escHTML(p.name)} (${p.stock||0} left)`,time:'Live inventory'}));
+  if(!rows.length){ list.innerHTML='<div style="text-align:center;padding:26px;color:var(--muted);">No activity yet — orders and stock alerts will appear here.</div>'; return; }
+  list.innerHTML=rows.slice(0,5).map(r=>`<div class="activity-item"><div class="act-icon" style="background:${r.bg};">${r.ico}</div><div><div class="act-msg">${r.msg}</div><div class="act-time">${r.time}</div></div></div>`).join('');
 }
 
 // ─── DUPLICATE PRODUCT ───
