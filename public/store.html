@@ -2296,7 +2296,7 @@ function applyTemplate(p) {
   // Build benefit badges for dark template
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       (tpl === 'dark') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
     if (bb.length && tpl === 'dark') {
       badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
@@ -2410,7 +2410,7 @@ function applyTemplate(p) {
     if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
     
     // Benefit grid (2x2)
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✨',text:'Short Benefit 1'},{icon:'⏱',text:'Short Benefit 2'},{icon:'💎',text:'Short Benefit 3'},{icon:'🎯',text:'Short Benefit 4'}];
     const benefitHTML = `<div class="tpl-injected" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
       ${bb.slice(0,4).map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;"><span style="font-size:16px;">${b.icon}</span>${b.text}</div>`).join('')}
@@ -2461,6 +2461,10 @@ function applyTemplate(p) {
       </div>
     </div>`;
     if (trustRow) trustRow.insertAdjacentHTML('afterend', afterTrustHTML);
+  }
+  if (faqSections && tpl !== 'luvea' && trustRow) {
+    trustRow.insertAdjacentHTML('afterend', `<div class="tpl-injected sp-faq-section" style="margin-top:18px;border-top:1px solid var(--border);padding-top:6px;">${faqSections.map(f=>`<div class="sp-faq-item" onclick="this.classList.toggle('open')"><div class="sp-faq-q" style="display:flex;justify-content:space-between;cursor:pointer;font-size:14px;font-weight:700;padding:14px 0;border-bottom:1px solid var(--border);"><span>${escHTML(f.q||'Question')}</span><span class="faq-plus">+</span></div><div class="sp-faq-a" style="display:none;font-size:13.5px;color:var(--muted);line-height:1.7;margin-top:10px;">${escHTML(f.a||'')}</div></div>`).join('')}</div>`);
+    document.querySelectorAll('.sp-faq-section .sp-faq-item').forEach(item=>item.addEventListener('click',()=>{const a=item.querySelector('.sp-faq-a'); if(a)a.style.display=item.classList.contains('open')?'block':'none';}));
   }
   
   // Build bundle cards (for aero template uses the standard bundle system)
