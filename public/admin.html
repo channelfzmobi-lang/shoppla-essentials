@@ -1317,23 +1317,8 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
 
 <script>
 // ─── STATE ───
-let products = [
-  {id:1,name:'Velvet 3-Seater Sofa in Dusty Rose',brand:'Cozy Co.',category:'Furniture',price:649,wasPrice:929,stock:7,status:'active',featured:true,icon:'🛋️',pageColor:'#ffffff'},
-  {id:2,name:'UltraSlim Pro Laptop 15" 512GB',brand:'TechNova',category:'Electronics',price:1199,wasPrice:0,stock:14,status:'active',featured:true,icon:'💻',pageColor:'#ffffff'},
-  {id:3,name:'Air Cloud Running Sneakers White',brand:'Stride',category:'Fashion',price:89,wasPrice:110,stock:42,status:'active',featured:true,icon:'👟',pageColor:'#ffffff'},
-  {id:4,name:'Espresso Machine with Milk Frother',brand:'Brew Master',category:'Kitchen',price:299,wasPrice:349,stock:2,status:'active',featured:true,icon:'☕',pageColor:'#fff5f3'},
-  {id:5,name:'Smart LED Pendant Light Gold',brand:'LumiGlow',category:'Lighting',price:129,wasPrice:152,stock:18,status:'active',featured:false,icon:'💡',pageColor:'#ffffff'},
-  {id:6,name:'Noise-Cancelling Wireless Headphones',brand:'SoundWave',category:'Electronics',price:199,wasPrice:249,stock:31,status:'active',featured:true,icon:'🎧',pageColor:'#f3f8ff'},
-  {id:7,name:'Rattan Garden Chair Set (2 pcs)',brand:'GreenSpace',category:'Outdoor',price:224,wasPrice:299,stock:9,status:'draft',featured:false,icon:'🪑',pageColor:'#f4faf5'},
-  {id:8,name:'Structured Leather Tote Bag Camel',brand:'Luxe & Co.',category:'Fashion',price:159,wasPrice:0,stock:23,status:'active',featured:true,icon:'👜',pageColor:'#ffffff'},
-];
-let orders = [
-  {id:1047,customer:'Sarah M.',email:'sarah@email.com',products:'Velvet 3-Seater Sofa',total:701,date:'Today, 10:23am',status:'pending'},
-  {id:1046,customer:'James T.',email:'james@email.com',products:'Headphones + Laptop',total:1398,date:'Yesterday',status:'processing'},
-  {id:1045,customer:'Amina K.',email:'amina@email.com',products:'Espresso Machine',total:351,date:'Mar 19',status:'shipped'},
-  {id:1044,customer:'David L.',email:'david@email.com',products:'Sneakers (White, L)',total:89,date:'Mar 18',status:'delivered'},
-  {id:1043,customer:'Maria S.',email:'maria@email.com',products:'LED Pendant Light',total:129,date:'Mar 17',status:'delivered'},
-];
+let products = [];
+let orders = [];
 let categories = [];
 let customers  = [];
 let contentSections = [];
