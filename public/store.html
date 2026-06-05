@@ -2243,6 +2243,8 @@ function openSalesPage(id) {
   if (!p) return;
   currentProductId = p._cloud_id || p.id;
   qty = 1;
+  selectedBundleIdx = 0;
+  selectedVariantIdx = 0;
   selectedOfferType = getInstallmentBreakdown(p)?.mode === 'only' ? 'installment' : 'full';
   const priceStr = formatMoney(p.price, p);
   const wasStr   = p.wasPrice ? formatMoney(p.wasPrice, p) : '';
