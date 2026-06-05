@@ -2423,7 +2423,7 @@ function applyTemplate(p) {
       variantHTML = `<div class="tpl-injected sp-variant-cards">${bundles.map((b, i) => {
         const tag = b.tag || (i===bundles.length-1 ? 'BEST DEAL' : '');
         const bonus = b.qty > 1 ? `${b.qty-1} FREE GIFTS` : '';
-        return `<div class="sp-variant-card${i===0?' active':''}" onclick="selectVariantCard(${i})">
+        return `<div class="sp-variant-card${i===selectedBundleIdx?' active':''}" onclick="selectVariantCard(${i})">
           ${tag ? `<div class="sp-vc-tag">${tag}</div>` : ''}
           ${bonus ? `<div class="sp-vc-bonus">${bonus}</div>` : ''}
           ${imgSrc ? `<img class="sp-vc-img" src="${imgSrc}" alt="${b.label}"/>` : '<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;">${p.icon||"📦"}</div>'}
@@ -2445,7 +2445,7 @@ function applyTemplate(p) {
     }
     
     // Selling out bar + money back after trust row
-    const soldPct = Math.floor(Math.random()*15 + 80);
+    const soldPct = Math.min(96, Math.max(35, 100 - ((p.stock||10)*4)));
     const afterTrustHTML = `<div class="tpl-injected">
       <div class="sp-selling-out">
         <div class="so-header">${TC.radSoTitle || '🔥 SELLING OUT FAST'}</div>
