@@ -2489,11 +2489,9 @@ function selectVariantCard(idx) {
   });
   const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
-    const wasEl = document.getElementById('sp-was');
-    if (wasEl && p.bundles[idx].qty > 1) {
-      wasEl.textContent = formatMoney(p.price * p.bundles[idx].qty, p);
-    }
+    qty = Math.max(1, parseInt(p.bundles[idx].qty)||1);
+    const q=document.getElementById('qty-val'); if(q) q.value=qty;
+    updateSalesPricing();
   }
 }
 
@@ -2547,7 +2545,9 @@ function selectBundle(idx) {
   });
   const p = productById(currentProductId);
   if (p && p.bundles && p.bundles[idx]) {
-    document.getElementById('sp-price').textContent = formatMoney(p.bundles[idx].price, p);
+    qty = Math.max(1, parseInt(p.bundles[idx].qty)||1);
+    const q=document.getElementById('qty-val'); if(q) q.value=qty;
+    updateSalesPricing();
   }
 }
 
