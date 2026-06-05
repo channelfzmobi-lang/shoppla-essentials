@@ -2638,10 +2638,10 @@ function renderOrders(){
       </div></td>
     </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;padding:38px;color:var(--muted);">No real orders yet — successful checkouts will appear here.</td></tr>`;
   const rt=document.getElementById('recent-orders-table');
-  if(rt)rt.innerHTML=sorted.length?sorted.slice(0,5).map(o=>`
+  if(rt) rt.innerHTML = sorted.length ? sorted.slice(0,5).map(o=>`
     <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>${formatOrderMoney(o)}</b></td>
-    <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('');
-    :`<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted);">No orders yet.</td></tr>`;
+    <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('')
+    : `<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted);">No orders yet.</td></tr>`;
   refreshDashStats();
 }
 
