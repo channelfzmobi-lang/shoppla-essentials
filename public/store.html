@@ -2315,6 +2315,8 @@ function applyTemplate(p) {
   const trustRow = spInfo?.querySelector('.trust-row');
   
   const TC = p.templateContent || {};
+  const iconSections = Array.isArray(p.templateIconSections) && p.templateIconSections.length ? p.templateIconSections : null;
+  const faqSections = Array.isArray(p.templateFaqSections) && p.templateFaqSections.length ? p.templateFaqSections : null;
 
   // Universal hero sub-headline (per template) — inserted right under sp-title
   const subMap = {aero:TC.aeroSub, luvea:TC.luveaSub, radiance:TC.radSub, dark:TC.darkSub, classic:TC.classicSub};
@@ -2328,10 +2330,10 @@ function applyTemplate(p) {
   // ═══ AERO TEMPLATE: Checklist + Bundle Kit Cards + Upsell + Stock Bar ═══
   if (tpl === 'aero') {
     // Inject checklist benefits after description/install area
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✓',text:'Powerful multi-surface suction'},{icon:'✓',text:'Lightweight, easy-to-use design'},{icon:'✓',text:'Works on carpet, rugs, stairs & upholstery'}];
     const aeroTitle = TC.aeroTitle || (p.desc ? p.desc.split('.')[0] : 'Key Benefits');
-    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free $${Math.round(p.price*0.3)} attachment on all orders over $${Math.round(p.price*1.5)}` : '');
+    const aeroGift = TC.aeroGift || (p.wasPrice ? `🟢 Free ${formatMoney(Math.round(p.price*0.3),p)} attachment on all orders over ${formatMoney(Math.round(p.price*1.5),p)}` : '');
     const checklistHTML = `<div class="tpl-injected">
       <div style="font-size:15px;font-weight:800;margin-bottom:10px;">${aeroTitle}</div>
       <ul class="sp-checklist">${bb.map(b => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${b.text}</li>`).join('')}</ul>
@@ -2370,7 +2372,7 @@ function applyTemplate(p) {
     if (guestNotice) { guestNotice.classList.add('tpl-injected'); guestNotice.style.display = 'none'; }
     
     // Benefit grid
-    const bb = p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'🌊',text:'Reduced Wrinkles'},{icon:'☀️',text:'Radiant Skin'},{icon:'⊞',text:'Less Dark Spots'},{icon:'🔬',text:'Reduced Acne'}];
     const gridHTML = `<div class="tpl-injected">
       <div style="font-size:14px;font-weight:700;margin-bottom:10px;">${TC.luveaTitle || 'After 6 weeks, visibly see:'}</div>
@@ -2384,8 +2386,8 @@ function applyTemplate(p) {
     if (insertPt) insertPt.insertAdjacentHTML('afterend', gridHTML);
     
     // Guarantee banner + FAQ after trust row
-    const faqItems = p.contentSections && p.contentSections.length ? 
-      p.contentSections.slice(0,5).map(s => ({q: s.heading||s.eyebrow||'Question', a: s.body||'Answer'})) :
+    const faqItems = faqSections ? faqSections : p.contentSections && p.contentSections.length ? 
+      p.contentSections.slice(0,5).map(s => ({q: s.headline||s.eyebrow||'Question', a: s.body||s.faqs||'Answer'})) :
       [{q:'Description',a:p.desc||'Product description goes here.'},{q:'How to use',a:'Application instructions go here.'},{q:'Does it really work?',a:'Information about efficacy goes here.'},{q:'What is the 100% results guarantee?',a:'Details about the guarantee go here.'}];
     
     const afterCtaHTML = `<div class="tpl-injected">
