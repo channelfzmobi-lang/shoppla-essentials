@@ -2152,7 +2152,7 @@ async function saveToStorage(){
         content_sections: p.contentSections||[],
         checkout_method: p.checkoutMethod||'standard',
         payment_route: p.paymentRoute||'pod',
-        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[], templateContent:p.templateContent||{}},
+        form_config: {...(p.formConfig||{}), bundles:p.bundles||[], benefitBadges:p.benefitBadges||[], templateIconSections:p.templateIconSections||[], templateFaqSections:p.templateFaqSections||[], templateContent:p.templateContent||{}},
         ty_config: p.tyConfig||{},
         gateway_config: p.gatewayConfig||{}, agent_id: (p.agentId && String(p.agentId).includes('-')) ? p.agentId : null,
         page_template: p.pageTemplate||'classic',
@@ -2204,6 +2204,8 @@ async function loadFromStorage(){
           pageTemplate:p.page_template||'classic',
           bundles:(p.form_config&&p.form_config.bundles)||[],
           benefitBadges:(p.form_config&&p.form_config.benefitBadges)||[],
+          templateIconSections:(p.form_config&&p.form_config.templateIconSections)||[],
+          templateFaqSections:(p.form_config&&p.form_config.templateFaqSections)||[],
           templateContent:(p.form_config&&p.form_config.templateContent)||{},
         }));
         localStorage.setItem(STORAGE_KEY,JSON.stringify(products));
