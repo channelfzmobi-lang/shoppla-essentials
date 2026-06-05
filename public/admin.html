@@ -857,6 +857,15 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
                     <div class="form-hint">Name shown to customers on the sales page.</div>
                     <div id="fp-ip-error-label" class="ip-error" style="display:none;margin-top:4px;font-size:12px;font-weight:600;color:var(--red);"></div>
                   </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label class="form-lbl">How customers use this plan</label>
+                    <select class="form-select" id="fp-ip-mode" onchange="updateInstallmentPreview()">
+                      <option value="selectable">Selectable offer — customer chooses Full Payment or Installment</option>
+                      <option value="notice">Notice only — show plan text without selectable pricing</option>
+                      <option value="only">Installment only — make installment the default order option</option>
+                    </select>
+                    <div class="form-hint">Use “Selectable offer” when customers should pick the payment plan before the order form.</div>
+                  </div>
                 </div>
                 <div id="fp-ip-preview" style="margin-top:10px;padding:14px;border-radius:10px;background:#fff8ee;border:1px solid #f0d8a8;font-size:13px;color:#5a3d10;display:none;"></div>
 
