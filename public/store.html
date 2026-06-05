@@ -3280,6 +3280,7 @@ function subscribeToCloudChanges(){
   if(_cloudChannel){ try{ sb.removeChannel(_cloudChannel); }catch(e){} _cloudChannel=null; }
   _cloudChannel = sb.channel('shoppla-storefront-live-'+Date.now())
     .on('postgres_changes',{event:'*',schema:'public',table:'products'},async()=>{await loadData(); renderHome(); if(currentProductId){const p=productById(currentProductId); if(p) openSalesPage(p.id);}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'store_settings'},async()=>{await loadSettings(); renderHome();})
     .on('postgres_changes',{event:'*',schema:'public',table:'agents'},async()=>{await loadAgents(); if(currentProductId){const p=productById(currentProductId); if(p) showAgentOnCallBar(p);}})
     .on('postgres_changes',{event:'*',schema:'public',table:'reviews'},async()=>{if(currentProductId){await loadCloudReviews(currentProductId); renderCloudReviews(currentProductId);}})
     .subscribe();
@@ -3288,6 +3289,7 @@ function subscribeToCloudChanges(){
 // ═══ INIT ═══
 (async function(){
   await loadData();
+  await loadSettings();
   await loadAgents();
   await loadCloudReviews();
   renderHome();
