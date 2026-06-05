@@ -2213,13 +2213,13 @@ async function loadFromStorage(){
       }
       const {data:cloudOrders}=await sb.from('orders').select('*').order('created_at',{ascending:false});
       if(cloudOrders&&cloudOrders.length){
-        orders=cloudOrders.map(o=>({
+        orders=cleanOrders(cloudOrders.map(o=>({
           id:o.order_number||o.id, _cloud_id:o.id, customer:o.customer,
           email:o.email, phone:o.phone, address:o.address, city:o.city,
           products:o.products_text, qty:o.qty, color:o.color, size:o.size,
           notes:o.notes, total:Number(o.total), status:o.status,
           paymentMethod:o.payment_method, date:o.created_at, productId:o.product_id,
-        }));
+        })));
         localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
       }
       return;
@@ -2230,7 +2230,7 @@ async function loadFromStorage(){
     const p=localStorage.getItem(STORAGE_KEY);
     const o=localStorage.getItem(ORDERS_KEY);
     if(p) products=JSON.parse(p);
-    if(o) orders=JSON.parse(o);
+    if(o) orders=cleanOrders(JSON.parse(o));
   }catch(e){}
 }
 
