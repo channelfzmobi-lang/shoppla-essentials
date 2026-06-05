@@ -1592,6 +1592,10 @@ async function saveProduct(draft=false){
   const pageTemplate = document.getElementById('fp-template')?.value||'classic';
   const benefitBadgesRaw = document.getElementById('fp-benefit-badges')?.value.trim()||'';
   const benefitBadges = benefitBadgesRaw ? benefitBadgesRaw.split('\n').filter(Boolean).map(l=>{const [ico,txt]=l.split('|');return{icon:ico?.trim()||'✅',text:txt?.trim()||''};}) : [];
+  const templateIconRaw = document.getElementById('fp-template-icon-sections')?.value.trim()||'';
+  const templateIconSections = templateIconRaw ? templateIconRaw.split('\n').filter(Boolean).map(l=>{const parts=l.split('|');return{icon:(parts[0]||'✅').trim(),title:(parts[1]||parts[0]||'').trim(),sub:(parts.slice(2).join('|')||'').trim()};}).filter(x=>x.title) : [];
+  const templateFaqRaw = document.getElementById('fp-template-faq-sections')?.value.trim()||'';
+  const templateFaqSections = templateFaqRaw ? templateFaqRaw.split('\n').filter(Boolean).map(l=>{const parts=l.split('|');return{q:(parts[0]||'Question').trim(),a:(parts.slice(1).join('|')||'').trim()};}).filter(x=>x.q) : [];
   const bundles = [...currentBundles].filter(b=>b.label&&b.price);
   const isActive = document.getElementById('toggle-active')?.classList.contains('on') !== false;
   const isFeatured = document.getElementById('toggle-featured')?.classList.contains('on') !== false;
@@ -1662,7 +1666,7 @@ async function saveProduct(draft=false){
   const payload = {
     name, brand, category:cat, price, wasPrice, stock, desc, colors, sizes,
     pageColor:productPageColor, status:(draft||!isActive)?'draft':'active', featured:isFeatured, mediaFit, mediaHeightDesktop, mediaHeightMobile, agentId, pageTemplate,
-    videoData, videoURL:effectiveUrl, images, benefitBadges, bundles,
+    videoData, videoURL:effectiveUrl, images, benefitBadges, templateIconSections, templateFaqSections, bundles,
     deliveryInfo, shippingNotes, returnDays, warranty, returnPolicy, installment,
     contentSections:[...contentSections], templateContent,
     checkoutMethod:cm, paymentRoute:pr, formConfig, tyConfig, gatewayConfig,
