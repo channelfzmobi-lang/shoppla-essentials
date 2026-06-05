@@ -1497,6 +1497,7 @@ function editProduct(id){
     setV('fp-ip-profit', ip.profit!=null?ip.profit:'');
     setV('fp-ip-count', ip.count||3);
     setV('fp-ip-label', ip.label||'');
+    setV('fp-ip-mode', ip.mode||'selectable');
     setTimeout(updateInstallmentPreview,50);
   }
   if(p.tyConfig){
@@ -1550,6 +1551,12 @@ function editProduct(id){
   if(bbEl && p.benefitBadges && p.benefitBadges.length) {
     bbEl.value = p.benefitBadges.map(b => b.icon+'|'+b.text).join('\n');
   } else if(bbEl) { bbEl.value = ''; }
+  const tiEl = document.getElementById('fp-template-icon-sections');
+  if(tiEl && p.templateIconSections && p.templateIconSections.length){ tiEl.value = p.templateIconSections.map(x => [x.icon,x.title,x.sub].filter(v=>v!==undefined).join('|')).join('\n'); }
+  else if(tiEl) tiEl.value = '';
+  const tfEl = document.getElementById('fp-template-faq-sections');
+  if(tfEl && p.templateFaqSections && p.templateFaqSections.length){ tfEl.value = p.templateFaqSections.map(x => `${x.q||''}|${x.a||''}`).join('\n'); }
+  else if(tfEl) tfEl.value = '';
 
   // Bundles
   currentBundles = p.bundles ? [...p.bundles] : [];
