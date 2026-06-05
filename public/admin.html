@@ -2915,31 +2915,41 @@ function saveBanner(i){
 }
 
 // ─── SETTINGS ───
-function saveSettings(){
-  const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
-  const toggleStates=ids.map(id=>document.getElementById(id)?.classList.contains('on')??true);
-  const contact={
-    email:document.getElementById('s-support-email')?.value||'',
-    phone:document.getElementById('s-phone')?.value||'',
-    whatsapp:document.getElementById('s-whatsapp')?.value||'',
-    zoom:document.getElementById('s-zoom')?.value||'',
+function collectSettings(){
+  const toggleIds=['s-guest','s-livecall','s-ugc','s-flash','s-email'];
+  const val=id=>document.getElementById(id)?.value||'';
+  return {
+    toggleStates:toggleIds.map(id=>document.getElementById(id)?.classList.contains('on')??true),
+    contact:{email:val('s-support-email'),phone:val('s-phone'),whatsapp:val('s-whatsapp'),zoom:val('s-zoom')},
+    social:{instagram:val('s-instagram'),threads:val('s-threads'),x:val('s-x'),tiktok:val('s-tiktok')},
+    homepage:{storeName:val('home-store-name')||'Shoppla',heroEyebrow:val('home-hero-eyebrow'),heroHeadline:val('home-hero-headline'),heroSubtext:val('home-hero-subtext'),heroCta:val('home-hero-cta'),topbar:val('home-topbar'),productsTitle:val('home-products-title'),productsSub:val('home-products-sub'),newsletterTitle:val('home-newsletter-title'),newsletterSub:val('home-newsletter-sub'),footerDesc:val('home-footer-desc')}
   };
-  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({toggleStates,contact}));}catch(e){}
+}
+async function saveSettings(){
+  const settings=collectSettings();
+  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){}
+  if(sb){
+    try{const {error}=await sb.from('store_settings').upsert({key:'site',value:settings},{onConflict:'key'}); if(error) throw error;}
+    catch(e){console.warn('Settings cloud save error:',e);showToast('❌ Settings cloud save failed');return;}
+  }
+  refreshLivePreview();
   showToast('✅ Settings saved!');
 }
-function loadSettings(){
-  try{
-    const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');
-    const ids=['s-guest','s-livecall','s-ugc','s-flash','s-orderform','s-email'];
-    if(s.toggleStates)s.toggleStates.forEach((on,i)=>{const el=document.getElementById(ids[i]);if(el)el.classList.toggle('on',on);});
-    if(s.contact){
-      ['s-support-email','s-phone','s-whatsapp','s-zoom'].forEach(id=>{
-        const key=id.replace('s-','').replace('support-email','email');
-        const el=document.getElementById(id);
-        if(el&&s.contact[key])el.value=s.contact[key];
-      });
-    }
-  }catch(e){}
+function applySettingsToAdmin(s={}){
+  const ids=['s-guest','s-livecall','s-ugc','s-flash','s-email'];
+  if(s.toggleStates)s.toggleStates.forEach((on,i)=>{const el=document.getElementById(ids[i]);if(el)el.classList.toggle('on',!!on);});
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  const c=s.contact||{}, so=s.social||{}, h=s.homepage||{};
+  set('s-support-email',c.email);set('s-phone',c.phone);set('s-whatsapp',c.whatsapp);set('s-zoom',c.zoom);
+  set('s-instagram',so.instagram);set('s-threads',so.threads);set('s-x',so.x);set('s-tiktok',so.tiktok);
+  set('home-store-name',h.storeName);set('home-hero-eyebrow',h.heroEyebrow);set('home-hero-headline',h.heroHeadline);set('home-hero-subtext',h.heroSubtext);set('home-hero-cta',h.heroCta);set('home-topbar',h.topbar);set('home-products-title',h.productsTitle);set('home-products-sub',h.productsSub);set('home-newsletter-title',h.newsletterTitle);set('home-newsletter-sub',h.newsletterSub);set('home-footer-desc',h.footerDesc);
+  const lp=document.getElementById('logo-preview'); if(lp&&h.storeName) lp.childNodes[0].textContent=h.storeName;
+}
+async function loadSettings(){
+  let s=null;
+  if(sb){try{const {data}=await sb.from('store_settings').select('value').eq('key','site').maybeSingle(); if(data?.value)s=data.value;}catch(e){console.warn('Settings cloud load error:',e);}}
+  if(!s){try{s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){s={};}}
+  applySettingsToAdmin(s||{});
 }
 
 // ─── EXPORT ───
