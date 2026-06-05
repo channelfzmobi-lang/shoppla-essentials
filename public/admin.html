@@ -3066,7 +3066,7 @@ function openPreview(productId){
   <div class="info">
     <div class="brand">${p.brand}</div><h1>${p.name}</h1>
     <div class="stars">★★★★★ <span style="color:#8a8480;font-size:13px;">4.9 (312 reviews)</span></div>
-    <div class="price-row"><span class="price">$${p.price}</span>${p.wasPrice?`<span class="was">$${p.wasPrice}</span><span class="save-t">Save $${save}</span>`:''}</div>
+    <div class="price-row"><span class="price">${formatAdminMoney(p.price,p.gatewayConfig?.currency)}</span>${p.wasPrice?`<span class="was">${formatAdminMoney(p.wasPrice,p.gatewayConfig?.currency)}</span><span class="save-t">Save ${formatAdminMoney(save,p.gatewayConfig?.currency)}</span>`:''}</div>
     <div class="call"><span>📞 Questions? Talk live</span><button>Call Now</button></div>
     <button class="cta-p">⚡ Buy Now — Guest Checkout</button>
     <button class="cta-s">🛒 Add to Cart</button>
