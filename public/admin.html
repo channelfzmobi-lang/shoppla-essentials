@@ -2618,15 +2618,15 @@ function viewOrder(id){
 // ─── ENHANCED RENDER ORDERS (with viewOrder wired) ───
 function renderOrders(){
   const tbody=document.getElementById('orders-table-body');if(!tbody)return;
-  try{const so=JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]');so.forEach(o=>{if(!orders.find(x=>x.id===o.id))orders.push(o);});}catch(e){}
+  try{const so=cleanOrders(JSON.parse(localStorage.getItem('shoppla_orders_v1')||'[]'));so.forEach(o=>{if(!orders.find(x=>String(x.id)===String(o.id)))orders.push(o);});orders=cleanOrders(orders);}catch(e){orders=cleanOrders(orders);}
   const sorted=[...orders].sort((a,b)=>new Date(b.date||b.created_at||0)-new Date(a.date||a.created_at||0));
-  tbody.innerHTML=sorted.map(o=>`
+  tbody.innerHTML=sorted.length?sorted.map(o=>`
     <tr>
       <td><b>#${o.id}</b></td>
       <td>${o.customer}<div style="font-size:12px;color:var(--muted);">${o.email||''}</div></td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.products}</td>
-      <td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
-      <td>${o.date||'—'}</td>
+      <td><b>${formatOrderMoney(o)}</b></td>
+      <td>${displayDate(o.date)}</td>
       <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td>
       <td><div class="table-actions">
         <button class="tbl-btn" onclick="viewOrder(${JSON.stringify(o.id)})">👁 View</button>
@@ -2636,14 +2636,13 @@ function renderOrders(){
           <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
         </select>
       </div></td>
-    </tr>`).join('');
+    </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;padding:38px;color:var(--muted);">No real orders yet — successful checkouts will appear here.</td></tr>`;
   const rt=document.getElementById('recent-orders-table');
-  if(rt)rt.innerHTML=sorted.slice(0,5).map(o=>`
-    <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>$${typeof o.total==='number'?o.total.toLocaleString():o.total}</b></td>
+  if(rt)rt.innerHTML=sorted.length?sorted.slice(0,5).map(o=>`
+    <tr><td><b>#${o.id}</b></td><td>${o.customer}</td><td><b>${formatOrderMoney(o)}</b></td>
     <td><span class="badge badge-${o.status==='pending'?'orange':o.status==='delivered'?'green':'gray'}">${o.status}</span></td></tr>`).join('');
-  const ostat=document.getElementById('total-orders-stat');if(ostat)ostat.textContent=orders.length;
-  const rev=orders.reduce((a,o)=>a+(typeof o.total==='number'?o.total:parseFloat(o.total)||0),0);
-  const rstat=document.getElementById('total-revenue-stat');if(rstat)rstat.textContent='$'+rev.toLocaleString();
+    :`<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted);">No orders yet.</td></tr>`;
+  refreshDashStats();
 }
 
 // ─── CUSTOMERS (derived from real orders) ───
