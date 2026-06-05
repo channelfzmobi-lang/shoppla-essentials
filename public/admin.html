@@ -1147,7 +1147,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-group">
               <label class="form-lbl">Store Name</label>
-              <input class="form-input" value="Shoppla" oninput="document.getElementById('logo-preview').childNodes[0].textContent=this.value"/>
+              <input class="form-input" id="home-store-name" value="Shoppla" oninput="document.getElementById('logo-preview').childNodes[0].textContent=this.value"/>
             </div>
             <div class="upload-zone" style="padding:20px;" onclick="showToast('📁 File picker would open here')">
               <div class="upload-icon" style="font-size:24px;">🖼</div>
@@ -1161,22 +1161,30 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             <div class="form-grid-2">
               <div class="form-group">
                 <label class="form-lbl">Hero Headline</label>
-                <input class="form-input" value="Shop Everything You Love"/>
+                <input class="form-input" id="home-hero-headline" value="Shop Everything You Love"/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">Hero Subtext</label>
-                <input class="form-input" value="UGC video reviews on every product. Live calls. Guest checkout."/>
+                <input class="form-input" id="home-hero-subtext" value="UGC video reviews on every product. Live calls. Guest checkout."/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">CTA Button Text</label>
-                <input class="form-input" value="Shop Now →"/>
+                <input class="form-input" id="home-hero-cta" value="Shop Now →"/>
               </div>
               <div class="form-group">
                 <label class="form-lbl">Topbar Announcement</label>
-                <input class="form-input" value="🎉 Free shipping on orders over $49 · No account needed"/>
+                <input class="form-input" id="home-topbar" value="🎉 Free shipping on orders over ₦49,000 · No account needed"/>
               </div>
             </div>
-            <button class="hdr-btn hdr-btn-primary" onclick="showToast('✅ Hero settings saved!')">Save Hero</button>
+            <div class="form-grid-2">
+              <div class="form-group"><label class="form-lbl">Hero Eyebrow</label><input class="form-input" id="home-hero-eyebrow" value="✦ Spring Collection 2026"/></div>
+              <div class="form-group"><label class="form-lbl">Products Section Title</label><input class="form-input" id="home-products-title" value="Featured Products"/></div>
+              <div class="form-group"><label class="form-lbl">Products Section Subtext</label><input class="form-input" id="home-products-sub" value="▶ UGC video · 📞 Live call · ⚡ Guest checkout"/></div>
+              <div class="form-group"><label class="form-lbl">Newsletter Headline</label><input class="form-input" id="home-newsletter-title" value="Get the Best Deals First 🎁"/></div>
+              <div class="form-group"><label class="form-lbl">Newsletter Subtext</label><input class="form-input" id="home-newsletter-sub" value="Join our shoppers. Unsubscribe anytime."/></div>
+              <div class="form-group"><label class="form-lbl">Footer Description</label><input class="form-input" id="home-footer-desc" value="UGC video on every listing. Live expert calls. Instant guest checkout."/></div>
+            </div>
+            <button class="hdr-btn hdr-btn-primary" onclick="saveSettings()">Save Homepage</button>
           </div>
         </div>
       </div>
