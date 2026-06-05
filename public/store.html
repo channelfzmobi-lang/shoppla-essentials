@@ -2788,15 +2788,16 @@ async function placeOrder() {
   if (!fname) { toast('⚠️ Please enter your name'); return; }
   if (!email||!email.includes('@')) { toast('⚠️ Please enter a valid email'); return; }
   const p = productById(currentProductId);
-  const total = p ? p.price + Math.round(p.price*0.08) : 0;
+  const subtotal = p ? currentDueTotal(p) : 0;
+  const total = subtotal + Math.round(subtotal*0.08);
   const oid = Math.floor(1000+Math.random()*9000);
   const orders = getOrders();
-  orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, currency:p?getCurrency(p):'NGN', date:'Just now', status:'pending'});
+  orders.unshift({id:oid, customer:fname, email, phone:document.getElementById('ck-phone')?.value.trim()||'', address:document.getElementById('ck-addr')?.value.trim()||'', city:document.getElementById('ck-city')?.value.trim()||'', products: p?p.name:'Order', productId:p?._cloud_id||p?.id||null, qty, total, currency:p?getCurrency(p):'NGN', paymentMethod:selectedOfferLabel(p), notes:selectedOfferType==='installment'?'Installment offer selected':'', date:'Just now', status:'pending'});
   await saveOrders(orders);
   saveCart([]);
   refreshBadge();
   closeModal('checkout-modal');
-  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:p?formatMoney(total,p):formatCurrencyAmount(total),
+  showThankyou({ id:oid, name:fname, email, product:p?p.name:'', qty, total:p?formatMoney(total,p):formatCurrencyAmount(total), paymentPlan:selectedOfferLabel(p),
     heading:'Order Confirmed! 🎉', sub:"We've received your order and will be in touch shortly.",
     body:'Check your email for confirmation. Our team will contact you to confirm delivery.' });
 }
