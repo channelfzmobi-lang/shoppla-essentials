@@ -2999,6 +2999,7 @@ function showThankyou(d) {
     <div class="ty-row"><span>Order #</span><b>${d.id}</b></div>
     <div class="ty-row"><span>Product</span><b>${d.product}</b></div>
     <div class="ty-row"><span>Quantity</span><b>${d.qty||1}</b></div>
+    ${d.paymentPlan?`<div class="ty-row"><span>Offer</span><b>${d.paymentPlan}</b></div>`:''}
     ${d.color?`<div class="ty-row"><span>Colour</span><b>${d.color}</b></div>`:''}
     ${d.size?`<div class="ty-row"><span>Size</span><b>${d.size}</b></div>`:''}
     ${d.address?`<div class="ty-row"><span>Delivery to</span><b>${d.address}${d.city?', '+d.city:''}</b></div>`:''}
