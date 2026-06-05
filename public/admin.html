@@ -2509,6 +2509,16 @@ function copyVal(v){
   try { navigator.clipboard.writeText(String(v||'')); showToast('📋 Copied'); }
   catch(e){ showToast('⚠️ Copy failed'); }
 }
+function isLegacyDemoOrder(o){
+  const demoIds = ['1043','1044','1045','1046','1047'];
+  const demoEmails = ['sarah@email.com','james@email.com','amina@email.com','david@email.com','maria@email.com'];
+  return demoIds.includes(String(o.id)) && demoEmails.includes(String(o.email||'').toLowerCase());
+}
+function cleanOrders(list){ return (Array.isArray(list)?list:[]).filter(o=>!isLegacyDemoOrder(o)); }
+function orderProduct(o){ return products.find(p=>String(p.id)===String(o.productId)||String(p._cloud_id||'')===String(o.productId)||p.name===o.products); }
+function orderCurrency(o){ return (o.currency || orderProduct(o)?.gatewayConfig?.currency || 'NGN').toUpperCase(); }
+function formatOrderMoney(o, amount=o?.total){ return formatAdminMoney(amount, orderCurrency(o)); }
+function displayDate(v){ const d=new Date(v||''); return !v ? '—' : isNaN(d) ? v : d.toLocaleString(); }
 function copyAllOrder(id){
   const o = orders.find(x=>String(x.id)===String(id)); if(!o) return;
   const txt = [
@@ -2525,7 +2535,7 @@ function copyAllOrder(id){
     `Qty: ${o.qty||1}`,
     o.color?`Color: ${o.color}`:null,
     o.size?`Size: ${o.size}`:null,
-    `Total: $${typeof o.total==='number'?o.total.toLocaleString():o.total}`,
+    `Total: ${formatOrderMoney(o)}`,
     o.paymentMethod?`Payment: ${o.paymentMethod}`:null,
     o.notes?`Notes: ${o.notes}`:null,
   ].filter(Boolean).join('\n');
@@ -2583,7 +2593,7 @@ function viewOrder(id){
 
     <div style="display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;border-radius:11px;padding:14px 16px;margin-bottom:14px;">
       <span style="opacity:.7;">Order Total</span>
-      <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">$${typeof o.total==='number'?o.total.toLocaleString():o.total}</span>
+      <span style="font-family:'Fraunces',serif;font-size:22px;font-weight:900;">${formatOrderMoney(o)}</span>
     </div>
 
     <div style="margin-bottom:14px;">
