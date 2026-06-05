@@ -3439,7 +3439,7 @@ async function deleteAdminReview(id) {
 (async function(){
   await loadFromStorage();
   await loadCategoriesCloud();
-  await loadAgents();renderOrders();renderMediaLibrary();loadSettings();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
+  await loadAgents(); await loadSettings(); renderOrders();renderMediaLibrary();refreshDashStats();setTimeout(refreshAgentDropdowns,100);renderAgentSalesSplits();
   renderProductsTable();
 })();
 </script>
