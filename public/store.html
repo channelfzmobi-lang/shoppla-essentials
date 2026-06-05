@@ -1863,6 +1863,13 @@ function formatCurrencyAmount(amount, currency='NGN'){ const c=CURRENCIES[String
 function escHTML(v=''){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function productById(id){return products.find(x=>String(x.id)===String(id)||String(x._cloud_id||'')===String(id));}
 function getImgSrc(img){ return typeof img === 'string' ? img : (img && (img.url || img.base64)) || ''; }
+async function loadSettings(){
+  if(sb){
+    try{const {data}=await sb.from('store_settings').select('value').eq('key','site').maybeSingle(); if(data?.value){storeSettings=data.value;localStorage.setItem(SETTINGS_KEY,JSON.stringify(storeSettings));return;}}
+    catch(e){console.warn('Settings load error:',e);}
+  }
+  try{storeSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')||{};}catch(e){storeSettings={};}
+}
 
 // ═══ STORAGE ═══
 async function loadData() {
