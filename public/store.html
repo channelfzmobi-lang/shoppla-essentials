@@ -2057,8 +2057,42 @@ function renderGrid(gridId, data, actions=true) {
 
 // ═══ HOME GRID ═══
 function renderHome(cat) {
+  applyStoreSettings();
+  renderHomeCategories();
   const featured = cat ? products.filter(p => (p.category||'').toLowerCase().includes(cat.toLowerCase())) : products;
   renderGrid('home-grid', featured.length ? featured : products);
+}
+
+function normalizeExternalUrl(url=''){
+  url=String(url||'').trim();
+  if(!url) return '';
+  return /^https?:\/\//i.test(url) ? url : 'https://' + url.replace(/^\/+/, '');
+}
+function setText(sel, text){ const el=document.querySelector(sel); if(el && text!==undefined && text!=='') el.textContent=text; }
+function applyStoreSettings(){
+  const h=storeSettings.homepage||{}, s=storeSettings.social||{};
+  const storeName=h.storeName||'Shoppla';
+  document.querySelectorAll('.logo,.f-logo').forEach(el=>{el.innerHTML=`${escHTML(storeName)}<em>.</em>`;});
+  setText('.hero-eye', h.heroEyebrow);
+  if(h.heroHeadline){ const el=document.querySelector('.hero-h'); if(el) el.textContent=h.heroHeadline; }
+  setText('.hero-p', h.heroSubtext);
+  if(h.heroCta){ const b=document.querySelector('.hero-btns .btn-primary'); if(b)b.textContent=h.heroCta; }
+  if(h.topbar){ const tb=document.querySelector('.topbar-inner'); if(tb) tb.innerHTML=`${escHTML(h.topbar)} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${escHTML(h.topbar)}`; }
+  if(h.productsTitle){ const t=document.getElementById('prods-title'); if(t)t.textContent=h.productsTitle; }
+  setText('#products-section .sec-sub', h.productsSub);
+  setText('.nl-h', h.newsletterTitle); setText('.nl-s', h.newsletterSub); setText('.f-desc', h.footerDesc);
+  const links={Instagram:s.instagram,Threads:s.threads,X:s.x,TikTok:s.tiktok};
+  document.querySelectorAll('.f-social a').forEach(a=>{ const href=normalizeExternalUrl(links[a.title]||a.getAttribute('href')); if(href) a.href=href; });
+}
+
+function renderHomeCategories(){
+  const counts={}; const icons={'Furniture':'🛋️','Electronics':'📱','Fashion':'👗','Kitchen':'🍳','Bedding':'🛏️','Lighting':'💡','Outdoor':'🌿','Beauty':'💄','Sports':'🏋️','Toys':'🧸','Gaming':'🎮','Books':'📚'};
+  products.filter(p=>p.status!=='draft').forEach(p=>{const n=p.category||'Other'; counts[n]=(counts[n]||0)+1;});
+  const cats=Object.keys(counts).sort();
+  const bar=document.querySelector('.cat-bar');
+  if(bar) bar.innerHTML=`<div class="cat-tab active" onclick="filterCat('All',this)">All</div>`+cats.map(c=>`<div class="cat-tab" onclick="filterCat('${escHTML(c)}',this)">${escHTML(c)}</div>`).join('')+`<div class="cat-tab" onclick="gotoInner('deals-page')">Deals 🔥</div>`;
+  const grid=document.querySelector('.cat-grid');
+  if(grid) grid.innerHTML=(cats.length?cats:['All']).map(c=>`<div class="cat-card" onclick="filterCat('${escHTML(c==='All'?'':c)}')"><div class="cat-icon">${icons[c]||'📦'}</div><div class="cat-name">${escHTML(c)}</div><div class="cat-count">${counts[c]||products.length} product${(counts[c]||products.length)===1?'':'s'}</div></div>`).join('')+`<div class="cat-card" onclick="gotoInner('deals-page')"><div class="cat-icon">🔥</div><div class="cat-name">Clearance</div><div class="cat-count">Hot deals</div></div>`;
 }
 
 function filterCat(cat, tabEl) {
