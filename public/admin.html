@@ -342,29 +342,29 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
     <!-- ═══ DASHBOARD ═══ -->
     <div class="panel active" id="panel-dash">
       <div class="stats-row">
-        <div class="stat-card orange">
+          <div class="stat-card orange">
           <div class="stat-icon">💰</div>
-          <div class="stat-val">$12,480</div>
+            <div class="stat-val" id="total-revenue-stat">₦0</div>
           <div class="stat-lbl">Total Revenue</div>
-          <div class="stat-change up">↑ 18% this month</div>
+            <div class="stat-change up" id="revenue-change-stat">Live orders</div>
         </div>
         <div class="stat-card yellow">
           <div class="stat-icon">🛒</div>
-          <div class="stat-val">247</div>
+            <div class="stat-val" id="total-orders-stat">0</div>
           <div class="stat-lbl">Total Orders</div>
-          <div class="stat-change up">↑ 12% this week</div>
+            <div class="stat-change up" id="orders-change-stat">Live orders</div>
         </div>
         <div class="stat-card green">
           <div class="stat-icon">👥</div>
-          <div class="stat-val">1,842</div>
+            <div class="stat-val" id="total-customers-stat">0</div>
           <div class="stat-lbl">Customers</div>
-          <div class="stat-change up">↑ 8% this month</div>
+            <div class="stat-change up" id="customers-change-stat">From real orders</div>
         </div>
         <div class="stat-card blue">
           <div class="stat-icon">📦</div>
           <div class="stat-val" id="total-products-stat">8</div>
           <div class="stat-lbl">Active Products</div>
-          <div class="stat-change up">↑ 2 added this week</div>
+            <div class="stat-change up" id="products-change-stat">Published products</div>
         </div>
       </div>
 
@@ -377,7 +377,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=orders]'),'orders')">
           <div class="qa-icon">📬</div>
           <div class="qa-title">New Orders</div>
-          <div class="qa-sub">3 awaiting</div>
+          <div class="qa-sub" id="qa-orders-sub">0 awaiting</div>
         </div>
         <div class="qa-card" onclick="nav(document.querySelector('.sb-item[onclick*=appearance]'),'appearance')">
           <div class="qa-icon">🎨</div>
@@ -407,13 +407,7 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
         <div class="section-card">
           <div class="sc-head"><div><div class="sc-title">Recent Activity</div></div></div>
           <div class="sc-body" style="padding:14px 18px;">
-            <div class="activity-list">
-              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">🛒</div><div><div class="act-msg"><b>New order #1047</b> from Sarah M.</div><div class="act-time">2 min ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#e8f8ee;">⭐</div><div><div class="act-msg"><b>5-star review</b> on Velvet Sofa</div><div class="act-time">14 min ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#fef3ec;">📦</div><div><div class="act-msg"><b>Low stock alert:</b> Espresso Machine (2 left)</div><div class="act-time">1 hr ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#eff6ff;">👤</div><div><div class="act-msg"><b>New customer</b> registered: James T.</div><div class="act-time">2 hr ago</div></div></div>
-              <div class="activity-item"><div class="act-icon" style="background:#f5f3ff;">✅</div><div><div class="act-msg"><b>Order #1044</b> shipped to Amina K.</div><div class="act-time">3 hr ago</div></div></div>
-            </div>
+            <div class="activity-list" id="activity-list"></div>
           </div>
         </div>
       </div>
