@@ -2956,16 +2956,82 @@ async function submitOrderForm(route) {
 // ═══ PAYMENT SCREEN ═══
 const GW_ICONS = {paystack:'🟢',flutterwave:'🦋',stripe:'💳',paypal:'🅿️',square:'◼️',custom:'💳'};
 const GW_NAMES = {paystack:'Paystack',flutterwave:'Flutterwave',stripe:'Stripe',paypal:'PayPal',square:'Square',custom:'Secure Payment'};
+const PAYSTACK_PUBLIC_KEY = 'pk_live_9a20879d1f4777dbde779564a65b75456b1b8876';
+
+function payWithPaystack(p, total){
+  const email = activeOrderData?.email || document.getElementById('ck-email')?.value?.trim();
+  if(!email){ toast('⚠️ Email required for Paystack'); return; }
+  const currency = (p?.gatewayConfig?.currency || getCurrency(p) || 'NGN').toUpperCase();
+  const reference = 'SHP-' + (activeOrderData?.id || Date.now()) + '-' + Math.random().toString(36).slice(2,8);
+  const orderId = activeOrderData?._cloud_id || activeOrderData?.id;
+  toast('🔒 Opening Paystack…');
+  try {
+    const handler = window.PaystackPop && window.PaystackPop.setup ? window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email,
+      amount: Math.round(Number(total) * 100),
+      currency,
+      ref: reference,
+      metadata: { order_id: String(orderId||''), product: p?.name||'', custom_fields: [
+        {display_name:'Order ID', variable_name:'order_id', value:String(orderId||'')},
+        {display_name:'Product',  variable_name:'product',  value:String(p?.name||'')},
+      ]},
+      callback: function(resp){
+        verifyAndCompletePaystack(resp.reference, p);
+      },
+      onClose: function(){ toast('Payment window closed'); }
+    }) : null;
+    if(handler && handler.openIframe) handler.openIframe();
+    else if(window.PaystackPop && window.PaystackPop.newTransaction){
+      window.PaystackPop.newTransaction({
+        key: PAYSTACK_PUBLIC_KEY,
+        email,
+        amount: Math.round(Number(total) * 100),
+        currency,
+        reference,
+        metadata: { order_id: String(orderId||''), product: p?.name||'' },
+        onSuccess: (tx) => verifyAndCompletePaystack(tx.reference, p),
+        onCancel:  () => toast('Payment cancelled'),
+      });
+    } else { throw new Error('Paystack SDK not loaded'); }
+  } catch(e){ console.error(e); toast('⚠️ Paystack failed to load — retry'); }
+}
+
+async function verifyAndCompletePaystack(reference, p){
+  toast('⏳ Verifying payment…');
+  try {
+    const base = (window.SUPABASE_URL || (typeof supabase!=='undefined' && supabase?.supabaseUrl) || '');
+    const url = (base || '').replace(/\/$/,'') + '/functions/v1/paystack-verify';
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'apikey': (window.SUPABASE_KEY||'')},
+      body: JSON.stringify({ reference, order_id: activeOrderData?._cloud_id || activeOrderData?.id })
+    });
+    const j = await res.json();
+    if(!j.success){ toast('⚠️ Payment not verified: ' + (j.message||'')); return; }
+    closeModal('payment-modal');
+    const tc = p?.tyConfig||{};
+    showThankyou({
+      id: activeOrderData?.id, name: activeOrderData?.name, product: activeOrderData?.product||'',
+      qty: activeOrderData?.qty||1, total: activeOrderData?.total||'', phone: activeOrderData?.phone||'',
+      address: activeOrderData?.address||'', paymentPlan: activeOrderData?.paymentPlan||'',
+      heading: tc.heading||'Payment Successful! 🎉',
+      sub:     tc.sub    ||'Your payment was confirmed and your order ships immediately.',
+      body:    tc.body   ||"You'll receive a confirmation email with tracking details shortly."
+    });
+  } catch(e){ console.error(e); toast('⚠️ Verification error'); }
+}
 
 function openPaymentScreen(p, total) {
   const gc = p.gatewayConfig || {};
-  const gw = gc.gateway || 'custom';
+  const gw = gc.gateway || 'paystack';
   if (gw==='custom' && gc.customUrl) {
     const url = gc.customUrl.replace('{PRICE}',total).replace('{ORDER_ID}',activeOrderData.id||'').replace('{EMAIL}',encodeURIComponent(activeOrderData.email||''));
     window.open(url,'_blank');
     toast('🔗 Opening payment page…');
     return;
   }
+  if (gw==='paystack' || !gw) { payWithPaystack(p, total); return; }
   document.getElementById('pay-logo').textContent    = GW_ICONS[gw]||'💳';
   document.getElementById('pay-name').textContent    = GW_NAMES[gw]||'Secure Payment';
   document.getElementById('pay-sub').textContent     = `Pay securely via ${GW_NAMES[gw]||'our payment gateway'}`;
