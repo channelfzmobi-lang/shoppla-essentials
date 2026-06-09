@@ -2296,11 +2296,15 @@ function applyTemplate(p) {
   
   // Clean up any previously injected template sections
   document.querySelectorAll('.tpl-injected').forEach(el => el.remove());
-  
+
+  const TC = p.templateContent || {};
+  const iconSections = Array.isArray(p.templateIconSections) && p.templateIconSections.length ? p.templateIconSections : null;
+  const faqSections = Array.isArray(p.templateFaqSections) && p.templateFaqSections.length ? p.templateFaqSections : null;
+
   // Build benefit badges for dark template
   const badges = document.getElementById('sp-benefit-badges');
   if (badges) {
-    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges :
       (tpl === 'dark') ? [{icon:'💪',text:'Premium Quality'},{icon:'🧠',text:'Expert Tested'},{icon:'✅',text:'Third-Party Verified'}] : [];
     if (bb.length && tpl === 'dark') {
       badges.innerHTML = bb.map(b => `<div class="bb-item"><div class="bb-ico">${b.icon}</div><div class="bb-txt">${b.text}</div></div>`).join('');
@@ -2309,18 +2313,15 @@ function applyTemplate(p) {
       badges.style.display = 'none';
     }
   }
-  
+
   // Adjust page background per template
   if (tpl === 'dark') salesPage.style.background = '#0f1a2e';
   else salesPage.style.background = '#f5f4f0';
-  
+
   const spInfo = document.getElementById('sp-info');
   const spCtas = document.getElementById('sp-ctas');
   const trustRow = spInfo?.querySelector('.trust-row');
-  
-  const TC = p.templateContent || {};
-  const iconSections = Array.isArray(p.templateIconSections) && p.templateIconSections.length ? p.templateIconSections : null;
-  const faqSections = Array.isArray(p.templateFaqSections) && p.templateFaqSections.length ? p.templateFaqSections : null;
+
 
   // Universal hero sub-headline (per template) — inserted right under sp-title
   const subMap = {aero:TC.aeroSub, luvea:TC.luveaSub, radiance:TC.radSub, dark:TC.darkSub, classic:TC.classicSub};
