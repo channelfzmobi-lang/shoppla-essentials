@@ -2961,42 +2961,39 @@ const GW_NAMES = {paystack:'Paystack',flutterwave:'Flutterwave',stripe:'Stripe',
 const PAYSTACK_PUBLIC_KEY = 'pk_live_9a20879d1f4777dbde779564a65b75456b1b8876';
 
 function payWithPaystack(p, total){
-  const email = activeOrderData?.email || document.getElementById('ck-email')?.value?.trim();
+  const email = (activeOrderData?.email || document.getElementById('ck-email')?.value?.trim() || '').trim();
   if(!email){ toast('⚠️ Email required for Paystack'); return; }
-  const currency = (p?.gatewayConfig?.currency || getCurrency(p) || 'NGN').toUpperCase();
+  const amountNum = Math.round(Number(total||0) * 100);
+  if(!amountNum || amountNum < 100){ toast('⚠️ Invalid payment amount'); console.error('[Paystack] invalid amount:', total); return; }
+  // Live key (sk_live_*/pk_live_*) is NGN-only for Nigerian merchants. Force NGN to avoid "currency_not_supported".
+  let currency = (p?.gatewayConfig?.currency || getCurrency(p) || 'NGN').toUpperCase();
+  if (PAYSTACK_PUBLIC_KEY.startsWith('pk_live_') && currency !== 'NGN' && currency !== 'GHS' && currency !== 'ZAR' && currency !== 'KES' && currency !== 'USD') currency = 'NGN';
   const reference = 'SHP-' + (activeOrderData?.id || Date.now()) + '-' + Math.random().toString(36).slice(2,8);
   const orderId = activeOrderData?._cloud_id || activeOrderData?.id;
+  console.log('[Paystack] launching', { email, amountNum, currency, reference, hasSDK: !!window.PaystackPop });
+  if(!window.PaystackPop){ toast('⚠️ Paystack SDK blocked — check ad-blocker or network'); return; }
   toast('🔒 Opening Paystack…');
   try {
-    const handler = window.PaystackPop && window.PaystackPop.setup ? window.PaystackPop.setup({
+    const cfg = {
       key: PAYSTACK_PUBLIC_KEY,
       email,
-      amount: Math.round(Number(total) * 100),
+      amount: amountNum,
       currency,
       ref: reference,
+      reference,
       metadata: { order_id: String(orderId||''), product: p?.name||'', custom_fields: [
         {display_name:'Order ID', variable_name:'order_id', value:String(orderId||'')},
         {display_name:'Product',  variable_name:'product',  value:String(p?.name||'')},
       ]},
-      callback: function(resp){
-        verifyAndCompletePaystack(resp.reference, p);
-      },
-      onClose: function(){ toast('Payment window closed'); }
-    }) : null;
-    if(handler && handler.openIframe) handler.openIframe();
-    else if(window.PaystackPop && window.PaystackPop.newTransaction){
-      window.PaystackPop.newTransaction({
-        key: PAYSTACK_PUBLIC_KEY,
-        email,
-        amount: Math.round(Number(total) * 100),
-        currency,
-        reference,
-        metadata: { order_id: String(orderId||''), product: p?.name||'' },
-        onSuccess: (tx) => verifyAndCompletePaystack(tx.reference, p),
-        onCancel:  () => toast('Payment cancelled'),
-      });
-    } else { throw new Error('Paystack SDK not loaded'); }
-  } catch(e){ console.error(e); toast('⚠️ Paystack failed to load — retry'); }
+      callback: function(resp){ verifyAndCompletePaystack(resp.reference || reference, p); },
+      onSuccess: function(tx){ verifyAndCompletePaystack(tx.reference || reference, p); },
+      onClose:   function(){ toast('Payment window closed'); },
+      onCancel:  function(){ toast('Payment cancelled'); },
+    };
+    if (window.PaystackPop.newTransaction) { window.PaystackPop.newTransaction(cfg); return; }
+    if (window.PaystackPop.setup) { const h = window.PaystackPop.setup(cfg); if (h && h.openIframe) h.openIframe(); return; }
+    throw new Error('Paystack API unavailable');
+  } catch(e){ console.error('[Paystack] error', e); toast('⚠️ Paystack failed: ' + (e?.message||'unknown')); }
 }
 
 async function verifyAndCompletePaystack(reference, p){
