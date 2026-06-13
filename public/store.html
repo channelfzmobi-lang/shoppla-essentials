@@ -292,10 +292,12 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px 28px;}
 .sp-offer-price{margin-left:auto;text-align:right;font-family:'Fraunces',serif;font-size:18px;font-weight:900;white-space:nowrap;}
 .sp-offer-option.installment{animation:installOfferGlow 2.2s ease-in-out infinite;}
 .ip-deliver-banner{display:block;margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,#0a7d2c,#16a34a);color:#fff;border-radius:10px;font-size:13.5px;font-weight:800;text-align:center;letter-spacing:.1px;box-shadow:0 0 0 0 rgba(22,163,74,.6);animation:deliverPulse 1.8s ease-in-out infinite;}
-.ip-deliver-pill{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:7px 13px;background:linear-gradient(90deg,#0a7d2c,#16a34a);color:#fff;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.2px;line-height:1.25;max-width:100%;box-shadow:0 0 0 0 rgba(10,125,44,.7);animation:deliverPulse 1.8s ease-in-out infinite;}
-.ip-deliver-pill .ip-truck{font-size:14px;line-height:1;flex-shrink:0;}
-.ip-deliver-pill span:last-child{white-space:normal;}
-@keyframes deliverPulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.6);}50%{box-shadow:0 0 0 8px rgba(22,163,74,0);}}
+.ip-deliver-pill{display:flex;align-items:center;gap:9px;margin-top:10px;padding:10px 14px;background:linear-gradient(95deg,#047a2b 0%,#16a34a 55%,#22c55e 100%);color:#fff;border-radius:12px;font-size:12.5px;font-weight:900;letter-spacing:.2px;line-height:1.35;width:100%;box-sizing:border-box;box-shadow:0 4px 14px -4px rgba(10,125,44,.55), 0 0 0 0 rgba(34,197,94,.7);animation:deliverPulse 1.6s ease-in-out infinite;border:1.5px solid rgba(255,255,255,.35);text-transform:uppercase;}
+.ip-deliver-pill .ip-truck{font-size:20px;line-height:1;flex-shrink:0;animation:truckMove 1.6s ease-in-out infinite;}
+.ip-deliver-pill span:last-child{white-space:normal;flex:1;min-width:0;}
+@media(max-width:480px){.ip-deliver-pill{font-size:11.5px;padding:9px 12px;gap:8px;}.ip-deliver-pill .ip-truck{font-size:18px;}}
+@keyframes deliverPulse{0%,100%{box-shadow:0 4px 14px -4px rgba(10,125,44,.55), 0 0 0 0 rgba(34,197,94,.7);}50%{box-shadow:0 4px 14px -4px rgba(10,125,44,.55), 0 0 0 10px rgba(34,197,94,0);}}
+@keyframes truckMove{0%,100%{transform:translateX(0);}50%{transform:translateX(3px);}}
 @keyframes installOfferGlow{0%,100%{box-shadow:0 0 0 0 var(--ip-glow-1),0 0 20px 1px var(--ip-glow-3);}50%{box-shadow:0 0 0 6px var(--ip-glow-2),0 0 32px 7px var(--ip-glow-4);}}
 @keyframes installGlow{
   0%,100%{box-shadow:0 0 0 0 rgba(245,180,0,.55), 0 0 22px 2px rgba(245,180,0,.22); border-color:#f5b400;}
@@ -2240,7 +2242,7 @@ function renderInstallmentOffer(p){
   if(b.mode==='notice') return;
   const options=`<div class="sp-offer-options" id="sp-offer-options">
     ${b.mode!=='only'?`<div class="sp-offer-option" data-offer="full" onclick="selectOffer('full')"><div class="sp-offer-radio"></div><div><div class="sp-offer-name">Pay in full</div><div class="sp-offer-sub">Complete payment now</div></div><div class="sp-offer-price">${formatMoney(b.total,p)}</div></div>`:''}
-    <div class="sp-offer-option installment" data-offer="installment" onclick="selectOffer('installment')" style="background:${bg};border-color:${bd};--ip-glow-1:${hexToRgba(gl,.55)};--ip-glow-2:${hexToRgba(gl,0)};--ip-glow-3:${hexToRgba(gl,.22)};--ip-glow-4:${hexToRgba(gl,.55)};"><div class="sp-offer-radio"></div><div style="flex:1;min-width:0;"><div class="sp-offer-name">${escHTML(b.label)}</div><div class="sp-offer-sub">Pay ${formatMoney(b.first,p)} today, then ${b.count-1} × ${formatMoney(b.rest,p)}</div><div class="ip-deliver-pill"><span class="ip-truck">🚚</span><span>Order ships immediately — pay rest later</span></div></div><div class="sp-offer-price">${formatMoney(b.first,p)}</div></div>
+    <div class="sp-offer-option installment" data-offer="installment" onclick="selectOffer('installment')" style="background:${bg};border-color:${bd};--ip-glow-1:${hexToRgba(gl,.55)};--ip-glow-2:${hexToRgba(gl,0)};--ip-glow-3:${hexToRgba(gl,.22)};--ip-glow-4:${hexToRgba(gl,.55)};"><div class="sp-offer-radio"></div><div style="flex:1;min-width:0;"><div class="sp-offer-name">${escHTML(b.label)}</div><div class="sp-offer-sub">Pay ${formatMoney(b.first,p)} today, then ${b.count-1} × ${formatMoney(b.rest,p)}</div><div class="ip-deliver-pill"><span class="ip-truck">🚚</span><span>Ships TODAY — Pay rest later, no waiting!</span></div></div><div class="sp-offer-price">${formatMoney(b.first,p)}</div></div>
   </div>`;
   instEl.insertAdjacentHTML('afterend',options);
 }
