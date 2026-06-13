@@ -2399,6 +2399,48 @@ function addBundle(){
   renderBundles();
 }
 
+// ─── BENEFIT BADGE & ICON SUBSECTION BUILDERS ───
+let bbRows=[], tiRows=[];
+function bbSync(){const el=document.getElementById('fp-benefit-badges');if(!el)return;el.value=bbRows.filter(r=>r.icon||r.text).map(r=>(r.icon||'✅')+'|'+(r.text||'')).join('\n');}
+function tiSync(){const el=document.getElementById('fp-template-icon-sections');if(!el)return;el.value=tiRows.filter(r=>r.icon||r.title||r.sub).map(r=>[(r.icon||'✅'),(r.title||''),(r.sub||'')].join('|')).join('\n');}
+function bbRender(){
+  const c=document.getElementById('bb-builder'); if(!c) return;
+  c.innerHTML = bbRows.length? bbRows.map((r,i)=>`
+    <div style="display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:10px;">
+      <input class="form-input" style="padding:8px;text-align:center;font-size:18px;" placeholder="✅" value="${(r.icon||'').replace(/"/g,'&quot;')}" oninput="bbRows[${i}].icon=this.value;bbSync()"/>
+      <input class="form-input" style="padding:8px;" placeholder="Benefit text (e.g. Premium Quality)" value="${(r.text||'').replace(/"/g,'&quot;')}" oninput="bbRows[${i}].text=this.value;bbSync()"/>
+      <button type="button" class="tbl-btn danger" onclick="bbRows.splice(${i},1);bbRender();bbSync()">✕</button>
+    </div>`).join('') : '<div class="form-hint" style="padding:10px 0;">No benefit badges yet. Click "Add Benefit Badge" below.</div>';
+}
+function bbAdd(){bbRows.push({icon:'✅',text:''});bbRender();bbSync();}
+window.bbAdd=bbAdd;
+window.bbRebuild=function(){
+  const el=document.getElementById('fp-benefit-badges');
+  const raw=(el?.value||'').trim();
+  bbRows = raw? raw.split('\n').filter(Boolean).map(l=>{const [i,...t]=l.split('|');return{icon:(i||'✅').trim(),text:t.join('|').trim()};}) : [];
+  bbRender();
+};
+function tiRender(){
+  const c=document.getElementById('ti-builder'); if(!c) return;
+  c.innerHTML = tiRows.length? tiRows.map((r,i)=>`
+    <div style="display:grid;grid-template-columns:70px 1fr 1.4fr auto;gap:8px;align-items:center;background:#f9f8f6;border:1px solid var(--border);border-radius:10px;padding:10px;">
+      <input class="form-input" style="padding:8px;text-align:center;font-size:18px;" placeholder="🌊" value="${(r.icon||'').replace(/"/g,'&quot;')}" oninput="tiRows[${i}].icon=this.value;tiSync()"/>
+      <input class="form-input" style="padding:8px;font-weight:700;" placeholder="Title (e.g. Reduced Wrinkles)" value="${(r.title||'').replace(/"/g,'&quot;')}" oninput="tiRows[${i}].title=this.value;tiSync()"/>
+      <input class="form-input" style="padding:8px;" placeholder="Subtext (e.g. Visible smoothing support)" value="${(r.sub||'').replace(/"/g,'&quot;')}" oninput="tiRows[${i}].sub=this.value;tiSync()"/>
+      <button type="button" class="tbl-btn danger" onclick="tiRows.splice(${i},1);tiRender();tiSync()">✕</button>
+    </div>`).join('') : '<div class="form-hint" style="padding:10px 0;">No icon subsections yet. Click "Add Icon Subsection" below.</div>';
+}
+function tiAdd(){tiRows.push({icon:'✨',title:'',sub:''});tiRender();tiSync();}
+window.tiAdd=tiAdd;
+window.tiRebuild=function(){
+  const el=document.getElementById('fp-template-icon-sections');
+  const raw=(el?.value||'').trim();
+  tiRows = raw? raw.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{icon:(p[0]||'✅').trim(),title:(p[1]||'').trim(),sub:(p.slice(2).join('|')||'').trim()};}) : [];
+  tiRender();
+};
+window.bbSync=bbSync; window.tiSync=tiSync;
+document.addEventListener('DOMContentLoaded',()=>{window.bbRebuild();window.tiRebuild();});
+
 function openAgentModal(agentId){
   const a=agentId?agents.find(x=>x.id===agentId):null;
   document.getElementById('agent-modal')?.remove();
