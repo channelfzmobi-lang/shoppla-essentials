@@ -1561,6 +1561,8 @@ function editProduct(id){
   const tfEl = document.getElementById('fp-template-faq-sections');
   if(tfEl && p.templateFaqSections && p.templateFaqSections.length){ tfEl.value = p.templateFaqSections.map(x => `${x.q||''}|${x.a||''}`).join('\n'); }
   else if(tfEl) tfEl.value = '';
+  if(window.bbRebuild) window.bbRebuild();
+  if(window.tiRebuild) window.tiRebuild();
 
   // Bundles
   currentBundles = p.bundles ? [...p.bundles] : [];
