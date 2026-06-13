@@ -38,7 +38,7 @@ export default function Store() {
         overflow: 'hidden',
         background: '#faf8f4',
       }}
-      allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; payment *"
     />
   )
 }
