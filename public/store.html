@@ -2422,10 +2422,10 @@ function applyTemplate(p) {
     if (installEl) installEl.insertAdjacentHTML('afterend', freeGiftHTML);
     
     // Benefit grid (2x2)
-    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
+    const bb = iconSections ? iconSections.map(x=>({icon:x.icon,text:x.title||x.text||'',sub:x.sub||''})) : p.benefitBadges && p.benefitBadges.length ? p.benefitBadges : 
       [{icon:'✨',text:'Short Benefit 1'},{icon:'⏱',text:'Short Benefit 2'},{icon:'💎',text:'Short Benefit 3'},{icon:'🎯',text:'Short Benefit 4'}];
     const benefitHTML = `<div class="tpl-injected" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-      ${bb.slice(0,4).map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;"><span style="font-size:16px;">${b.icon}</span>${b.text}</div>`).join('')}
+      ${bb.slice(0,4).map(b => `<div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;font-weight:500;"><span style="font-size:16px;line-height:1.2;">${b.icon}</span><div style="display:flex;flex-direction:column;gap:2px;min-width:0;"><span style="font-weight:700;">${escHTML(b.text)}</span>${b.sub?`<span style="font-size:11px;color:var(--muted);font-weight:500;line-height:1.4;">${escHTML(b.sub)}</span>`:''}</div></div>`).join('')}
       <div style="grid-column:span 2;font-size:11px;color:var(--muted);font-style:italic;">*based on a third-party consumer study</div>
     </div>`;
     
