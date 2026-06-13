@@ -608,13 +608,17 @@ body{overflow-x:hidden;font-family:'Satoshi',sans-serif;background:#f5f4f0;color
             </div>
             <div class="form-group">
               <label class="form-lbl">🏷️ Benefit Badges (Optional)</label>
-              <div class="form-hint" style="margin-bottom:8px;">Used by every template — checklist (Aero), 4-icon grid (LUVEA/Radiance), floating image badges (Dark). One per line: emoji|text</div>
-              <textarea class="form-textarea" id="fp-benefit-badges" placeholder="💪|Premium Quality&#10;🧠|Expert Tested&#10;✅|Third-Party Verified&#10;🔬|13.6x Absorption" style="min-height:80px;"></textarea>
+              <div class="form-hint" style="margin-bottom:8px;">Used by every template — checklist (Aero), badge row (LUVEA/Radiance/Dark/Classic). Add one per row.</div>
+              <div id="bb-builder" style="display:flex;flex-direction:column;gap:8px;"></div>
+              <button type="button" class="add-sec-btn" onclick="bbAdd()" style="margin-top:8px;">➕ Add Benefit Badge</button>
+              <textarea id="fp-benefit-badges" style="display:none;"></textarea>
             </div>
             <div class="form-group">
-              <label class="form-lbl">🔹 Template Icon Subsections</label>
-              <div class="form-hint" style="margin-bottom:8px;">For icon grids like the screenshot. One per line: emoji|title|subtext. Used by LUVEA, Radiance, Dark and Classic.</div>
-              <textarea class="form-textarea" id="fp-template-icon-sections" placeholder="🌊|Reduced Wrinkles|Visible smoothing support&#10;☀️|Radiant Skin|Brighter-looking finish&#10;⊞|Less Dark Spots|More even tone&#10;🔬|Reduced Acne|Clearer-looking skin" style="min-height:90px;"></textarea>
+              <label class="form-lbl">🔹 Template Icon Subsections <span style="font-weight:500;color:var(--muted);font-size:11px;">(emoji + title + subtext)</span></label>
+              <div class="form-hint" style="margin-bottom:8px;">The 4-icon grid used by LUVEA, Radiance, Aero, Classic & Dark Premium. Each row = one tile.</div>
+              <div id="ti-builder" style="display:flex;flex-direction:column;gap:8px;"></div>
+              <button type="button" class="add-sec-btn" onclick="tiAdd()" style="margin-top:8px;">➕ Add Icon Subsection</button>
+              <textarea id="fp-template-icon-sections" style="display:none;"></textarea>
             </div>
             <div class="form-group">
               <label class="form-lbl">❓ Template FAQ / Accordion Subsections</label>
