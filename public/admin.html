@@ -1738,6 +1738,9 @@ function clearProductForm(){
   // Reset bundles & badges
   currentBundles = []; renderBundles();
   const bbEl = document.getElementById('fp-benefit-badges'); if(bbEl) bbEl.value = ''; const ef=document.getElementById('fp-external-form-enabled'); if(ef) ef.checked=false;
+  const tiClr = document.getElementById('fp-template-icon-sections'); if(tiClr) tiClr.value='';
+  if(window.bbRebuild) window.bbRebuild();
+  if(window.tiRebuild) window.tiRebuild();
   const scEl=document.getElementById('fp-show-colors'); if(scEl) scEl.checked=true;
   const ssEl=document.getElementById('fp-show-sizes');  if(ssEl) ssEl.checked=true;
   const efc=document.getElementById('fp-external-form-code'); if(efc) efc.value='';
